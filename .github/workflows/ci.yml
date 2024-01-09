@@ -1,0 +1,40 @@
+name: CI Script
+
+on:
+  pull_request:
+    branches: [ "master" ]
+permissions: write-all
+
+jobs:
+  ClangFormat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Installing clang-format
+        run: sudo apt-get install clang-format
+      - name: Running clang-format
+        run: clang-format -i $(find -type f -a \( -name "*.c" -o -name "*.h" \))
+      - name: Checking for non-conforming files
+        run: git diff --exit-code
+
+  Build:
+    needs: [ClangFormat]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Installing Criterion
+      run: sudo apt-get install libcriterion-dev
+    - name: Running basic make
+      run: make
+
+  TestSuites:
+    needs: [Build]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Installing Criterion
+      run: sudo apt-get install libcriterion-dev
+    - name: Running unit tests
+      run: make unit
+    - name: Running functionnal tests
+      run: make check
