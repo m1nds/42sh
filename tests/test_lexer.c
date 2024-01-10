@@ -2,7 +2,7 @@
 
 #include <../src/lexer/lexer.h>
 
-Test(ast, empty_string)
+Test(lexer, empty_string)
 {
     struct lexer *lexer = create_lexer("");
     enum token token = lexer_peek(lexer);
