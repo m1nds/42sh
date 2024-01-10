@@ -46,19 +46,7 @@ enum token match_word(char *word)
     }
     if (strcmp(word, "fi") == 0)
     {
-        return TOKEN_IF;
-    }
-    if (strcmp(word, "\n") == 0)
-    {
-        return TOKEN_RETURN;
-    }
-    if (strcmp(word, ";") == 0)
-    {
-        return TOKEN_SEMICOLON;
-    }
-    if (strcmp(word, "'") == 0)
-    {
-        return TOKEN_SINGLE_QUOTE;
+        return TOKEN_FI;
     }
     return TOKEN_WORD;
 }
@@ -71,7 +59,10 @@ bool is_continuous_word(char *input, size_t pos)
 {
     return input[pos] != ' '
         && input[pos] != ';'
-        && input[pos] != '\'';
+        && input[pos] != '\''
+        && input[pos] != '\n'
+        && input[pos] != '\0'
+        && input[pos] != EOF;
 }
 
 enum token get_next_token(struct lexer *lexer)
@@ -87,6 +78,18 @@ enum token get_next_token(struct lexer *lexer)
     if (lexer->input[lexer->pos] == EOF || lexer->input[lexer->pos] == '\0')
     {
         return TOKEN_EOF;
+    }
+    if (lexer->input[lexer->pos] == ';')
+    {
+        return TOKEN_SEMICOLON;
+    }
+    if (lexer->input[lexer->pos] == '\n')
+    {
+        return TOKEN_RETURN;
+    }
+    if (lexer->input[lexer->pos] == '\'')
+    {
+        return TOKEN_SINGLE_QUOTE;
     }
     size_t new_pos = lexer->pos;
     // Very basic version, won't work later
@@ -116,6 +119,11 @@ enum token lexer_pop(struct lexer *lexer)
     enum token token = get_next_token(lexer);
     //Update position of lexer
     while (is_continuous_word(lexer->input, lexer->pos))
+    {
+        lexer->pos++;
+    }
+    if (token == TOKEN_SEMICOLON || token == TOKEN_RETURN 
+        || token == TOKEN_SINGLE_QUOTE)
     {
         lexer->pos++;
     }
