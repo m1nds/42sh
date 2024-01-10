@@ -24,6 +24,6 @@ char *token_string(enum token token)
         return "\\n";
     default:
         // Should only happen if it's a TOKEN_WORD
-        return "idk";
+        return "use get_token_string instead";
     }
 }

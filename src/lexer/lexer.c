@@ -26,7 +26,7 @@ void free_lexer(struct lexer *lexer)
     }
 }
 
-enum token match_word(char *word)
+static enum token match_word(char *word)
 {
     if (strcmp(word, "if") == 0)
     {
@@ -55,7 +55,7 @@ enum token match_word(char *word)
  * Returns true if the current character belongs in the word
  * False if not
  */
-bool is_continuous_word(char *input, size_t pos)
+static bool is_continuous_word(char *input, size_t pos)
 {
     return input[pos] != ' '
         && input[pos] != ';'
@@ -65,7 +65,17 @@ bool is_continuous_word(char *input, size_t pos)
         && input[pos] != EOF;
 }
 
-enum token get_next_token(struct lexer *lexer)
+static void ignore_line(struct lexer *lexer)
+{
+    while (lexer->input[lexer->pos] != '\n'
+           || lexer->input[lexer->pos] != EOF
+           || lexer->input[lexer->pos] != '\0')
+    {
+        lexer->pos++;
+    }
+}
+
+static enum token get_next_token(struct lexer *lexer)
 {
     char *word = calloc(100, sizeof(char));
     size_t word_pos = 0;
@@ -90,6 +100,15 @@ enum token get_next_token(struct lexer *lexer)
     if (lexer->input[lexer->pos] == '\'')
     {
         return TOKEN_SINGLE_QUOTE;
+    }
+    if (lexer->input[lexer->pos] == '#')
+    {
+        ignore_line(lexer);
+    }
+    // Special case if there is a \n after \, need to check later
+    if (lexer->input[lexer->pos] == '\\')
+    {
+        return TOKEN_WORD;
     }
     size_t new_pos = lexer->pos;
     // Very basic version, won't work later
@@ -138,5 +157,22 @@ char *get_token_string(struct lexer *lexer)
         return token_string(token);
     }
     // Read the input again and store it in a buffer
-    return "TODO";
+    char *buffer = malloc(100 * sizeof(char));
+    size_t pos = lexer->pos;
+    size_t buffer_pos = 0;
+    if (lexer->input[pos] == '\\')
+    {
+        pos++;
+    }
+    while (is_continuous_word(lexer->input, pos))
+    {
+        buffer[buffer_pos++] = lexer->input[pos++];
+        // If the buffer is too small, we increase it by 100
+        if (buffer_pos % 100 == 0)
+        {
+            buffer = realloc(buffer, (buffer_pos + 100) * sizeof(char));
+        }
+    }
+    buffer[buffer_pos] = '\0';
+    return buffer;
 }
