@@ -1,6 +1,6 @@
 check_PROGRAMS = test
 
-test_SOURCES = test_ast.c
+test_SOURCES = test_ast.c test_lexer.c
 
 test_LDADD = \
 		-lcriterion \
