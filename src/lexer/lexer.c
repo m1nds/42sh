@@ -1,6 +1,7 @@
 #include "lexer.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -53,7 +54,7 @@ enum token match_word(char *word)
     }
     if (strcmp(word, ";") == 0)
     {
-        return TOKEN_SEMI_COLON;
+        return TOKEN_SEMICOLON;
     }
     if (strcmp(word, "'") == 0)
     {
@@ -68,9 +69,9 @@ enum token match_word(char *word)
  */
 bool is_continuous_word(char *input, size_t pos)
 {
-    return input[new_pos] != ' '
-        && input[new_pos] != ';'
-        && input[new_pos] != ''';
+    return input[pos] != ' '
+        && input[pos] != ';'
+        && input[pos] != '\'';
 }
 
 enum token get_next_token(struct lexer *lexer)

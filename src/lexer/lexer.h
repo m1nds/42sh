@@ -1,11 +1,15 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stddef.h>
+
+#include "token.h"
+
 struct lexer
 {
     char *input;
     size_t pos;
-}
+};
 
 /*
  * @def: creates the lexer and returns it

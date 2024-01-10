@@ -2,7 +2,8 @@
 
 char *token_string(enum token token)
 {
-    switch (token):
+    switch (token)
+    {
     case TOKEN_IF:
         return "if";
     case TOKEN_THEN:
@@ -13,15 +14,16 @@ char *token_string(enum token token)
         return "else";
     case TOKEN_FI:
         return "fi";
-    case TOKEN_SEMI_COLON:
+    case TOKEN_SEMICOLON:
         return ";";
     case TOKEN_SINGLE_QUOTE:
         return "'";
     case TOKEN_EOF:
         return "$";
     case TOKEN_RETURN:
-        return "\\n"
+        return "\\n";
     default:
         // Should only happen if it's a TOKEN_WORD
         return "idk";
+    }
 }

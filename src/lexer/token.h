@@ -14,7 +14,7 @@ enum token
     TOKEN_SINGLE_QUOTE,
     TOKEN_RETURN
     //......
-}
+};
 
 /*
  * @def: Returns a string based on the token
