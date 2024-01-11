@@ -58,7 +58,7 @@ static enum token match_word(char *word)
 static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
-           && character != '\0' && character != EOF;
+        && character != '\0' && character != EOF;
 }
 
 static void ignore_line(struct lexer *lexer)
