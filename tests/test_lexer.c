@@ -18,7 +18,8 @@ Test(lexer, empty_string)
 
 Test(lexer, simple_if)
 {
-    struct lexer *lexer = create_lexer(fmemopen("if true ; then true ; else false ; fi", 1000, "r+"));
+    struct lexer *lexer = create_lexer(
+        fmemopen("if true ; then true ; else false ; fi", 1000, "r+"));
 
     enum token correct[] = { TOKEN_IF,   TOKEN_WORD, TOKEN_SEMICOLON,
                              TOKEN_THEN, TOKEN_WORD, TOKEN_SEMICOLON,
@@ -38,8 +39,10 @@ Test(lexer, simple_if)
 
 Test(lexer, double_if)
 {
-    struct lexer *lexer = create_lexer(fmemopen("if if true; then true;"
-                                       "else false; fi; then echo ACU; fi", 1000, "r+"));
+    struct lexer *lexer =
+        create_lexer(fmemopen("if if true; then true;"
+                              "else false; fi; then echo ACU; fi",
+                              1000, "r+"));
 
     enum token correct[] = { TOKEN_IF,        TOKEN_IF,   TOKEN_WORD,
                              TOKEN_SEMICOLON, TOKEN_THEN, TOKEN_WORD,
