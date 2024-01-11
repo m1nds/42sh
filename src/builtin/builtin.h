@@ -11,6 +11,6 @@ static inline int false_builtin(void)
     return 1;
 }
 
-int echo_builtin(const char *str);
+int echo_builtin(const char **list_str);
 
 #endif /* !BUILTIN_H */
