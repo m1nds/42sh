@@ -11,8 +11,8 @@ enum token
     TOKEN_WORD,
     TOKEN_THEN,
     TOKEN_ELIF,
-    TOKEN_SINGLE_QUOTE,
-    TOKEN_RETURN
+    TOKEN_RETURN,
+    TOKEN_STDIN,
     //......
 };
 
