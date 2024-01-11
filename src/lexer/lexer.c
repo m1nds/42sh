@@ -216,6 +216,7 @@ char *handle_single_quote(struct lexer *lexer, char *buffer)
         }
     }
     buffer[buffer_pos] = '\0';
+    fseek(lexer->input, lexer->pos, SEEK_SET);
     return buffer;
 }
 
