@@ -97,8 +97,6 @@ static enum token check_single_quote(struct lexer *lexer)
 
 static enum token get_next_token(struct lexer *lexer)
 {
-    char *word = calloc(100, sizeof(char));
-    size_t word_pos = 0;
     char c = fgetc(lexer->input);
     // Remove all spaces before the word
     while (c == ' ')
@@ -137,6 +135,8 @@ static enum token get_next_token(struct lexer *lexer)
         ungetc(c, lexer->input);
         return TOKEN_WORD;
     }
+    char *word = calloc(100, sizeof(char));
+    size_t word_pos = 0;
     // Very basic version, won't work later
     while (is_continuous_word(c))
     {
