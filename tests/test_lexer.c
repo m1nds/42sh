@@ -1,11 +1,12 @@
 #include <criterion/criterion.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "lexer/lexer.h"
 
 Test(lexer, empty_string)
 {
-    struct lexer *lexer = create_lexer("");
+    struct lexer *lexer = create_lexer(fmemopen("", 1, "r+"));
     enum token token = lexer_peek(lexer);
 
     cr_expect_eq(token, TOKEN_EOF,
@@ -17,7 +18,7 @@ Test(lexer, empty_string)
 
 Test(lexer, simple_if)
 {
-    struct lexer *lexer = create_lexer("if true ; then true ; else false ; fi");
+    struct lexer *lexer = create_lexer(fmemopen("if true ; then true ; else false ; fi", 1000, "r+"));
 
     enum token correct[] = { TOKEN_IF,   TOKEN_WORD, TOKEN_SEMICOLON,
                              TOKEN_THEN, TOKEN_WORD, TOKEN_SEMICOLON,
@@ -37,8 +38,8 @@ Test(lexer, simple_if)
 
 Test(lexer, double_if)
 {
-    struct lexer *lexer = create_lexer("if if true; then true;"
-                                       "else false; fi; then echo ACU; fi");
+    struct lexer *lexer = create_lexer(fmemopen("if if true; then true;"
+                                       "else false; fi; then echo ACU; fi", 1000, "r+"));
 
     enum token correct[] = { TOKEN_IF,        TOKEN_IF,   TOKEN_WORD,
                              TOKEN_SEMICOLON, TOKEN_THEN, TOKEN_WORD,
@@ -60,8 +61,8 @@ Test(lexer, double_if)
 
 Test(lexer, single_quotes)
 {
-    struct lexer *lexer = create_lexer("if 'true; then true;"
-                                       "else false; fi;' then echo ACU; fi");
+    char *string = "if 'true; then true; else false; fi;' then echo ACU; fi";
+    struct lexer *lexer = create_lexer(fmemopen(string, strlen(string), "r+"));
 
     enum token correct[] = { TOKEN_IF,   TOKEN_WORD, TOKEN_THEN,
                              TOKEN_WORD, TOKEN_WORD, TOKEN_SEMICOLON,
@@ -80,8 +81,8 @@ Test(lexer, single_quotes)
 
 Test(lexer, missing_single_quote)
 {
-    struct lexer *lexer = create_lexer("if true; then true;"
-                                       "else 'false; fi; then echo ACU; fi");
+    char *string = "if true; then true;else 'false; fi; then echo ACU; fi";
+    struct lexer *lexer = create_lexer(fmemopen(string, strlen(string), "r+"));
 
     enum token correct[] = { TOKEN_IF,   TOKEN_WORD, TOKEN_SEMICOLON,
                              TOKEN_THEN, TOKEN_WORD, TOKEN_SEMICOLON,
@@ -100,8 +101,9 @@ Test(lexer, missing_single_quote)
 
 Test(lexer, comment)
 {
-    struct lexer *lexer = create_lexer("if true; then tr#ue; #test\n"
-                                       "else false; fi; #then echo ACU; fi");
+    char *string = "if true; then tr#ue; #test\n"
+                   "else false; fi; #then echo ACU; fi";
+    struct lexer *lexer = create_lexer(fmemopen(string, strlen(string), "r+"));
 
     enum token correct[] = { TOKEN_IF,   TOKEN_WORD,      TOKEN_SEMICOLON,
                              TOKEN_THEN, TOKEN_WORD,      TOKEN_SEMICOLON,
@@ -121,8 +123,8 @@ Test(lexer, comment)
 
 Test(lexer, returns)
 {
-    struct lexer *lexer = create_lexer("if true; then tr#ue;\n"
-                                       "else \n\n\nfalse; fi;");
+    char *string = "if true; then tr#ue;\nelse \n\n\nfalse; fi;";
+    struct lexer *lexer = create_lexer(fmemopen(string, strlen(string), "r+"));
 
     enum token correct[] = { TOKEN_IF,        TOKEN_WORD,   TOKEN_SEMICOLON,
                              TOKEN_THEN,      TOKEN_WORD,   TOKEN_SEMICOLON,

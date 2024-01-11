@@ -2,12 +2,13 @@
 #define PARSER_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 #include "token.h"
 
 struct lexer
 {
-    char *input;
+    FILE *input;
     size_t pos;
 };
 
@@ -15,7 +16,7 @@ struct lexer
  * @def: creates the lexer and returns it
  * @args input: input that needs to be parsed
  */
-struct lexer *create_lexer(char *input);
+struct lexer *create_lexer(FILE *input);
 
 /*
  * @def: frees the lexer
