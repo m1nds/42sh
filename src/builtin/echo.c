@@ -1,6 +1,6 @@
-#include "builtin.h"
-
 #include <stdio.h>
+
+#include "builtin.h"
 
 int echo_builtin(const char *str)
 {

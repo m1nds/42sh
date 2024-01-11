@@ -8,7 +8,7 @@
 struct lexer *create_lexer(char *input)
 {
     struct lexer *result = calloc(1, sizeof(struct lexer));
-    //Check for NULL
+    // Check for NULL
     if (result == NULL)
     {
         return NULL;
@@ -57,18 +57,13 @@ static enum token match_word(char *word)
  */
 static bool is_continuous_word(char *input, size_t pos)
 {
-    return input[pos] != ' '
-        && input[pos] != ';'
-        && input[pos] != '\''
-        && input[pos] != '\n'
-        && input[pos] != '\0'
-        && input[pos] != EOF;
+    return input[pos] != ' ' && input[pos] != ';' && input[pos] != '\''
+        && input[pos] != '\n' && input[pos] != '\0' && input[pos] != EOF;
 }
 
 static void ignore_line(struct lexer *lexer)
 {
-    while (lexer->input[lexer->pos] != '\n'
-           || lexer->input[lexer->pos] != EOF
+    while (lexer->input[lexer->pos] != '\n' || lexer->input[lexer->pos] != EOF
            || lexer->input[lexer->pos] != '\0')
     {
         lexer->pos++;
@@ -136,12 +131,12 @@ enum token lexer_peek(struct lexer *lexer)
 enum token lexer_pop(struct lexer *lexer)
 {
     enum token token = get_next_token(lexer);
-    //Update position of lexer
+    // Update position of lexer
     while (is_continuous_word(lexer->input, lexer->pos))
     {
         lexer->pos++;
     }
-    if (token == TOKEN_SEMICOLON || token == TOKEN_RETURN 
+    if (token == TOKEN_SEMICOLON || token == TOKEN_RETURN
         || token == TOKEN_SINGLE_QUOTE)
     {
         lexer->pos++;
