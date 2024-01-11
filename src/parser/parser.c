@@ -47,8 +47,9 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
     return PARSER_OK;
 }
 
-enum parser_status parse_command(struct ast **res, struct lexer *lexer)
- element->value{
+enum parser_status parse_command(struct ast **res,
+                                 struct lexer *lexer) element->value
+{
     if (parse_simple_command(res, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
         return PARSER_UNEXPECTED_TOKEN;
@@ -88,8 +89,7 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
         lexer_pop(lexer);
         // Add token in ast
         struct ast *word = ast_new(AST_WORD);
-        word->
-        *res = word;
+        word->*res = word;
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;
