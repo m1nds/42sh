@@ -45,11 +45,6 @@ struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
             return NULL;
         }
         node->value[0] = value;
-        node->value[1] = NULL;
-    }
-    else
-    {
-        node->value = NULL;
     }
     node->node_type = type;
     return node;
