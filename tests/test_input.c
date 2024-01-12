@@ -7,7 +7,7 @@ Test(input, on_stdin)
 {
     int flag = 0;
     char *argv[] = { "42sh", NULL };
-    FILE *fd = parse_input(1, argv, &flag);
+    FILE *fd = get_input(1, argv, &flag);
     cr_expect_eq(fd, stdin);
 }
 
@@ -15,7 +15,7 @@ Test(input, on_string)
 {
     int flag = 0;
     char *argv[] = { "42sh", "-c", "echo hello world", NULL };
-    FILE *fd = parse_input(3, argv, &flag);
+    FILE *fd = get_input(3, argv, &flag);
     size_t i = 0;
     char c = fgetc(fd);
     while (c != EOF)
@@ -32,7 +32,7 @@ Test(input, on_file)
     int flag = 0;
     char *str = "echo hello world\n";
     char *argv[] = { "42sh", "test_input_file", NULL };
-    FILE *fd = parse_input(2, argv, &flag);
+    FILE *fd = get_input(2, argv, &flag);
     size_t i = 0;
     char c = fgetc(fd);
     while (c != EOF)
@@ -44,11 +44,59 @@ Test(input, on_file)
     fclose(fd);
 }
 
-Test(input, check_flags)
+Test(input_flags, check_flags1)
+{
+    int flags = 0;
+    char *argv[] = { "42sh", "--verbose", NULL };
+    FILE *fd = get_input(2, argv, &flags);
+    cr_expect_eq(flags, 0b01);
+    fclose(fd);
+}
+
+Test(input_flags, check_flags2)
+{
+    int flags = 0;
+    char *argv[] = { "42sh", "--pretty-print", NULL };
+    FILE *fd = get_input(2, argv, &flags);
+    cr_expect_eq(flags, 0b10);
+    fclose(fd);
+}
+
+Test(input_flags, check_flags3)
 {
     int flags = 0;
     char *argv[] = { "42sh", "--verbose", "--pretty-print", NULL };
-    FILE *fd = parse_input(3, argv, &flags);
+    FILE *fd = get_input(3, argv, &flags);
     cr_expect_eq(flags, 0b11);
+    fclose(fd);
+}
+
+Test(check_flags, chck_verbose)
+{
+    int flags = 0;
+    char *argv[] = { "42sh", "--verbose", NULL };
+    FILE *fd = get_input(2, argv, &flags);
+    int res = check_verbose(&flags);
+    cr_expect_eq(res, VERBOSE_FLAG);
+    fclose(fd);
+}
+
+Test(check_flags, chck_prettyprint)
+{
+    int flags = 0;
+    char *argv[] = { "42sh", "--pretty-print", NULL };
+    FILE *fd = get_input(2, argv, &flags);
+    int res = check_prettyprint(&flags);
+    cr_expect_eq(res, PRETTY_PRINT_FLAG);
+    fclose(fd);
+}
+
+Test(check_flags, chck_verb_both)
+{
+    int flags = 0;
+    char *argv[] = { "42sh", "--verbose", "--pretty-print", NULL };
+    FILE *fd = get_input(2, argv, &flags);
+    int res = check_verbose(&flags);
+    cr_expect_eq(res, VERBOSE_FLAG);
     fclose(fd);
 }
