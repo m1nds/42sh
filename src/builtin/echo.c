@@ -4,7 +4,7 @@
 
 #include "builtin.h"
 
-static void echo_int(const char **list_str, size_t i, char flag)
+static void echo_int(char **list_str, size_t i, char flag)
 {
     char c;
     while (list_str[i] != NULL)
@@ -45,7 +45,7 @@ static void echo_int(const char **list_str, size_t i, char flag)
     }
 }
 
-int echo_builtin(const char **list_str)
+int echo_builtin(char **list_str)
 {
     if (list_str == NULL)
         return 500000;
