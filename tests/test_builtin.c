@@ -19,7 +19,62 @@ Test(false_builtin, default_behavior)
 Test(echo_builtin, hello_world)
 {
     cr_redirect_stdout();
-    echo_builtin("Hello World!");
+    const char *str[] = { "echo", "Hello World!", NULL };
+    echo_builtin(str);
     fflush(stdout);
     cr_assert_stdout_eq_str("Hello World!\n");
+}
+
+Test(echo_builtin, empty)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\n");
+}
+
+Test(echo_builtin, empty_n)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", "-n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("");
+}
+
+Test(echo_builtin, backslash_n_flag_e)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", "-e", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\n\n");
+}
+
+Test(echo_builtin, backslash_n_flag_E)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", "-E", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\\n\n");
+}
+
+Test(echo_builtin, multi_flag)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", "-E", "-n", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\\n");
+}
+
+Test(echo_builtin, redefinition_of_flag)
+{
+    cr_redirect_stdout();
+    const char *str[] = { "echo", "-E", "-e", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\n\n");
 }

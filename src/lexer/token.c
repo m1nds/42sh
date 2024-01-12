@@ -16,12 +16,12 @@ char *token_string(enum token token)
         return "fi";
     case TOKEN_SEMICOLON:
         return ";";
-    case TOKEN_SINGLE_QUOTE:
-        return "'";
     case TOKEN_EOF:
         return "$";
     case TOKEN_RETURN:
         return "\\n";
+    case TOKEN_STDIN:
+        return "Need more input from stdin";
     default:
         // Should only happen if it's a TOKEN_WORD
         return "use get_token_string instead";
