@@ -80,37 +80,56 @@ void ast_free(struct ast *ast)
     }
     free(ast);
 }
-/*
-int execute_command(struct ast *ast)
+
+int check_builtin(char **value)
 {
-    if (ast->node_type != NODE_COMMAND)
+    if (strcmp("echo", value[0]) == 0)
     {
-        return false_builtin();
+        return echo_builtin(value);
     }
 
-    if (strcmp(ast->content.command[0], "true") == 0)
+    if (strcmp("true", value[0]) == 0)
     {
         return true_builtin();
     }
 
-    if (strcmp(ast->content.command[0], "false") == 0)
+    if (strcmp("false", value[0]) == 0)
     {
         return false_builtin();
     }
 
-    if (strcmp(ast->content.command[0], "echo") == 0)
+    return -1;
+}
+
+int handle_command(struct ast *ast)
+{
+    if (ast->node_type != NODE_COMMAND)
     {
-        return echo_builtin(ast->content.command);
+        return -1;
+    }
+
+    if (ast->value == NULL)
+    {
+        return 0;
+    }
+
+    int cb = check_builtin(ast->value);
+    if (cb != -1)
+    {
+        return cb;
     }
 
     int pid = fork();
     if (pid == -1)
     {
-        return false_builtin();
+        return -1;
     }
     else if (!pid)
     {
-        execvp(ast->content.command[0], ast->content.command);
+        if (execvp(ast->value[0], ast->value) == -1)
+        {
+            exit(127);
+        }
     }
 
     int status;
@@ -119,49 +138,57 @@ int execute_command(struct ast *ast)
     return WEXITSTATUS(status);
 }
 
-int handle_if(struct ast *ast)
-{
-    if (ast->node_type != NODE_IF)
-    {
-        return false_builtin();
-    }
-
-    if (evaluate_ast(ast->content.compound_list) == true_builtin())
-    {
-        return evaluate_ast(ast->left_child);
-    }
-
-    return evaluate_ast(ast->right_child);
-}
-
 int handle_semicolon(struct ast *ast)
 {
     if (ast->node_type != NODE_SEMICOLON)
     {
-        return false_builtin();
+        return -1;
     }
 
-    evaluate_ast(ast->left_child);
-    return evaluate_ast(ast->right_child);
+    struct ast **current_child = ast->children;
+    int out = 0;
+
+    while (*current_child)
+    {
+        out = evaluate_ast(*current_child);
+        current_child++;
+    }
+
+    return out;
+}
+
+int handle_if(struct ast *ast)
+{
+    if (ast->node_type != NODE_IF)
+    {
+        return -1;
+    }
+
+    int condition = evaluate_ast(ast->children[0]);
+    if (condition == true_builtin())
+    {
+        return evaluate_ast(ast->children[1]);
+    }
+
+    return (ast->children[2] != NULL) ? evaluate_ast(ast->children[2]) : 0;
 }
 
 int evaluate_ast(struct ast *ast)
 {
     if (ast == NULL)
     {
-        return false_builtin();
+        return 0;
     }
 
     switch (ast->node_type)
     {
-        case NODE_COMMAND:
-            //TODO: Execute a command
-            return -1;
-        case NODE_SEMICOLON:
-            return handle_semicolon(ast);
-        case NODE_IF:
-            return handle_if(ast);
-        default:
-            return -1;
+    case NODE_COMMAND:
+        return handle_command(ast);
+    case NODE_SEMICOLON:
+        return handle_semicolon(ast);
+    case NODE_IF:
+        return handle_if(ast);
+    default:
+        return -1;
     }
-}*/
+}
