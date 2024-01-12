@@ -99,15 +99,15 @@ void true_print_ast(struct ast *ast, size_t tabs)
     printf("Type: ");
     switch (ast->node_type)
     {
-        case NODE_COMMAND:
-            printf("Command: ");
-            break;
-        case NODE_IF:
-            printf("If\n");
-            break;
-        case NODE_SEMICOLON:
-            printf(";????");
-            break;
+    case NODE_COMMAND:
+        printf("Command: ");
+        break;
+    case NODE_IF:
+        printf("If\n");
+        break;
+    case NODE_SEMICOLON:
+        printf(";????");
+        break;
     }
     if (ast->value != NULL)
     {
@@ -128,7 +128,7 @@ void true_print_ast(struct ast *ast, size_t tabs)
         {
             print_tabs(tabs + 1);
             printf("Child %lu: ", i);
-            true_print_ast(ast->children[i], tabs+1);
+            true_print_ast(ast->children[i], tabs + 1);
             i++;
         }
         print_tabs(tabs);
