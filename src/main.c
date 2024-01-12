@@ -9,7 +9,7 @@
 int main(int argc, char **argv)
 {
     int options = 0;
-    FILE *input = parse_input(argc, argv, &options);
+    FILE *input = get_input(argc, argv, &options);
     struct lexer *lexer = create_lexer(input);
     enum token token = TOKEN_IF;
     while (token != TOKEN_EOF)

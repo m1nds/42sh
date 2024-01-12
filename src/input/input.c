@@ -7,6 +7,7 @@
 
 FILE *get_string(char *str)
 {
+    // Open a stream with a string str and returns it.
     return fmemopen(str, strlen(str), "r");
 }
 
@@ -19,31 +20,54 @@ int set_flags(const char *arg, int *flags)
 {
     if (strcmp(arg, "--verbose") == 0)
     {
-        *flags |= 1 << 0;
+        // Set the first bit to 1.
+        *flags |= VERBOSE_FLAG;
         return 1;
     }
     if (strcmp(arg, "--pretty-print") == 0)
     {
-        *flags |= 1 << 1;
+        // Set the second bit to 1.
+        *flags |= PRETTY_PRINT_FLAG;
         return 1;
     }
     return 0;
 }
 
-FILE *parse_input(int nbargs, char **args, int *flags)
+int check_verbose(int *flags)
 {
+    // Compare the flags with the verbose enum
+    return *flags & VERBOSE_FLAG;
+}
+
+int check_prettyprint(int *flags)
+{
+    // Compare the flags with the pretty-print enum
+    return *flags & PRETTY_PRINT_FLAG;
+}
+
+FILE *get_input(int nbargs, char **args, int *flags)
+{
+    // Iterate over all arguments (skip the first one "./42sh")
     for (int i = 1; i < nbargs; i++)
     {
+        // Set the flags and continue if "--verbose" or "--pretty-print"
         int skip = set_flags(args[i], flags);
         if (skip)
         {
             continue;
         }
-        if (strcmp(args[i], "-c") == 0) // Input by string
+        // Input by string
+        if (strcmp(args[i], "-c") == 0)
         {
+            // check if "-c" is the last argument
             if (i + 1 < nbargs)
             {
                 return get_string(args[i + 1]);
+            }
+            else
+            {
+                // error "-c" option requires an argument
+                return NULL;
             }
         }
         // Input by file
@@ -52,22 +76,3 @@ FILE *parse_input(int nbargs, char **args, int *flags)
     // Input on stdin
     return get_stdin();
 }
-
-/*int main(int argc, char **argv)
-{
-    int flags = 0;
-    FILE *fd = parse_input(argc, argv, &flags, NULL);
-    if (!fd)
-    {
-        printf("input error\n");
-        return 1;
-    }
-    char buf[1];
-    ssize_t r = fread(buf, 1, 1, fd);
-    while (r)
-    {
-        printf("%c", buf[0]);
-        r = fread(buf, 1, 1, fd);
-    }
-    printf("\nflags: %d\n", flags);
-}*/
