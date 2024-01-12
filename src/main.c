@@ -5,13 +5,14 @@
 
 #include "input/input.h"
 #include "lexer/lexer.h"
+#include "parser/parser.h"
 
 int main(int argc, char **argv)
 {
     int options = 0;
     FILE *input = get_input(argc, argv, &options);
     struct lexer *lexer = create_lexer(input);
-    enum token token = TOKEN_IF;
+    /*enum token token = TOKEN_IF;
     while (token != TOKEN_EOF)
     {
         char *string = get_token_string(lexer);
@@ -22,7 +23,18 @@ int main(int argc, char **argv)
             free(string);
         }
     }
-    printf("\n");
+    printf("\n");*/
+    struct ast *ast = NULL;
+    enum parser_status status = parse_input(&ast, lexer);
+    if (status == PARSER_OK)
+    {
+        printf("Parser is OK!");
+    }
+    else
+    {
+        printf("Parser is not ok :(");
+    }
+    ast_free(ast);
     free_lexer(lexer);
     fclose(input);
 }
