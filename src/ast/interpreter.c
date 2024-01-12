@@ -1,10 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <system_error>
 #include <unistd.h>
 
-#include "ast.h"
 #include "ast/ast.h"
 #include "builtin/builtin.h"
 

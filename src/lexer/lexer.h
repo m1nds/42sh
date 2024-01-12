@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -42,4 +42,4 @@ enum token lexer_pop(struct lexer *lexer);
  */
 char *get_token_string(struct lexer *lexer);
 
-#endif /* PARSER_H */
+#endif /* LEXER_H */
