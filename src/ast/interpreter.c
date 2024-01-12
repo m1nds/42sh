@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -79,6 +80,65 @@ void ast_free(struct ast *ast)
         free(ast->children);
     }
     free(ast);
+}
+
+void print_tabs(size_t tabs)
+{
+    for (size_t i = 0; i < tabs; i++)
+    {
+        printf("    ");
+    }
+}
+
+void true_print_ast(struct ast *ast, size_t tabs)
+{
+    if (ast == NULL)
+    {
+        return;
+    }
+    printf("Type: ");
+    switch (ast->node_type)
+    {
+    case NODE_COMMAND:
+        printf("Command: ");
+        break;
+    case NODE_IF:
+        printf("If\n");
+        break;
+    case NODE_SEMICOLON:
+        printf(";????");
+        break;
+    }
+    if (ast->value != NULL)
+    {
+        size_t i = 0;
+        while (ast->value[i] != NULL)
+        {
+            printf("%s ", ast->value[i]);
+            i++;
+        }
+        printf("\n");
+    }
+    if (ast->children != NULL)
+    {
+        print_tabs(tabs);
+        printf("{\n");
+        size_t i = 0;
+        while (ast->children[i] != NULL)
+        {
+            print_tabs(tabs + 1);
+            printf("Child %lu: ", i);
+            true_print_ast(ast->children[i], tabs + 1);
+            i++;
+        }
+        print_tabs(tabs);
+        printf("}\n");
+    }
+}
+
+void print_ast(struct ast *ast)
+{
+    true_print_ast(ast, 0);
 }
 
 int check_builtin(char **value)

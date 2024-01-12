@@ -22,6 +22,8 @@ struct ast *ast_new(enum ast_type type, size_t nb_child, char *value);
 
 void ast_free(struct ast *ast);
 
+void print_ast(struct ast *ast);
+
 /*
  * @def:   Evaluation handler for commands. Checks if it is a builtin.
  * @param: struct ast *ast: ast node containing a command in the value field.
