@@ -43,7 +43,8 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer);
 enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer);
 
 /**
- * @def: Parses a command comprised of multiple simple commands or a shell command
+ * @def: Parses a command comprised of multiple simple commands or a shell
+ * command
  *
  * command =      simple_command
  *              | shell_command

@@ -92,7 +92,8 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         struct ast *element = NULL;
         if (parse_element(&element, lexer) == PARSER_OK)
         {
-            command->value = realloc(command->value, (loop + 2) * sizeof(char *));
+            command->value =
+                realloc(command->value, (loop + 2) * sizeof(char *));
             command->value[loop] = element->value[0];
             command->value[loop + 1] = NULL;
         }
@@ -199,7 +200,8 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
         }
         lexer_pop(lexer);
         struct ast *second_child = NULL;
-        if (parse_compound_list(&second_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+        if (parse_compound_list(&second_child, lexer)
+            == PARSER_UNEXPECTED_TOKEN)
         {
             return PARSER_UNEXPECTED_TOKEN;
         }

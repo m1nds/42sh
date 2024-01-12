@@ -22,7 +22,7 @@ Test(parser, simple_command)
     enum parser_status status = parse_input(&ast, lexer);
     cr_expect_eq(status, PARSER_OK, "Expected: OK. Got: PAS_OK.");
     cr_expect_eq(ast->node_type, NODE_COMMAND, "Expected command, got ff");
-    //cr_expect_eq_str(ast->value[0], "echo", "Expected echo, got ff");
+    // cr_expect_eq_str(ast->value[0], "echo", "Expected echo, got ff");
     ast_free(ast);
     free_lexer(lexer);
 }
