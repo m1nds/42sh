@@ -1,11 +1,93 @@
-#include "ast/ast.h"
-
-#include <sys/wait.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <system_error>
+#include <unistd.h>
 
+#include "ast.h"
+#include "ast/ast.h"
 #include "builtin/builtin.h"
 
+struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
+{
+    struct ast *node = calloc(1, sizeof(struct ast));
+
+    // malloc checking
+    if (node == NULL)
+    {
+        return NULL;
+    }
+
+    // if nb_child == 0 then ast->children = NULL else ast->children NULL T
+    if (nb_child != 0)
+    {
+        node->children = calloc(nb_child + 1, sizeof(struct ast));
+
+        // malloc checking
+        if (node->children == NULL)
+        {
+            free(node);
+            return NULL;
+        }
+    }
+
+    // if value == NULL then ast->value = NULL else ast->value NULL T
+    if (value != NULL)
+    {
+        // on ast_new one string is given if it is a command so it's a list of 2
+        node->value = calloc(2, sizeof(char *));
+
+        // malloc checking
+        if (node->value == NULL)
+        {
+            free(node->children);
+            free(node);
+            return NULL;
+        }
+        node->value[0] = value;
+        node->value[1] = NULL;
+    }
+    else
+    {
+        node->value = NULL;
+    }
+    node->node_type = type;
+    return node;
+}
+
+void ast_free(struct ast *ast)
+{
+    // protection
+    if (ast == NULL)
+        return;
+
+    // free the list of value
+    if (ast->value != NULL)
+    {
+        size_t i = 0;
+        while (ast->value[i] != NULL)
+        {
+            free(ast->value[i]);
+            i++;
+        }
+        free(ast->value);
+    }
+
+    // free the list of child
+    if (ast->children != NULL)
+    {
+        size_t i = 0;
+        while (ast->children[i] != NULL)
+        {
+            // recursive iteration
+            ast_free(ast->children[i]);
+            i++;
+        }
+        free(ast->children);
+    }
+    free(ast);
+}
+/*
 int execute_command(struct ast *ast)
 {
     if (ast->node_type != NODE_COMMAND)
@@ -89,4 +171,4 @@ int evaluate_ast(struct ast *ast)
         default:
             return -1;
     }
-}
+}*/
