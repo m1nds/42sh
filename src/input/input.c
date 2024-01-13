@@ -45,7 +45,7 @@ int check_prettyprint(int *flags)
     return *flags & PRETTY_PRINT_FLAG;
 }
 
-FILE *get_input(int nbargs, char **args, int *flags)
+FILE *get_input(int nbargs, char **args, int *flags, int *err)
 {
     // Iterate over all arguments (skip the first one "./42sh")
     for (int i = 1; i < nbargs; i++)
@@ -66,12 +66,19 @@ FILE *get_input(int nbargs, char **args, int *flags)
             }
             else
             {
-                // error "-c" option requires an argument
+                // Set error code to 2 because "-c" option requires an argument
+                *err = 2;
                 return NULL;
             }
         }
         // Input by file
-        return get_file(args[i]);
+        FILE *fp = get_file(args[i]);
+        if (!fp)
+        {
+            // Set error code to 127 because the file doesn't exist.
+            *err = 127;
+        }
+        return fp;
     }
     // Input on stdin
     return get_stdin();
