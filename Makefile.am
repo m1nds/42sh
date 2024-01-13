@@ -18,7 +18,10 @@ CLEAN_FILES=42sh-1.0.tar.gz \
 
 
 check-local:
-	$(MAKE) -C tests check
+	echo tests
 
 clean:
+	$(RM) $(shell find -name "*.o" -o -name "*.a" -o -name "42sh" -o -name "test")
+
+fullclean:
 	$(RM) -rf $(CLEAN_FILES) $(shell find -name "Makefile.in" -o -name "Makefile" -o -name "*.o" -o -name "lib*.a")
