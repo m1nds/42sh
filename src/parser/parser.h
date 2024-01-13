@@ -92,7 +92,7 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer);
 /**
  * @def: Parses a element comprised of a compound_list
  *
- * compound_list = and_or [';'] {'\n'} ;
+ * compound_list = {'\n'} and_or { ( ';' | '\n' ) {'\n'} and_or } [';'] {'\n'} ;
  */
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 

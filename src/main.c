@@ -32,12 +32,17 @@ int main(int argc, char **argv)
     }
     else
     {
-        printf("Parser is not ok :(\n");
+        fprintf(stderr, "Parser is not ok :(\n");
+        ast_free(ast);
+        free_lexer(lexer);
+        fclose(input);
+        return 1;
     }
     if (check_prettyprint(&options))
     {
         print_ast(ast);
     }
+    evaluate_ast(ast);
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);

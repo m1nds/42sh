@@ -106,7 +106,7 @@ void true_print_ast(struct ast *ast, size_t tabs)
         printf("If\n");
         break;
     case NODE_SEMICOLON:
-        printf(";????");
+        printf(";\n");
         break;
     }
     if (ast->value != NULL)
