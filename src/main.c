@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,8 +10,25 @@
 
 int main(int argc, char **argv)
 {
+    int err = 0;
     int options = 0;
-    FILE *input = get_input(argc, argv, &options);
+    FILE *input = get_input(argc, argv, &options, &err);
+    if (!input)
+    {
+        switch (err)
+        {
+        case 2:
+            errx(2, "option requires an argument");
+            break;
+
+        case 127:
+            errx(127, "No such file or directory");
+            break;
+
+        default:
+            break;
+        }
+    }
     struct lexer *lexer = create_lexer(input);
     /*enum token token = TOKEN_IF;
     while (token != TOKEN_EOF)
