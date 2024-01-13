@@ -107,8 +107,8 @@ Test(ast, semicolon_in_if)
                               .children = NULL };
 
     struct ast gcc = { .node_type = NODE_COMMAND,
-                       .value = (char *[]){ "git", "rev-list",
-                                            "--max-parents=0", "HEAD", NULL },
+                       .value =
+                           (char *[]){ "find", "-name", "test_ast.c", NULL },
                        .children = NULL };
 
     struct ast condition_node = { .node_type = NODE_SEMICOLON,
@@ -132,6 +132,5 @@ Test(ast, semicolon_in_if)
                  evaluate_ast(&if_one));
 
     fflush(stdout);
-    cr_assert_stdout_eq_str(
-        "one\na92b64b7b1bb707067efb51c399e2be686b0ce51\ntwo\nthree\n");
+    cr_assert_stdout_eq_str("one\n./test_ast.c\ntwo\nthree\n");
 }
