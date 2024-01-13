@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     enum parser_status status = parse_input(&ast, lexer);
     if (status == PARSER_OK)
     {
-        printf("Parser is OK!\n");
+        //printf("Parser is OK!\n");
     }
     else
     {
@@ -42,8 +42,9 @@ int main(int argc, char **argv)
     {
         print_ast(ast);
     }
-    evaluate_ast(ast);
+    int return_code = evaluate_ast(ast);
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);
+    return return_code;
 }

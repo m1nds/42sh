@@ -50,10 +50,7 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
             lexer_pop(lexer);
             if (parse_and_or(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
             {
-                ast_free(semicolon);
-                *res = NULL;
-                print_error("Error while parsing list of and_ors", lexer);
-                return PARSER_UNEXPECTED_TOKEN;
+                break;
             }
             nb_children++;
             semicolon->children = realloc(
