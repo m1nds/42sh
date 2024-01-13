@@ -77,5 +77,6 @@ int echo_builtin(char **list_str)
     {
         putchar('\n');
     }
+    fflush(stdout);
     return 0;
 }
