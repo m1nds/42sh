@@ -1,6 +1,5 @@
 #include "lexer.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,6 +13,7 @@ struct lexer *create_lexer(FILE *input)
     }
     result->input = input;
     result->pos = ftell(input);
+    result->stack = create_stack();
     return result;
 }
 
@@ -197,7 +197,7 @@ enum token lexer_pop(struct lexer *lexer)
     return token;
 }
 
-char *handle_single_quote(struct lexer *lexer, char *buffer)
+static char *handle_single_quote(struct lexer *lexer, char *buffer)
 {
     size_t buffer_pos = 0;
     char c = fgetc(lexer->input);
@@ -252,4 +252,21 @@ char *get_token_string(struct lexer *lexer)
     buffer[buffer_pos] = '\0';
     fseek(lexer->input, lexer->pos, SEEK_SET);
     return buffer;
+}
+
+void lexer_savestate(struct lexer *lexer)
+{
+    long value = ftell(lexer->input);
+    push_stack(lexer->stack, value);
+}
+
+bool lexer_loadstate(struct lexer *lexer)
+{
+    if (lexer->stack == NULL)
+    {
+        return false;
+    }
+    long value = pop_stack(lexer->stack);
+    fseek(lexer->input, value, SEEK_SET);
+    return true;
 }
