@@ -3,7 +3,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-
 struct stack *create_stack(void)
 {
     // This looks useless but it might change later

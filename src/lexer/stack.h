@@ -1,7 +1,7 @@
 #ifndef STACK_H
-#define STACH_H
+#    define STACH_H
 
-#include <sys/types.h>
+#    include <sys/types.h>
 
 struct stack
 {
