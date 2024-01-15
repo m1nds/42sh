@@ -21,16 +21,16 @@ struct stack *push_stack(struct stack *stack, long value)
     return result;
 }
 
-ssize_t pop_stack(struct stack *stack)
+ssize_t pop_stack(struct stack **stack)
 {
-    if (stack == NULL)
+    struct stack *current = *stack;
+    if (current == NULL)
     {
         return -1;
     }
-    long result = stack->value;
-    struct stack *to_free = stack;
-    stack = stack->next;
-    free(to_free);
+    long result = current->value;
+    *stack = current->next;
+    free(current);
     return result;
 }
 

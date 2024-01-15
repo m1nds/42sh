@@ -25,7 +25,7 @@ struct stack *push_stack(struct stack *stack, long value);
  * @def: Pops the first value in the stack and returns it
  * Returns -1 if no value are in the stack
  */
-ssize_t pop_stack(struct stack *stack);
+ssize_t pop_stack(struct stack **stack);
 
 /*
  * @def: Frees the stack

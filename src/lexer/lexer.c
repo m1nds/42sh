@@ -266,7 +266,7 @@ bool lexer_loadstate(struct lexer *lexer)
     {
         return false;
     }
-    long value = pop_stack(lexer->stack);
+    long value = pop_stack(&(lexer->stack));
     fseek(lexer->input, value, SEEK_SET);
     return true;
 }
