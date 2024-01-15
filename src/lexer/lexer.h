@@ -1,15 +1,18 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
+#include "stack.h"
 #include "token.h"
 
 struct lexer
 {
     FILE *input;
     size_t pos;
+    struct stack *stack;
 };
 
 /*
@@ -41,5 +44,17 @@ enum token lexer_pop(struct lexer *lexer);
  * @args lexer: the lexer that holds the current token
  */
 char *get_token_string(struct lexer *lexer);
+
+/*
+ * @def: Save the current file position in the stack
+ * @args lexer: the lexer to save the current file position
+ */
+void lexer_savestate(struct lexer *lexer);
+
+/*
+ * @def: Loads the first file position of the stack in the lexer
+ * @args lexer: the lexer to load the file position
+ */
+bool lexer_loadstate(struct lexer *lexer);
 
 #endif /* LEXER_H */

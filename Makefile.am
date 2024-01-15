@@ -18,7 +18,7 @@ CLEAN_FILES=42sh-1.0.tar.gz \
 
 
 check-local:
-	echo tests
+	cd tests && $(MAKE) check
 
 clean:
 	$(RM) $(shell find -name "*.o" -o -name "*.a" -o -name "42sh" -o -name "test")
