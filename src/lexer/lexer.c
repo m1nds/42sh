@@ -21,6 +21,8 @@ void free_lexer(struct lexer *lexer)
 {
     if (lexer != NULL)
     {
+        destroy_stack(lexer->stack);
+        lexer->stack = NULL;
         free(lexer);
     }
 }
