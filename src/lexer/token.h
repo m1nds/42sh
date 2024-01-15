@@ -3,6 +3,7 @@
 
 enum token
 {
+    TOKEN_NONE = -1,
     TOKEN_IF,
     TOKEN_FI,
     TOKEN_ELSE,

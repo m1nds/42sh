@@ -8,11 +8,16 @@
 #include "stack.h"
 #include "token.h"
 
+struct lexer_token_save {
+    enum token curr_tok;
+    char *tok_str;
+};
+
 struct lexer
 {
     FILE *input;
     size_t pos;
-    struct stack *stack;
+    struct lexer_token_save ls;
 };
 
 /*

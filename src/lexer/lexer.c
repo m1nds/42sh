@@ -1,7 +1,10 @@
 #include "lexer.h"
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
+
+#include "utils/vector.h"
 
 struct lexer *create_lexer(FILE *input)
 {
@@ -13,7 +16,7 @@ struct lexer *create_lexer(FILE *input)
     }
     result->input = input;
     result->pos = ftell(input);
-    result->stack = create_stack();
+    //result->stack = create_stack();
     return result;
 }
 
@@ -21,10 +24,16 @@ void free_lexer(struct lexer *lexer)
 {
     if (lexer != NULL)
     {
-        destroy_stack(lexer->stack);
-        lexer->stack = NULL;
+        //destroy_stack(lexer->stack);
+        //lexer->stack = NULL;
         free(lexer);
     }
+}
+
+char lexer_step(struct lexer *lexer, int step)
+{
+    lexer->pos += step;
+    return fgetc(lexer->input);
 }
 
 static enum token match_word(char *word)
@@ -64,21 +73,20 @@ static bool is_continuous_word(char character)
 
 static void ignore_line(struct lexer *lexer)
 {
-    char c = fgetc(lexer->input);
-    lexer->pos++;
+    char c = lexer_step(lexer, 1);
     while (c != '\n' && c != EOF && c != '\0')
     {
-        c = fgetc(lexer->input);
-        lexer->pos++;
+        c = lexer_step(lexer, 1);
     }
+
     if (c == '\n')
     {
         lexer->pos++;
     }
-    else
+    /*else
     {
         ungetc(c, lexer->input);
-    }
+    }*/
 }
 
 static enum token check_single_quote(struct lexer *lexer)
@@ -97,19 +105,28 @@ static enum token check_single_quote(struct lexer *lexer)
     return TOKEN_WORD;
 }
 
+char skip_blanks(struct lexer *lexer)
+{
+    char c = lexer_step(lexer, 0);
+
+    while (isblank(c))
+    {
+        c = lexer_step(lexer, 1);
+    }
+
+    return c;
+}
+
 static enum token get_next_token(struct lexer *lexer)
 {
-    char c = fgetc(lexer->input);
     // Remove all spaces before the word
-    while (c == ' ')
-    {
-        c = fgetc(lexer->input);
-        lexer->pos++;
-    }
-    if (c == '#')
+    char c = skip_blanks(lexer);
+    
+    // Skip comment line
+    /*if (c == '#')
     {
         ignore_line(lexer);
-        c = fgetc(lexer->input);
+        c = lexer_step(lexer, 0);
     }
     // Not sure if \0 should count as EOF but it should be fine
     if (c == EOF || c == '\0')
@@ -118,12 +135,10 @@ static enum token get_next_token(struct lexer *lexer)
     }
     if (c == ';')
     {
-        ungetc(c, lexer->input);
         return TOKEN_SEMICOLON;
     }
     if (c == '\n')
     {
-        ungetc(c, lexer->input);
         return TOKEN_RETURN;
     }
     if (c == '\'')
@@ -134,10 +149,38 @@ static enum token get_next_token(struct lexer *lexer)
     // Special case if there is a \n after \, need to check later
     if (c == '\\')
     {
-        ungetc(c, lexer->input);
+        return TOKEN_WORD;
+    }*/
+
+    switch (c)
+    {
+    case '#':
+        ignore_line(lexer);
+        c = lexer_step(lexer, 0);
+        break;
+    case EOF:
+    case '\0':
+        return TOKEN_EOF;
+    case ';':
+        return TOKEN_SEMICOLON;
+    case '\'':
+        return check_single_quote(lexer);
+    case '\\':
         return TOKEN_WORD;
     }
-    char *word = calloc(100, sizeof(char));
+
+    struct vector *vec = vector_create(100);
+    while (is_continuous_word(c))
+    {
+        vector_append(vec, c);
+        c = lexer_step(lexer, 0);
+    }
+
+    enum token result = match_word(vec->data);
+    vector_destroy(vec);
+    return result;
+
+    /*char *word = calloc(100, sizeof(char));
     size_t word_pos = 0;
     // Very basic version, won't work later
     while (is_continuous_word(c))
@@ -150,18 +193,23 @@ static enum token get_next_token(struct lexer *lexer)
             return TOKEN_WORD;
         }
     }
-    fseek(lexer->input, lexer->pos, SEEK_SET);
+
     enum token result = match_word(word);
     free(word);
-    return result;
+    return result;*/
 }
 
 enum token lexer_peek(struct lexer *lexer)
 {
-    return get_next_token(lexer);
+    if (lexer->ls.curr_tok == TOKEN_NONE)
+    {
+        lexer->ls.curr_tok = get_next_token(lexer);
+    }
+
+    return lexer->ls.curr_tok;
 }
 
-static void skip_single_quote(struct lexer *lexer)
+/*static void skip_single_quote(struct lexer *lexer)
 {
     lexer->pos++;
     char c = fgetc(lexer->input);
@@ -171,32 +219,24 @@ static void skip_single_quote(struct lexer *lexer)
         lexer->pos++;
     }
     lexer->pos++;
-}
+}*/
 
 enum token lexer_pop(struct lexer *lexer)
 {
-    enum token token = get_next_token(lexer);
-    char c = fgetc(lexer->input);
-    // Update position of lexer
-    if (token == TOKEN_WORD && c == '\'')
+    enum token out;
+
+    if (lexer->ls.curr_tok == TOKEN_NONE)
     {
-        skip_single_quote(lexer);
-        return token;
+        out = get_next_token(lexer);
+
+        lexer->ls.curr_tok = get_next_token(lexer);
+        return out;
     }
-    while (is_continuous_word(c))
-    {
-        c = fgetc(lexer->input);
-        lexer->pos++;
-    }
-    if (token == TOKEN_RETURN || token == TOKEN_SEMICOLON)
-    {
-        lexer->pos++;
-    }
-    else
-    {
-        ungetc(c, lexer->input);
-    }
-    return token;
+
+    out = lexer->ls.curr_tok;
+    lexer->ls.curr_tok = get_next_token(lexer);
+
+    return out;
 }
 
 static char *handle_single_quote(struct lexer *lexer, char *buffer)
@@ -256,7 +296,7 @@ char *get_token_string(struct lexer *lexer)
     return buffer;
 }
 
-void lexer_savestate(struct lexer *lexer)
+/*void lexer_savestate(struct lexer *lexer)
 {
     long value = ftell(lexer->input);
     push_stack(lexer->stack, value);
@@ -268,7 +308,7 @@ bool lexer_loadstate(struct lexer *lexer)
     {
         return false;
     }
-    long value = pop_stack(&(lexer->stack));
+    //long value = pop_stack(&(lexer->stack));
     fseek(lexer->input, value, SEEK_SET);
     return true;
-}
+}*/
