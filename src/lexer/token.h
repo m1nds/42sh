@@ -3,7 +3,7 @@
 
 enum token
 {
-    TOKEN_IF,
+    TOKEN_IF = 0,
     TOKEN_FI,
     TOKEN_ELSE,
     TOKEN_SEMICOLON,
@@ -13,6 +13,19 @@ enum token
     TOKEN_ELIF,
     TOKEN_RETURN,
     TOKEN_STDIN,
+    TOKEN_NOT,
+    TOKEN_WHILE,
+    TOKEN_UNTIL,
+    TOKEN_FOR,
+    TOKEN_DO,
+    TOKEN_DONE,
+    TOKEN_REDIR_INPUT = 100, // To facilitate regrouping all redirects
+    TOKEN_REDIR_OUTPUT,
+    TOKEN_REDIR_APPEND,
+    TOKEN_REDIR_INFD,
+    TOKEN_REDIR_OUTFD,
+    TOKEN_REDIR_BOTHFD,
+    TOKEN_REDIR_PIPE,
     //......
 };
 

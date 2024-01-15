@@ -22,6 +22,22 @@ char *token_string(enum token token)
         return "\\n";
     case TOKEN_STDIN:
         return "Need more input from stdin";
+    case TOKEN_NOT:
+        return "!";
+    case TOKEN_REDIR_INPUT:
+        return "<";
+    case TOKEN_REDIR_OUTPUT:
+        return ">";
+    case TOKEN_REDIR_APPEND:
+        return ">>";
+    case TOKEN_REDIR_INFD:
+        return "<&";
+    case TOKEN_REDIR_OUTFD:
+        return ">&";
+    case TOKEN_REDIR_BOTHFD:
+        return "<>";
+    case TOKEN_REDIR_PIPE:
+        return "|";
     default:
         // Should only happen if it's a TOKEN_WORD
         return "use get_token_string instead";

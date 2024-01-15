@@ -58,8 +58,16 @@ static enum token match_word(char *word)
  */
 static bool is_continuous_word(char character)
 {
-    return character != ' ' && character != ';' && character != '\n'
-        && character != '\0' && character != EOF;
+    char invalid_chars[] = { ' ', ';', '\n', '\0', EOF, '>', '<' };
+    size_t invalid_size = 8;
+    for (size_t i = 0; i < invalid_size; i++)
+    {
+        if (character == invalid_chars[i])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -97,6 +105,49 @@ static enum token check_single_quote(struct lexer *lexer)
     return TOKEN_WORD;
 }
 
+static enum token get_redirect(struct lexer *lexer, char c)
+{
+    enum token token;
+    if (c == '>')
+    {
+        c = fgetc(lexer->input);
+        if (c == '>')
+        {
+            token = TOKEN_REDIR_APPEND;
+        }
+        else if (c == '&')
+        {
+            token = TOKEN_REDIR_INFD;
+        }
+        else
+        {
+            token = TOKEN_REDIR_OUTPUT;
+        }
+    }
+    else if (c == '<')
+    {
+        c = fgetc(lexer->input);
+        if (c == '&')
+        {
+            token = TOKEN_REDIR_OUTFD;
+        }
+        else if (c == '>')
+        {
+            token = TOKEN_REDIR_BOTHFD;
+        }
+        else
+        {
+            token = TOKEN_REDIR_INPUT;
+        }
+    }
+    else
+    {
+        token = TOKEN_REDIR_PIPE;
+    }
+    fseek(lexer->input, lexer->pos, SEEK_SET);
+    return token;
+}
+
 static enum token get_next_token(struct lexer *lexer)
 {
     char c = fgetc(lexer->input);
@@ -115,6 +166,15 @@ static enum token get_next_token(struct lexer *lexer)
     if (c == EOF || c == '\0')
     {
         return TOKEN_EOF;
+    }
+    if (c == '>' || c == '<' || c == '|')
+    {
+        return get_redirect(lexer, c);
+    }
+    if (c == '!')
+    {
+        ungetc(c, lexer->input);
+        return TOKEN_NOT;
     }
     if (c == ';')
     {
@@ -173,6 +233,24 @@ static void skip_single_quote(struct lexer *lexer)
     lexer->pos++;
 }
 
+static void handle_redirect(struct lexer *lexer, enum token token)
+{
+    size_t length = strlen(token_string(token));
+    char c;
+    for (size_t i = 0; i < length; i++)
+    {
+        c = fgetc(lexer->input);
+    }
+    if (token == TOKEN_REDIR_OUTPUT)
+    {
+        c = fgetc(lexer->input);
+        if (c != '|')
+        {
+            ungetc(c, lexer->input);
+        }
+    }
+}
+
 enum token lexer_pop(struct lexer *lexer)
 {
     enum token token = get_next_token(lexer);
@@ -181,6 +259,11 @@ enum token lexer_pop(struct lexer *lexer)
     if (token == TOKEN_WORD && c == '\'')
     {
         skip_single_quote(lexer);
+        return token;
+    }
+    if (token >= TOKEN_REDIR_INPUT)
+    {
+        handle_redirect(lexer, token);
         return token;
     }
     while (is_continuous_word(c))
