@@ -6,7 +6,7 @@
 /**
  * @def: Used when input is on stdin
  */
-static inline FILE *get_stdin()
+static inline FILE *get_stdin(void)
 {
     return stdin;
 }
