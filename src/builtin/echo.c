@@ -51,22 +51,43 @@ int echo_builtin(char **list_str)
         return 500000;
     char flag_n = 1; // if set to 1 \n is add at the end of the string
     char flag_special_char = 0; // if set to 1 special char are replace
+    char break_flag = 0;
     size_t i = 1;
     while (list_str[i] != NULL)
     {
-        if (strcmp(list_str[i], "-n") == 0)
+        size_t j = 0;
+        char flag_option = 0;
+        while (list_str[i][j] != '\0')
         {
-            flag_n = 0;
+            if (flag_option && list_str[i][j] == 'n')
+            {
+                flag_n = 0;
+            }
+            else if (flag_option && list_str[i][j] == 'e')
+            {
+                flag_special_char = 1;
+            }
+            else if (flag_option && list_str[i][j] == 'E')
+            {
+                flag_special_char = 0;
+            }
+            else if (list_str[i][j] == '-')
+            {
+                if (flag_option || list_str[i][j + 1] == '\0')
+                {
+                    break_flag = 1;
+                    break;
+                }
+                flag_option = 1;
+            }
+            else
+            {
+                break_flag = 1;
+                break;
+            }
+            j++;
         }
-        else if (strcmp(list_str[i], "-e") == 0)
-        {
-            flag_special_char = 1;
-        }
-        else if (strcmp(list_str[i], "-E") == 0)
-        {
-            flag_special_char = 0;
-        }
-        else
+        if (break_flag)
         {
             break;
         }
