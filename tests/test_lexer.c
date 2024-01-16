@@ -7,7 +7,7 @@
 Test(lexer, empty_string)
 {
     struct lexer *lexer = create_lexer(fmemopen("", 1, "r+"));
-    enum token token = lexer_peek(lexer);
+    enum token token = lexer_peek(lexer).curr_tok;
 
     cr_expect_eq(token, TOKEN_EOF,
                  "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
@@ -28,7 +28,7 @@ Test(lexer, simple_if)
 
     for (size_t i = 0; i < 11; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);
@@ -53,7 +53,7 @@ Test(lexer, double_if)
 
     for (size_t i = 0; i < 18; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);
@@ -73,7 +73,7 @@ Test(lexer, single_quotes)
 
     for (size_t i = 0; i < 8; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);
@@ -93,7 +93,7 @@ Test(lexer, missing_single_quote)
 
     for (size_t i = 0; i < 8; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);
@@ -115,7 +115,7 @@ Test(lexer, comment)
 
     for (size_t i = 0; i < 12; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);
@@ -138,7 +138,7 @@ Test(lexer, returns)
 
     for (size_t i = 0; i < 16; i++)
     {
-        enum token token = lexer_pop(lexer);
+        enum token token = lexer_pop(lexer).curr_tok;
         cr_expect_eq(
             token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
             token_string(correct[i]), token_string(token), i, lexer->pos);

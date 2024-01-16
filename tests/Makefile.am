@@ -10,6 +10,7 @@ test_LDADD = \
 		%D%/../src/exec/libexec.a \
 		%D%/../src/lexer/liblexer.a \
 		%D%/../src/parser/libparser.a \
+		%D%/../src/utils/libutils.a \
 		%D%/../src/builtin/libbuiltin.a
 
 check-local: test

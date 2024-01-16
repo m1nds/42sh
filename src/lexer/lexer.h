@@ -17,6 +17,7 @@ struct lexer
 {
     FILE *input;
     size_t pos;
+    char prev;
     struct lexer_token_save ls;
 };
 
@@ -36,13 +37,13 @@ void free_lexer(struct lexer *lexer);
  * @def: Returns the next token without moving the lexer
  * @args lexer: the lexer to peek
  */
-enum token lexer_peek(struct lexer *lexer);
+struct lexer_token_save lexer_peek(struct lexer *lexer);
 
 /*
  * @def: Returns the next token and moves the lexer to be after that token
  * @args lexer: the lexer to pop
  */
-enum token lexer_pop(struct lexer *lexer);
+struct lexer_token_save lexer_pop(struct lexer *lexer);
 
 /*
  * @def: Returns a string version of the next token
