@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         ast_free(ast);
         free_lexer(lexer);
         fclose(input);
-        return 1;
+        return 2;
     }
     if (check_prettyprint(&options))
     {

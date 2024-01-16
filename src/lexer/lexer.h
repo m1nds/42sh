@@ -8,7 +8,8 @@
 #include "stack.h"
 #include "token.h"
 
-struct lexer_token_save {
+struct lexer_token_save
+{
     enum token curr_tok;
     char *tok_str;
 };

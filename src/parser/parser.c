@@ -134,7 +134,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 {
     struct lexer_token_save token = lexer_peek(lexer);
-    if (token.curr_tok == TOKEN_WORD)
+    if (token.curr_tok >= TOKEN_IF && token.curr_tok <= TOKEN_WORD)
     {
         char *string = token.tok_str;
         lexer_pop(lexer);

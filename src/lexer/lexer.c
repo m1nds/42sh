@@ -18,6 +18,7 @@ struct lexer *create_lexer(FILE *input)
     result->input = input;
     result->pos = 0;
     result->prev = EOF;
+    result->ls.curr_tok = TOKEN_NONE;
     //result->stack = create_stack();
     return result;
 }
@@ -104,9 +105,9 @@ static struct lexer_token_save check_single_quote(struct lexer *lexer)
         vector_append(vec, c);
         c = fgetc(lexer->input);
     }
-
+    c = fgetc(lexer->input);
     vector_append(vec, '\0');
-
+    lexer->prev = c;
     out.curr_tok = TOKEN_WORD;
     out.tok_str = strdup(vec->data);
 
@@ -151,13 +152,18 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     case ';':
         out.curr_tok = TOKEN_SEMICOLON;
         out.tok_str = strdup(";");
+        lexer->prev = fgetc(lexer->input);
         return out;
     case '\'':
-        c = fgetc(lexer->input);
         return check_single_quote(lexer);
     case '\\':
         c = fgetc(lexer->input);
         break;
+    case '\n':
+        lexer->prev = fgetc(lexer->input);
+        out.curr_tok = TOKEN_RETURN;
+        out.tok_str = strdup("\n");
+        return out;
     }
 
     struct vector *vec = vector_create(100);
@@ -211,7 +217,7 @@ struct lexer_token_save lexer_pop(struct lexer *lexer)
         return out;
     }
 
-    free(lexer->ls.tok_str);
+    //free(lexer->ls.tok_str);
     out = lexer->ls;
     lexer->ls = get_next_token(lexer);
 
