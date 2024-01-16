@@ -1,8 +1,8 @@
 #define _POSIX_C_SOURCE 200809L
 #include "lexer/lexer.h"
 
-#include <stdlib.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "utils/vector.h"
@@ -19,7 +19,7 @@ struct lexer *create_lexer(FILE *input)
     result->pos = 0;
     result->prev = EOF;
     result->ls.curr_tok = TOKEN_NONE;
-    //result->stack = create_stack();
+    // result->stack = create_stack();
     return result;
 }
 
@@ -27,8 +27,8 @@ void free_lexer(struct lexer *lexer)
 {
     if (lexer != NULL)
     {
-        //destroy_stack(lexer->stack);
-        //lexer->stack = NULL;
+        // destroy_stack(lexer->stack);
+        // lexer->stack = NULL;
         free(lexer);
     }
 }

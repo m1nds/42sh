@@ -1,7 +1,7 @@
 #include "vector.h"
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct vector *vector_create(size_t capacity)
 {
