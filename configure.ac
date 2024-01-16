@@ -12,6 +12,7 @@ AC_PROG_CC
 AC_CONFIG_FILES([
                     Makefile
                     src/Makefile
+                    src/utils/Makefile
                     src/ast/Makefile
                     src/exec/Makefile
                     src/input/Makefile

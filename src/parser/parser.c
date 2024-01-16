@@ -9,12 +9,12 @@ void print_error(char *message, struct lexer *lexer)
 {
     fprintf(stderr, "%s. ", message);
     fprintf(stderr, "Current position is %lu. ", ftell(lexer->input));
-    fprintf(stderr, "Current word is %s\n", get_token_string(lexer));
+    fprintf(stderr, "Current word is %s\n", lexer->ls.tok_str);
 }
 
 enum parser_status parse_input(struct ast **res, struct lexer *lexer)
 {
-    enum token token = lexer_peek(lexer);
+    enum token token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_RETURN || token == TOKEN_EOF)
     {
         return PARSER_OK;
@@ -23,7 +23,7 @@ enum parser_status parse_input(struct ast **res, struct lexer *lexer)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
-    token = lexer_peek(lexer);
+    token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_RETURN || token == TOKEN_EOF)
     {
         return PARSER_OK;
@@ -38,7 +38,8 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
         print_error("Error while parsing first and_or in list", lexer);
         return PARSER_UNEXPECTED_TOKEN;
     }
-    enum token token = lexer_peek(lexer);
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
     if (token == TOKEN_SEMICOLON)
     {
         size_t nb_children = 0;
@@ -47,7 +48,7 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
         struct ast *child = NULL;
         while (token == TOKEN_SEMICOLON)
         {
-            lexer_pop(lexer);
+            lexer_pop(lexer, true);
             if (parse_and_or(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
             {
                 break;
@@ -57,15 +58,17 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
                 semicolon->children, sizeof(struct ast) * (nb_children + 1));
             semicolon->children[nb_children] = child;
             child = NULL;
-            token = lexer_peek(lexer);
+            t = lexer_peek(lexer);
+            token = t.curr_tok;
         }
         semicolon->children[nb_children + 1] = NULL;
         *res = semicolon;
     }
-    token = lexer_peek(lexer);
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
     if (token == TOKEN_SEMICOLON)
     {
-        lexer_pop(lexer);
+        lexer_pop(lexer, true);
     }
     return PARSER_OK;
 }
@@ -103,6 +106,11 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
+    struct lexer_token_save token = lexer_peek(lexer);
+    if (token.curr_tok != TOKEN_WORD)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
     if (parse_element(res, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
         return PARSER_UNEXPECTED_TOKEN;
@@ -133,11 +141,11 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_element(struct ast **res, struct lexer *lexer)
 {
-    enum token token = lexer_peek(lexer);
-    if (token == TOKEN_WORD)
+    struct lexer_token_save token = lexer_peek(lexer);
+    if (token.curr_tok >= TOKEN_IF && token.curr_tok <= TOKEN_WORD)
     {
-        char *string = get_token_string(lexer);
-        lexer_pop(lexer);
+        char *string = token.tok_str;
+        lexer_pop(lexer, false);
         // Add token in ast
         struct ast *word = ast_new(NODE_COMMAND, 0, string);
         *res = word;
@@ -157,12 +165,13 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
 {
-    enum token token = lexer_peek(lexer);
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
     if (token != TOKEN_IF)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
-    lexer_pop(lexer);
+    lexer_pop(lexer, true);
     struct ast *node_if = ast_new(NODE_IF, 3, NULL);
     struct ast *first_child = NULL;
     if (parse_compound_list(&first_child, lexer) == PARSER_UNEXPECTED_TOKEN)
@@ -173,7 +182,8 @@ enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
         return PARSER_UNEXPECTED_TOKEN;
     }
     node_if->children[0] = first_child;
-    token = lexer_peek(lexer);
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
     if (token != TOKEN_THEN)
     {
         ast_free(node_if);
@@ -181,7 +191,7 @@ enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
         print_error("Error while parsing then", lexer);
         return PARSER_UNEXPECTED_TOKEN;
     }
-    lexer_pop(lexer);
+    lexer_pop(lexer, true);
     struct ast *second_child = NULL;
     if (parse_compound_list(&second_child, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
@@ -196,11 +206,12 @@ enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
     {
         node_if->children[2] = third_child;
     }
-    token = lexer_peek(lexer);
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
     *res = node_if;
     if (token == TOKEN_FI)
     {
-        lexer_pop(lexer);
+        lexer_pop(lexer, true);
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;
@@ -208,15 +219,16 @@ enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
 {
-    enum token token = lexer_peek(lexer);
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
     if (token == TOKEN_ELSE)
     {
-        lexer_pop(lexer);
+        lexer_pop(lexer, true);
         return parse_compound_list(res, lexer);
     }
     else if (token == TOKEN_ELIF)
     {
-        lexer_pop(lexer);
+        lexer_pop(lexer, true);
         struct ast *node_if = ast_new(NODE_IF, 3, NULL);
         struct ast *first_child = NULL;
         if (parse_compound_list(&first_child, lexer) == PARSER_UNEXPECTED_TOKEN)
@@ -227,7 +239,8 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
             return PARSER_UNEXPECTED_TOKEN;
         }
         node_if->children[0] = first_child;
-        token = lexer_peek(lexer);
+        t = lexer_peek(lexer);
+        token = t.curr_tok;
         if (token != TOKEN_THEN)
         {
             ast_free(node_if);
@@ -235,7 +248,7 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
             print_error("Error while parsing then of elif", lexer);
             return PARSER_UNEXPECTED_TOKEN;
         }
-        lexer_pop(lexer);
+        lexer_pop(lexer, true);
         struct ast *second_child = NULL;
         if (parse_compound_list(&second_child, lexer)
             == PARSER_UNEXPECTED_TOKEN)
@@ -262,17 +275,17 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer)
 {
-    enum token token = lexer_peek(lexer);
+    enum token token = lexer_peek(lexer).curr_tok;
     while (token == TOKEN_RETURN)
     {
-        lexer_pop(lexer);
-        token = lexer_peek(lexer);
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
     }
     if (parse_and_or(res, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
-    token = lexer_peek(lexer);
+    token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_SEMICOLON || token == TOKEN_RETURN)
     {
         size_t nb_children = 0;
@@ -281,12 +294,12 @@ enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer)
         struct ast *child = NULL;
         while (token == TOKEN_SEMICOLON || token == TOKEN_RETURN)
         {
-            lexer_pop(lexer);
-            token = lexer_peek(lexer);
+            lexer_pop(lexer, true);
+            token = lexer_peek(lexer).curr_tok;
             while (token == TOKEN_RETURN)
             {
-                lexer_pop(lexer);
-                token = lexer_peek(lexer);
+                lexer_pop(lexer, true);
+                token = lexer_peek(lexer).curr_tok;
             }
             if (parse_and_or(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
             {
@@ -298,20 +311,21 @@ enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer)
                 semicolon->children, sizeof(struct ast) * (nb_children + 1));
             semicolon->children[nb_children] = child;
             child = NULL;
-            token = lexer_peek(lexer);
+            token = lexer_peek(lexer).curr_tok;
         }
         semicolon->children[nb_children + 1] = NULL;
         *res = semicolon;
     }
-    token = lexer_peek(lexer);
+    token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_SEMICOLON)
     {
-        token = lexer_pop(lexer);
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
     }
     while (token == TOKEN_RETURN)
     {
-        lexer_pop(lexer);
-        token = lexer_peek(lexer);
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
     }
     return PARSER_OK;
 }

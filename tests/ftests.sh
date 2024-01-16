@@ -24,13 +24,13 @@ test_stdin() {
     diff output1 output2
     check=$?
 
-    if [ ! "$check" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Print $2: expected :\n  $out2\n  got :\n  $out1"
+    if [ "$check" -ne 0 ]; then
+        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Print \"$2\": expected :\n  $out2\n  got :\n  $out1"
         $flag=1
     fi
 
     if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Return CODE $2: expected :\n  $out2\n  got :\n  $out1"
+        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Return CODE \"$2\": expected $code2 but got $code1"
         return 1
     fi
 
@@ -67,7 +67,7 @@ test_file() {
     fi
 
     if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: FILE\n  Return CODE: expected :\n  $out2\n  got :\n$out1"
+        echo -e "  ${RED}ERROR${NC} Type: FILE\n  Return CODE \"$2\": expected $code2 but got $code1"
         return 1
     fi
 
@@ -97,12 +97,12 @@ test_string() {
     check=$?
 
     if [ ! "$check" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Print $2: expected :\n  $out2\n  got :\n  $out1"
+        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Print \"$2\": expected :\n  $out2\n  got :\n  $out1"
         $flag=1
     fi
 
     if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Return CODE $2: expected :\n  $out2\n  got :\n  $out1"
+        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Return CODE \"$2\": expected $code2 but got $code1"
         return 1
     fi
 

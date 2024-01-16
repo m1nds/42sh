@@ -3,14 +3,15 @@
 
 enum token
 {
+    TOKEN_NONE = -1,
     TOKEN_IF,
     TOKEN_FI,
     TOKEN_ELSE,
-    TOKEN_SEMICOLON,
-    TOKEN_EOF,
-    TOKEN_WORD,
     TOKEN_THEN,
     TOKEN_ELIF,
+    TOKEN_WORD,
+    TOKEN_EOF = 10,
+    TOKEN_SEMICOLON,
     TOKEN_RETURN,
     TOKEN_STDIN,
     //......
