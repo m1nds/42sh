@@ -142,7 +142,7 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
 
     struct lexer_token_save out;
-
+    out.tok_str = NULL;
     switch (c)
     {
     case EOF:
@@ -205,23 +205,18 @@ struct lexer_token_save lexer_peek(struct lexer *lexer)
     lexer->pos++;
 }*/
 
-struct lexer_token_save lexer_pop(struct lexer *lexer)
+void lexer_pop(struct lexer *lexer, bool to_free)
 {
-    struct lexer_token_save out;
-
     if (lexer->ls.curr_tok == TOKEN_NONE)
     {
-        out = get_next_token(lexer);
-
+        get_next_token(lexer);
         lexer->ls = get_next_token(lexer);
-        return out;
     }
-
-    //free(lexer->ls.tok_str);
-    out = lexer->ls;
+    if (to_free)
+    {
+        free(lexer->ls.tok_str);
+    }
     lexer->ls = get_next_token(lexer);
-
-    return out;
 }
 
 /*static char *handle_single_quote(struct lexer *lexer, char *buffer)

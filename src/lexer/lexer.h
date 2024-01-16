@@ -44,7 +44,7 @@ struct lexer_token_save lexer_peek(struct lexer *lexer);
  * @def: Returns the next token and moves the lexer to be after that token
  * @args lexer: the lexer to pop
  */
-struct lexer_token_save lexer_pop(struct lexer *lexer);
+void lexer_pop(struct lexer *lexer, bool to_free);
 
 /*
  * @def: Returns a string version of the next token
