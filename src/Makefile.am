@@ -8,9 +8,9 @@ bin_PROGRAMS = 42sh
 42sh_CFLAGS = -std=c99 -Werror -Wall -Wextra -Wvla -pedantic
 
 42sh_LDADD = ast/libast.a \
-		exec/libexec.a \
 		input/libinput.a \
 		lexer/liblexer.a \
 		parser/libparser.a \
 		utils/libutils.a \
+		exec/libexec.a \
 		builtin/libbuiltin.a
