@@ -116,7 +116,8 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             {
                 return PARSER_UNEXPECTED_TOKEN;
             }
-            pipe->children = realloc(pipe->children, sizeof(struct ast) * (nb_children + 2));
+            pipe->children =
+                realloc(pipe->children, sizeof(struct ast) * (nb_children + 2));
             pipe->children[nb_children] = child;
             nb_children++;
             token = lexer_peek(lexer).curr_tok;
