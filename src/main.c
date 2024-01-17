@@ -45,11 +45,26 @@ int main(int argc, char **argv)
     printf("\n");*/
     struct ast *ast = NULL;
     enum parser_status status = parse_input(&ast, lexer);
-    if (status == PARSER_OK)
+    int return_code = 0;
+    while (status == PARSER_OK)
     {
+        if (check_prettyprint(&options))
+        {
+            print_ast(ast);
+        }
+        return_code = evaluate_ast(ast);
+        ast_free(ast);
+        enum token token = lexer_peek(lexer).curr_tok;
+        if (token == TOKEN_EOF)
+        {
+            break;
+        }
+        ast = NULL;
+        fflush(NULL);
+        status = parse_input(&ast, lexer);
         // printf("Parser is OK!\n");
     }
-    else
+    if (status == PARSER_UNEXPECTED_TOKEN)
     {
         fprintf(stderr, "Parser is not ok :(\n");
         ast_free(ast);
@@ -57,12 +72,6 @@ int main(int argc, char **argv)
         fclose(input);
         return 2;
     }
-    if (check_prettyprint(&options))
-    {
-        print_ast(ast);
-    }
-    int return_code = evaluate_ast(ast);
-    ast_free(ast);
     free_lexer(lexer);
     fclose(input);
     return return_code;

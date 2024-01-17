@@ -17,6 +17,10 @@ enum parser_status parse_input(struct ast **res, struct lexer *lexer)
     enum token token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_RETURN || token == TOKEN_EOF)
     {
+        if (token == TOKEN_RETURN)
+        {
+            lexer_pop(lexer, true);
+        }
         return PARSER_OK;
     }
     if (parse_list(res, lexer) == PARSER_UNEXPECTED_TOKEN)
@@ -26,6 +30,10 @@ enum parser_status parse_input(struct ast **res, struct lexer *lexer)
     token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_RETURN || token == TOKEN_EOF)
     {
+        if (token == TOKEN_RETURN)
+        {
+            lexer_pop(lexer, true);
+        }
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;

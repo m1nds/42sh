@@ -37,7 +37,6 @@ static struct lexer_token_save match_word(char *word)
 {
     struct lexer_token_save out;
     out.curr_tok = TOKEN_WORD;
-
     if (strcmp(word, "if") == 0)
     {
         out.curr_tok = TOKEN_IF;
@@ -63,7 +62,26 @@ static struct lexer_token_save match_word(char *word)
         out.curr_tok = TOKEN_FI;
         return out;
     }
-
+    if (strcmp(word, "for") == 0)
+    {
+        out.curr_tok = TOKEN_FOR;
+        return out;
+    }
+    if (strcmp(word, "in") == 0)
+    {
+        out.curr_tok = TOKEN_IN;
+        return out;
+    }
+    if (strcmp(word, "do") == 0)
+    {
+        out.curr_tok = TOKEN_DO;
+        return out;
+    }
+    if (strcmp(word, "done") == 0)
+    {
+        out.curr_tok = TOKEN_DONE;
+        return out;
+    }
     return out;
 }
 
@@ -146,7 +164,7 @@ static struct lexer_token_save handle_escape(struct lexer *lexer, char c)
     return out;
 }
 
-static struct lexer_token_save get_next_token(struct lexer *lexer)
+static struct lexer_token_save get_part_one(struct lexer *lexer)
 {
     char c = lexer->prev;
     if (c == EOF)
@@ -170,6 +188,7 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
 
     struct lexer_token_save out;
+    out.curr_tok = TOKEN_NONE;
     out.tok_str = NULL;
     switch (c)
     {
@@ -197,7 +216,18 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
         lexer->prev = fgetc(lexer->input);
         return out;
     }
+    lexer->prev = c;
+    return out;
+}
 
+static struct lexer_token_save get_next_token(struct lexer *lexer)
+{
+    struct lexer_token_save out = get_part_one(lexer);
+    if (out.curr_tok != TOKEN_NONE)
+    {
+        return out;
+    }
+    char c = lexer->prev;
     struct vector *vec = vector_create(100);
     while (is_continuous_word(c))
     {
