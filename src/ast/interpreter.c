@@ -108,6 +108,9 @@ void true_print_ast(struct ast *ast, size_t tabs)
     case NODE_SEMICOLON:
         printf(";\n");
         break;
+    case NODE_PIPE:
+        printf("|\n");
+        break;
     }
     if (ast->value != NULL)
     {

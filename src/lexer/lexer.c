@@ -125,6 +125,27 @@ static char skip_blanks(struct lexer *lexer, char c)
     return c;
 }
 
+static struct lexer_token_save handle_escape(struct lexer *lexer, char c)
+{
+    struct lexer_token_save out;
+    out.tok_str = NULL;
+    out.curr_tok = TOKEN_WORD;
+
+    struct vector *vec = vector_create(100);
+    vector_append(vec, c);
+    c = fgetc(lexer->input);
+    while (isblank(c) == 0 && c != EOF && c != '\0')
+    {
+        vector_append(vec, c);
+        c = fgetc(lexer->input);
+    }
+    vector_append(vec, '\0');
+    lexer->prev = c;
+    out.tok_str = strdup(vec->data);
+    vector_destroy(vec);
+    return out;
+}
+
 static struct lexer_token_save get_next_token(struct lexer *lexer)
 {
     char c = lexer->prev;
@@ -132,9 +153,16 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     {
         c = fgetc(lexer->input);
     }
+    if (c == '\\')
+    {
+        return handle_escape(lexer, c);
+    }
     // Remove all spaces before the word
     c = skip_blanks(lexer, c);
-
+    if (c == '\\')
+    {
+        return handle_escape(lexer, c);
+    }
     if (c == '#')
     {
         ignore_line(lexer);
@@ -157,12 +185,16 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     case '\'':
         return check_single_quote(lexer);
     case '\\':
-        c = fgetc(lexer->input);
-        break;
+        return handle_escape(lexer, c);
     case '\n':
         lexer->prev = fgetc(lexer->input);
         out.curr_tok = TOKEN_RETURN;
         out.tok_str = strdup("\n");
+        return out;
+    case '|':
+        out.curr_tok = TOKEN_REDIR_PIPE;
+        out.tok_str = strdup("|");
+        lexer->prev = fgetc(lexer->input);
         return out;
     }
 

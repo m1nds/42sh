@@ -88,6 +88,34 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
+    enum token token = lexer_peek(lexer).curr_tok;
+    if (token == TOKEN_REDIR_PIPE)
+    {
+        struct ast *pipe = ast_new(NODE_PIPE, 1, NULL);
+        pipe->children[0] = *res;
+        size_t nb_children = 1;
+        while (token == TOKEN_REDIR_PIPE)
+        {
+            lexer_pop(lexer, true);
+            token = lexer_peek(lexer).curr_tok;
+            while (token == TOKEN_RETURN)
+            {
+                lexer_pop(lexer, true);
+                token = lexer_peek(lexer).curr_tok;
+            }
+            struct ast *child = NULL;
+            if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
+            {
+                return PARSER_UNEXPECTED_TOKEN;
+            }
+            pipe->children = realloc(pipe->children, sizeof(struct ast) * (nb_children + 2));
+            pipe->children[nb_children] = child;
+            nb_children++;
+            token = lexer_peek(lexer).curr_tok;
+        }
+        pipe->children[nb_children + 1] = NULL;
+        *res = pipe;
+    }
     return PARSER_OK;
 }
 

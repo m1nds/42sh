@@ -14,6 +14,7 @@ enum token
     TOKEN_SEMICOLON,
     TOKEN_RETURN,
     TOKEN_STDIN,
+    TOKEN_REDIR_PIPE,
     //......
 };
 
