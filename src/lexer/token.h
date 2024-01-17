@@ -9,11 +9,16 @@ enum token
     TOKEN_ELSE,
     TOKEN_THEN,
     TOKEN_ELIF,
+    TOKEN_FOR,
+    TOKEN_IN,
+    TOKEN_DO,
+    TOKEN_DONE,
     TOKEN_WORD,
-    TOKEN_EOF = 10,
+    TOKEN_EOF = 100,
     TOKEN_SEMICOLON,
     TOKEN_RETURN,
     TOKEN_STDIN,
+    TOKEN_REDIR_PIPE,
     //......
 };
 

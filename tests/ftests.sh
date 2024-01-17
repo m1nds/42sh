@@ -114,6 +114,8 @@ test_all 'if true; then echo nice; fi' "if_echo"
 test_all 'if false; then echo not printed; else echo printed; fi' "else_echo"
 test_all 'if false; then true; elif true; then echo printed; fi' "elif_echo"
 test_all 'if; then true; fi' "wrong_if"
+test_all 'if if true; then echo a; else echo b; fi; then echo false; fi' "double_monstre"
+test_all "echo a; echo b; echo c" "triple_monstre"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
 rm output1 output2 file 2> /dev/null > /dev/null

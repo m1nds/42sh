@@ -7,7 +7,8 @@ enum ast_type
 {
     NODE_COMMAND,
     NODE_SEMICOLON,
-    NODE_IF
+    NODE_IF,
+    NODE_PIPE
 
 };
 

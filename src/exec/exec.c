@@ -17,6 +17,8 @@ int evaluate_ast(struct ast *ast)
         return handle_semicolon(ast);
     case NODE_IF:
         return handle_if(ast);
+    case NODE_PIPE:
+        return handle_pipe(ast);
     default:
         return -1;
     }
