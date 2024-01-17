@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "ast/ast.h"
+#include "exec/exec.h"
 
 Test(ast, true_builtin)
 {

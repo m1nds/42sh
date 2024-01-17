@@ -141,7 +141,7 @@ void print_ast(struct ast *ast)
     true_print_ast(ast, 0);
 }
 
-int check_builtin(char **value)
+/*int check_builtin(char **value)
 {
     if (strcmp("echo", value[0]) == 0)
     {
@@ -251,4 +251,4 @@ int evaluate_ast(struct ast *ast)
     default:
         return -1;
     }
-}
+}*/

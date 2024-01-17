@@ -1,6 +1,5 @@
-#include "exec.h"
-
 #include "ast/ast.h"
+#include "exec.h"
 
 int handle_semicolon(struct ast *ast)
 {

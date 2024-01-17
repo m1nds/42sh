@@ -1,7 +1,6 @@
-#include "exec.h"
 #include "ast/ast.h"
-
 #include "builtin/builtin.h"
+#include "exec.h"
 
 int handle_if(struct ast *ast)
 {

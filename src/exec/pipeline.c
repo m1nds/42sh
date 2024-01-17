@@ -1,9 +1,9 @@
-#include "exec.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include "exec.h"
 
 int exec_command(char **argv, int tmp_fds[2], int is_right)
 {

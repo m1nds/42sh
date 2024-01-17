@@ -1,12 +1,11 @@
-#include "exec.h"
-
-#include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "ast/ast.h"
 #include "builtin/builtin.h"
+#include "exec.h"
 
 int check_builtin(char **value)
 {
@@ -64,5 +63,3 @@ int handle_command(struct ast *ast)
 
     return WEXITSTATUS(status);
 }
-
-
