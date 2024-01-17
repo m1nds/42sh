@@ -8,38 +8,29 @@ pass=0
 fail=0
 
 test_stdin() {
-    echo "$1" | ./42sh > output1 2> /dev/null
-    echo "$1" | bash --posix > output2 2> /dev/null
+    echo "$1" | ./42sh 1> output1 2> /dev/null
+    echo "$1" | bash --posix 1> output2 2> /dev/null
 
     flag=0
 
-    out1=$(cat output1)
-    out2=$(cat output2)
+    out1=$(cat -e output1)
+    out2=$(cat -e output2)
 
-    echo "$1" | ./42sh 2> /dev/null
+    echo "$1" | ./42sh > /dev/null 2> /dev/null
     code1=$?
-    echo "$1" | bash --posix 2> /dev/null
+    echo "$1" | bash --posix > /dev/null 2> /dev/null
     code2=$?
 
-    diff output1 output2
+    diff output1 output2 > /dev/null
     check=$?
 
-    if [ "$check" -ne 0 ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Print \"$2\": expected :\n  $out2\n  got :\n  $out1"
-        $flag=1
-    fi
-
-    if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STDIN\n  Return CODE \"$2\": expected $code2 but got $code1"
+    if [ $check -eq 1 ] && [ "$code1" -ne "$code2" ]; then
+        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STDIN\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+        echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
         return 1
     fi
 
-    if [ "$flag" -ne "1" ]; then
-        echo -e "  STDIN Test \"$2\" : ${GREEN}OK${NC}"
-        return 0
-    fi
-
-    return 1
+    return 0
 }
 
 test_file() {
@@ -50,73 +41,53 @@ test_file() {
 
     flag=0
 
-    out1=$(cat output1)
-    out2=$(cat output2)
+    out1=$(cat -e output1)
+    out2=$(cat -e output2)
 
-    ./42sh file 2> /dev/null
+    ./42sh file > /dev/null 2> /dev/null
     code1=$?
-    bash --posix file 2> /dev/null
+    bash --posix file > /dev/null 2> /dev/null
     code2=$?
 
-    diff output1 output2
+    diff output1 output2 > /dev/null
     check=$?
 
-    if [ ! "$check" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: FILE\n  Print: expected :\n  $out2\n  got :\n$out1"
-        $flag=1
-    fi
-
-    if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: FILE\n  Return CODE \"$2\": expected $code2 but got $code1"
+    if [ $check -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: FILE\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+        echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
         return 1
     fi
 
-    if [ "$flag" -ne "1" ]; then
-        echo -e "  FILE   Test \"$2\" : ${GREEN}OK${NC}"
-        return 0
-    fi
-
-    return 1
+    return 0
 }
 
 test_string() {
-    ./42sh -c "$1"> output1 2> /dev/null
+    ./42sh -c "$1" > output1 2> /dev/null
     bash --posix -c "$1" > output2 2> /dev/null
 
     flag=0
 
-    out1=$(cat output1)
-    out2=$(cat output2)
+    out1=$(cat -e output1)
+    out2=$(cat -e output2)
 
-    ./42sh -c "$1" 2> /dev/null
+    ./42sh -c "$1" > /dev/null 2> /dev/null
     code1=$?
-    bash --posix -c "$1" 2> /dev/null
+    bash --posix -c "$1" > /dev/null 2> /dev/null
     code2=$?
 
-    diff output1 output2
+    diff output1 output2 > /dev/null
     check=$?
-
-    if [ ! "$check" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Print \"$2\": expected :\n  $out2\n  got :\n  $out1"
-        $flag=1
-    fi
-
-    if [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} Type: STRING\n  Return CODE \"$2\": expected $code2 but got $code1"
+    if [ $check -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STRING\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+        echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
         return 1
     fi
 
-    if [ "$flag" -ne "1" ]; then
-        echo -e "  STRING Test \"$2\" : ${GREEN}OK${NC}"
-        return 0
-    fi
-
-    return 1
+    return 0
 }
 
 test_all() {
-    echo "Running \"$2\"..."
-
+    echo -e "Running TEST : $2..."
     test_string "$1" "$2"
     one=$?
     test_file "$1" "$2"
@@ -132,8 +103,21 @@ test_all() {
 }
 
 test_all "true;" "true;"
+test_all "echo a ; echo b" "double_echo"
+test_all "echo -E 'ab\n'" "echo_flag_E"
+test_all "echo -e 'salam\n'" "echo_flag_e"
+test_all "echo -n 'mon boeuf\n'" "echo_flag_n"
+test_all "echo -nE 'jure mon boeuf\n'" "echo_flag_nE"
+test_all "echo -Ee 't vraiment un sang\n'" "echo_flag_Ee"
+test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
+test_all 'if true; then echo nice; fi' "if_echo"
+test_all 'if false; then echo not printed; else echo printed; fi' "else_echo"
+test_all 'if false; then true; elif true; then echo printed; fi' "elif_echo"
+test_all 'if; then true; fi' "wrong_if"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
+rm output1 output2 file 2> /dev/null > /dev/null
+
 
 if [ "$fail" -eq 0 ]; then
     exit 0
