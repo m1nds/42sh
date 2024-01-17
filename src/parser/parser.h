@@ -9,6 +9,10 @@ enum parser_status
     PARSER_OK,
     PARSER_UNEXPECTED_TOKEN,
 };
+/*
+ * @def: prints an error
+ */
+void print_error(char *message, struct lexer *lexer);
 
 /**
  * @def: Parses the input and builds the ast
