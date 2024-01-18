@@ -45,13 +45,13 @@ int main(int argc, char **argv)
     printf("\n");*/
     struct ast *ast = NULL;
     enum parser_status status = parse_input(&ast, lexer);
+    if (check_prettyprint(&options))
+    {
+        print_ast(ast);
+    }
     int return_code = 0;
     while (status == PARSER_OK)
     {
-        if (check_prettyprint(&options))
-        {
-            print_ast(ast);
-        }
         if (ast != NULL)
         {
             return_code = evaluate_ast(ast);
