@@ -1,10 +1,11 @@
+#include "ast/ast.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "ast/ast.h"
 #include "builtin/builtin.h"
 
 struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
@@ -82,7 +83,7 @@ void ast_free(struct ast *ast)
     free(ast);
 }
 
-void print_tabs(size_t tabs)
+static void print_tabs(size_t tabs)
 {
     for (size_t i = 0; i < tabs; i++)
     {
@@ -90,7 +91,7 @@ void print_tabs(size_t tabs)
     }
 }
 
-void true_print_ast(struct ast *ast, size_t tabs)
+static void true_print_ast(struct ast *ast, size_t tabs)
 {
     if (ast == NULL)
     {
