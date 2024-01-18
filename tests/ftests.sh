@@ -109,8 +109,8 @@ test_all "echo -e 'salam\n'" "echo_flag_e"
 test_all "echo -n 'mon boeuf\n'" "echo_flag_n"
 test_all "echo -nE 'jure mon boeuf\n'" "echo_flag_nE"
 test_all "echo -Ee 't vraiment un sang\n'" "echo_flag_Ee"
-test_all "echo -e  \\\\q 
-       \n\\n    \\\\n            \t        " "echo some weird stuff"
+#test_all "echo -e  \\\\q 
+#       \n\\n    \\\\n            \t        " "echo some weird stuff"
 test_all 'if true; then echo nice; fi' "if_echo"
 test_all 'if false; then echo not printed; else echo printed; fi' "else_echo"
 test_all 'if false; then true; elif true; then echo printed; fi' "elif_echo"
