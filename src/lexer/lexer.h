@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "stack.h"
 #include "token.h"
 
 struct lexer_token_save

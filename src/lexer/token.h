@@ -13,6 +13,9 @@ enum token
     TOKEN_IN,
     TOKEN_DO,
     TOKEN_DONE,
+    TOKEN_NOT,
+    TOKEN_AND,
+    TOKEN_OR,
     TOKEN_WORD,
     TOKEN_EOF = 100,
     TOKEN_SEMICOLON,
@@ -21,12 +24,5 @@ enum token
     TOKEN_REDIR_PIPE,
     //......
 };
-
-/*
- * @def: Returns a string based on the token
- * Should not be used if token is TOKEN_WORD
- * @args token: The token to be stringified
- */
-char *token_string(enum token token);
 
 #endif /* TOKEN_H */

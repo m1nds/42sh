@@ -39,10 +39,10 @@ enum parser_status parse_list(struct ast **res, struct lexer *lexer)
     }
     t = lexer_peek(lexer);
     token = t.curr_tok;
-    if (token == TOKEN_SEMICOLON)
+    /*if (token == TOKEN_SEMICOLON)
     {
         lexer_pop(lexer, true);
-    }
+    }*/
     return PARSER_OK;
 }
 

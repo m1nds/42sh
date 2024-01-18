@@ -78,3 +78,30 @@ Test(echo_builtin, redefinition_of_flag)
     fflush(stdout);
     cr_assert_stdout_eq_str("\n\n");
 }
+
+Test(echo_builtin, multi_flags_together1)
+{
+    cr_redirect_stdout();
+    char *str[] = { "echo", "-en", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\n");
+}
+
+Test(echo_builtin, multi_flags_together2)
+{
+    cr_redirect_stdout();
+    char *str[] = { "echo", "-eEn", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\\n");
+}
+
+Test(echo_builtin, multi_flags_together3)
+{
+    cr_redirect_stdout();
+    char *str[] = { "echo", "-nnE", "\\n", NULL };
+    echo_builtin(str);
+    fflush(stdout);
+    cr_assert_stdout_eq_str("\\n");
+}

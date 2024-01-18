@@ -1,3 +1,4 @@
+#include <err.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -54,7 +55,7 @@ int handle_command(struct ast *ast)
     {
         if (execvp(ast->value[0], ast->value) == -1)
         {
-            exit(127);
+            errx(127, "Could not find command %s", ast->value[0]);
         }
     }
 
