@@ -24,13 +24,12 @@ struct ast
  * @param: enum ast_type type: the type of node you want to create
  *         size_t nb_child: the number of child it should have
  *         char *value: the value of the first child set at ast->children[0]
- * @ret:   exit code or -1 if an error occurs
+ * @ret:   return the allocated ast struct or NULL if malloc failled
  * */
 struct ast *ast_new(enum ast_type type, size_t nb_child, char *value);
 
 /*
  * @def:   free the struct ast, all its children recursively and their **value
- * array
  * @param: struct ast *ast: the ast node that should be freed
  * @ret:   None
  * */
