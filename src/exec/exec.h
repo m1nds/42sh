@@ -36,6 +36,28 @@ int handle_if(struct ast *ast);
 int handle_semicolon(struct ast *ast);
 
 /*
+ * @def: Evaluation handler for negation.
+ * @param: struct ast *ast: AST node containing commands in the children field.
+ * @ret: return code of the negation on the correct condition node or -1 on
+ * error.
+ * */
+int handle_negation(struct ast *ast);
+
+/*
+ * @def: Evaluation handler for and.
+ * @param: struct ast *ast: AST node containing commands in the children field.
+ * @ret: return code
+ * */
+int handle_and(struct ast *ast);
+
+/*
+ * @def: Evaluation handler for or.
+ * @param: struct ast *ast: AST node containing commands in the children field.
+ * @ret: return code
+ * */
+int handle_or(struct ast *ast);
+
+/*
  * @def:   Complete AST evaluation function
  * @param: struct ast *ast: the complete AST
  * @ret:   exit code or -1 if an error occurs
