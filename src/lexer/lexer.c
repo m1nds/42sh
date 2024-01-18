@@ -93,9 +93,18 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
     char c = lexer->prev;
     struct vector *vec = vector_create(100);
-    while (is_continuous_word(c))
+    char single_quote_flag = 0;
+    while (is_continuous_word(c) || single_quote_flag == 1)
     {
-        vector_append(vec, c);
+        if (c == '\'')
+        {
+            single_quote_flag += 1;
+            single_quote_flag %= 2;
+        }
+        else
+        {
+            vector_append(vec, c);
+        }
         c = fgetc(lexer->input);
     }
 
