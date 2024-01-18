@@ -5,9 +5,9 @@
 
 #include "ast/ast.h"
 #include "builtin/builtin.h"
-#include "exec.h"
+#include "exec/exec.h"
 
-int check_builtin(char **value)
+/*int check_builtin(char **value)
 {
     if (strcmp("echo", value[0]) == 0)
     {
@@ -25,7 +25,7 @@ int check_builtin(char **value)
     }
 
     return -1;
-}
+}*/
 
 int handle_command(struct ast *ast)
 {

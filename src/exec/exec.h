@@ -6,6 +6,13 @@
 #include "ast/ast.h"
 
 /*
+ * @def:   Check if command is a builtin and runs it if it is one
+ * @param: char **value NULL-terminated array of strings, representing a command
+ * @ret:   return code of the builtin or -1 if it is not a builtin
+ * */
+int check_builtin(char **value);
+
+/*
  * @def:   Evaluation handler for pipelines.
  * @param: struct ast *ast: ast node containing a pipeline in the value field.
  * @ret:   exit code of the executed command or -1 on error.
