@@ -8,7 +8,10 @@ enum ast_type
     NODE_COMMAND,
     NODE_SEMICOLON,
     NODE_IF,
-    NODE_PIPE
+    NODE_PIPE,
+    NODE_NOT,
+    NODE_AND,
+    NODE_OR
 
 };
 
