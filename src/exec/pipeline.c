@@ -55,7 +55,7 @@ int close_pids(int *pids, size_t len)
         waitpid(pids[i], &out, 0);
     }
 
-    // free(pids);
+    free(pids);
     return out;
 }
 
