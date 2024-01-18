@@ -105,6 +105,15 @@ void true_print_ast(struct ast *ast, size_t tabs)
     case NODE_IF:
         printf("If\n");
         break;
+    case NODE_NOT:
+        printf("!\n");
+        break;
+    case NODE_AND:
+        printf("&&\n");
+        break;
+    case NODE_OR:
+        printf("||\n");
+        break;
     case NODE_SEMICOLON:
         printf(";\n");
         break;
