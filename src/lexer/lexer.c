@@ -28,6 +28,10 @@ void free_lexer(struct lexer *lexer)
 {
     if (lexer != NULL)
     {
+        if (lexer->ls.curr_tok != TOKEN_NONE)
+        {
+            free(lexer->ls.tok_str);
+        }
         // destroy_stack(lexer->stack);
         // lexer->stack = NULL;
         free(lexer);
@@ -41,7 +45,8 @@ void free_lexer(struct lexer *lexer)
 static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
-        && character != '\0' && character != EOF && character != '\t';
+        && character != '\0' && character != EOF && character != '\t'
+        && character != '|' && character != '&' && character != '=';
 }
 
 static void ignore_line(struct lexer *lexer)

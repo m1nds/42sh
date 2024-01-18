@@ -1,7 +1,7 @@
 SUBDIRS = src
 
 CLEAN_FILES=42sh-1.0.tar.gz \
-		aclocal.m4 \
+	    aclocal.m4 \
 	    autom4te.cache \
 	    configure \
 	    install-sh \
@@ -14,7 +14,7 @@ CLEAN_FILES=42sh-1.0.tar.gz \
 	    configure~ \
 	    depcomp \
 	    src/42sh tests/42sh \
-		tests/test
+	    tests/test
 
 
 check-local:
