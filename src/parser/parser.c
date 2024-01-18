@@ -73,6 +73,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             struct ast *child = NULL;
             if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
             {
+                ast_free(pipe);
                 return PARSER_UNEXPECTED_TOKEN;
             }
             pipe->children =

@@ -52,7 +52,10 @@ int main(int argc, char **argv)
         {
             print_ast(ast);
         }
-        return_code = evaluate_ast(ast);
+        if (ast != NULL)
+        {
+            return_code = evaluate_ast(ast);
+        }
         ast_free(ast);
         enum token token = lexer_peek(lexer).curr_tok;
         if (token == TOKEN_EOF)

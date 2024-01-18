@@ -8,7 +8,6 @@ int evaluate_ast(struct ast *ast)
     {
         return 0;
     }
-
     switch (ast->node_type)
     {
     case NODE_COMMAND:

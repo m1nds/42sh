@@ -7,11 +7,10 @@
 Test(lexer, empty_string)
 {
     struct lexer *lexer = create_lexer(fmemopen("", 1, "r+"));
-    enum token token = lexer_peek(lexer).curr_tok;
-
-    cr_expect_eq(token, TOKEN_EOF,
-                 "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-                 token_string(TOKEN_EOF), token_string(token), 0, lexer->pos);
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
+    cr_expect_eq(token, TOKEN_EOF, "Got: %s. Token: %ld. Pos: %ld", t.tok_str,
+                 0, lexer->pos);
 
     free_lexer(lexer);
 }
@@ -28,11 +27,11 @@ Test(lexer, simple_if)
 
     for (size_t i = 0; i < 11; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);
@@ -54,11 +53,11 @@ Test(lexer, double_if)
 
     for (size_t i = 0; i < 18; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);
@@ -75,11 +74,11 @@ Test(lexer, single_quotes)
 
     for (size_t i = 0; i < 8; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);
@@ -96,11 +95,11 @@ Test(lexer, missing_single_quote)
 
     for (size_t i = 0; i < 8; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);
@@ -119,11 +118,11 @@ Test(lexer, comment)
 
     for (size_t i = 0; i < 12; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);
@@ -143,11 +142,11 @@ Test(lexer, returns)
 
     for (size_t i = 0; i < 16; i++)
     {
-        enum token token = lexer_peek(lexer).curr_tok;
+        struct lexer_token_save t = lexer_peek(lexer);
+        enum token token = t.curr_tok;
         lexer_pop(lexer, true);
-        cr_expect_eq(
-            token, correct[i], "Expected: %s. Got: %s. Token: %ld. Pos: %ld",
-            token_string(correct[i]), token_string(token), i, lexer->pos);
+        cr_expect_eq(token, correct[i], "Got: %s. Token: %ld. Pos: %ld",
+                     t.tok_str, i, lexer->pos);
     }
 
     free_lexer(lexer);

@@ -1,6 +1,6 @@
 check_PROGRAMS = test
 
-test_SOURCES = test_parser.c test_ast.c test_lexer.c test_builtin.c test_input.c test_stack.c
+test_SOURCES = test_parser.c test_ast.c test_lexer.c test_builtin.c test_input.c
 test_CPPFLAGS = -I../src/
 
 test_LDADD = \
@@ -14,5 +14,6 @@ test_LDADD = \
 		%D%/../src/builtin/libbuiltin.a
 
 check-local: test
-	mv %D%/../src/42sh .
+	cp %D%/../src/42sh .
 	./test
+	./ftests.sh

@@ -22,11 +22,4 @@ enum token
     //......
 };
 
-/*
- * @def: Returns a string based on the token
- * Should not be used if token is TOKEN_WORD
- * @args token: The token to be stringified
- */
-char *token_string(enum token token);
-
 #endif /* TOKEN_H */
