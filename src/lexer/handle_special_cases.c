@@ -36,26 +36,28 @@ struct lexer_token_save handle_escape(struct lexer *lexer, char c)
     return out;
 }
 
-struct lexer_token_save handle_single_quote(struct lexer *lexer)
+struct lexer_token_save handle_single_quote(struct lexer *lexer, char c)
 {
     struct lexer_token_save out;
     out.tok_str = NULL;
 
-    char c = fgetc(lexer->input);
     struct vector *vec = vector_create(100);
-
-    while (c != '\'')
+    while (c == '\'')
     {
-        if (c == EOF || c == '\0')
+        c = fgetc(lexer->input);
+        while (c != '\'')
         {
-            out.curr_tok = TOKEN_STDIN;
-            return out;
-        }
+            if (c == EOF || c == '\0')
+            {
+                out.curr_tok = TOKEN_STDIN;
+                return out;
+            }
 
-        vector_append(vec, c);
+            vector_append(vec, c);
+            c = fgetc(lexer->input);
+        }
         c = fgetc(lexer->input);
     }
-    c = fgetc(lexer->input);
     vector_append(vec, '\0');
     lexer->prev = c;
     out.curr_tok = TOKEN_WORD;

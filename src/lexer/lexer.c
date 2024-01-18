@@ -41,7 +41,7 @@ void free_lexer(struct lexer *lexer)
 static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
-        && character != '\0' && character != EOF;
+        && character != '\0' && character != EOF && character != '\t';
 }
 
 static void ignore_line(struct lexer *lexer)

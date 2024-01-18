@@ -76,7 +76,7 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         lexer->prev = fgetc(lexer->input);
         return out;
     case '\'':
-        return handle_single_quote(lexer);
+        return handle_single_quote(lexer, c);
     case '\\':
         return handle_escape(lexer, c);
     case '\n':
@@ -89,6 +89,8 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         out.tok_str = strdup("|");
         lexer->prev = fgetc(lexer->input);
         return out;
+    default:
+        break;
     }
     lexer->prev = c;
     return out;
