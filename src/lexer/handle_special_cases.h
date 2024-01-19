@@ -2,6 +2,7 @@
 #define HANDLE_SPECIAL_CASES_H
 
 #include "lexer.h"
+#include "utils/vector.h"
 
 /*
  * @def: Skips blanks in the lexer and returns the next character
@@ -12,11 +13,23 @@ char skip_blanks(struct lexer *lexer, char c);
 /*
  * @def: Handles the case where the word starts with a \
  */
-struct lexer_token_save handle_escape(struct lexer *lexer, char c);
+struct lexer_token_save handle_escape(struct lexer *lexer);
 
 /*
- * @def: Handles the case where the word starts with a single quote
+ * @def: Handles the case where the word contains with a single quote
  */
 struct lexer_token_save handle_single_quote(struct lexer *lexer, char c);
+
+/*
+ * @def: Handles the case where the word contains a double quote
+ */
+struct lexer_token_save handle_double_quote(struct lexer *lexer,
+                                            struct vector *vec);
+
+/*
+ * @def: Handles the case where there's an = sign in a word
+ */
+struct lexer_token_save handle_assignment(struct lexer *lexer,
+                                          struct vector *vec);
 
 #endif /* HANDLE_SPECIAL_CASES_H */

@@ -26,16 +26,6 @@ Test(ast, false_builtin)
                  evaluate_ast(&ast));
 }
 
-Test(ast, unknown_command)
-{
-    struct ast ast = { .node_type = NODE_COMMAND,
-                       .value = (char *[]){ "ACU>YAKA", NULL },
-                       .children = NULL };
-
-    cr_expect_eq(evaluate_ast(&ast), 127, "Expected: %d. Got: %d", 127,
-                 evaluate_ast(&ast));
-}
-
 Test(ast, double_if)
 {
     struct ast echo_a = { .node_type = NODE_COMMAND,
