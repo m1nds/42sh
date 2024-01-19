@@ -24,7 +24,7 @@ int handle_while(struct ast *ast)
 
 int handle_until(struct ast *ast)
 {
-    if (ast->node_type != NODE_WHILE)
+    if (ast->node_type != NODE_UNTIL)
     {
         return -1;
     }

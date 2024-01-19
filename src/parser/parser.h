@@ -71,9 +71,12 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer);
 enum parser_status parse_element(struct ast **res, struct lexer *lexer);
 
 /**
- * @def: Parses a element comprised of an rule if
+ * @def: Parses a element comprised of a rule if, while and until
  *
- * shell_command = rule_if ;
+ * shell_command = rule_if
+ *               | rule_while
+ *               | rule_until
+ *               ;
  */
 enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
 
@@ -87,11 +90,25 @@ enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer);
 /**
  * @def: Parses a element comprised of an else clause
  *
- * else_clause =   'else' compound_list
+ * else_clause  =  'else' compound_list
  *               | 'elif' compound_list 'then' compound_list [else_clause]
  *               ;
  */
 enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer);
+
+/**
+ * @def: Parses a element comprised of a rule until
+ *
+ * while_rule  =   'while' compound_list 'do' compound_list 'done' ;
+ * */
+enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);
+
+/**
+ * @def: Parses a element comprised of a rule until
+ *
+ * until_rule  =   'until' compound_list 'do' compound_list 'done' ;
+ */
+enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
 
 /**
  * @def: Parses a element comprised of a compound_list
