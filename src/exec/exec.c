@@ -24,6 +24,10 @@ int evaluate_ast(struct ast *ast)
         return handle_or(ast);
     case NODE_PIPE:
         return handle_pipe(ast);
+    case NODE_WHILE:
+        return handle_while(ast);
+    case NODE_UNTIL:
+        return handle_until(ast);
     default:
         return -1;
     }

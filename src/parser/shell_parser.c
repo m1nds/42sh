@@ -2,15 +2,116 @@
 
 #include <stdlib.h>
 
+#include "parser.h"
+
 enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
 {
-    if (parse_rule_if(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+    if (parse_rule_if(res, lexer) == PARSER_UNEXPECTED_TOKEN
+        && parse_rule_while(res, lexer) == PARSER_UNEXPECTED_TOKEN
+        && parse_rule_until(res, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
     return PARSER_OK;
 }
 
+enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer)
+{
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
+    if (token != TOKEN_WHILE)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    struct ast *node_while = ast_new(NODE_WHILE, 2, NULL);
+    struct ast *first_child = NULL;
+    if (parse_compound_list(&first_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        ast_free(node_while);
+        *res = NULL;
+        print_error("Error while parsing first child of while", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    node_while->children[0] = first_child;
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
+    if (token != TOKEN_DO)
+    {
+        ast_free(node_while);
+        *res = NULL;
+        print_error("Error while parsing do", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    struct ast *second_child = NULL;
+    if (parse_compound_list(&second_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        ast_free(node_while);
+        *res = NULL;
+        print_error("Error while parsing second child of while", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    node_while->children[1] = second_child;
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
+    *res = node_while;
+    if (token == TOKEN_DONE)
+    {
+        lexer_pop(lexer, true);
+        return PARSER_OK;
+    }
+    return PARSER_UNEXPECTED_TOKEN;
+}
+
+enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer)
+{
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
+    if (token != TOKEN_UNTIL)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    struct ast *node_until = ast_new(NODE_UNTIL, 2, NULL);
+    struct ast *first_child = NULL;
+    if (parse_compound_list(&first_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        ast_free(node_until);
+        *res = NULL;
+        print_error("Error while parsing first child of until", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    node_until->children[0] = first_child;
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
+    if (token != TOKEN_DO)
+    {
+        ast_free(node_until);
+        *res = NULL;
+        print_error("Error while parsing do", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    struct ast *second_child = NULL;
+    if (parse_compound_list(&second_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        ast_free(node_until);
+        *res = NULL;
+        print_error("Error while parsing second child of until", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    node_until->children[1] = second_child;
+    t = lexer_peek(lexer);
+    token = t.curr_tok;
+    *res = node_until;
+    if (token == TOKEN_DONE)
+    {
+        lexer_pop(lexer, true);
+        return PARSER_OK;
+    }
+    return PARSER_UNEXPECTED_TOKEN;
+}
 enum parser_status parse_rule_if(struct ast **res, struct lexer *lexer)
 {
     struct lexer_token_save t = lexer_peek(lexer);
