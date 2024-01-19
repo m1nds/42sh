@@ -11,7 +11,9 @@ enum ast_type
     NODE_PIPE,
     NODE_NOT,
     NODE_AND,
-    NODE_OR
+    NODE_OR,
+    NODE_WHILE,
+    NODE_UNTIL
 
 };
 

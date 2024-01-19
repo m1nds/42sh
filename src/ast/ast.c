@@ -8,6 +8,13 @@
 
 #include "builtin/builtin.h"
 
+/*
+ * @def:    An array containing the string associated with an enum ast_type
+ *          at the ast_type index
+ * */
+char *token_to_string[] = { "Command: ", ";\n",  "If\n",    "|\n",    "!\n",
+                            "&&\n",      "||\n", "While\n", "Until\n" };
+
 struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
 {
     struct ast *node = calloc(1, sizeof(struct ast));
@@ -97,31 +104,7 @@ static void true_print_ast(struct ast *ast, size_t tabs)
     {
         return;
     }
-    printf("Type: ");
-    switch (ast->node_type)
-    {
-    case NODE_COMMAND:
-        printf("Command: ");
-        break;
-    case NODE_IF:
-        printf("If\n");
-        break;
-    case NODE_NOT:
-        printf("!\n");
-        break;
-    case NODE_AND:
-        printf("&&\n");
-        break;
-    case NODE_OR:
-        printf("||\n");
-        break;
-    case NODE_SEMICOLON:
-        printf(";\n");
-        break;
-    case NODE_PIPE:
-        printf("|\n");
-        break;
-    }
+    printf("Type: %s", token_to_string[ast->node_type]);
     if (ast->value != NULL)
     {
         size_t i = 0;
