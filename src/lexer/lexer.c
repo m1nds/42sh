@@ -79,16 +79,12 @@ static struct lexer_token_save get_part_one(struct lexer *lexer)
     return out;
 }
 
-static struct lexer_token_save get_next_token(struct lexer *lexer)
+static struct lexer_token_save main_loop(struct lexer *lexer,
+                                         struct vector *vec)
 {
-    struct lexer_token_save out = get_part_one(lexer);
-    if (out.curr_tok != TOKEN_NONE)
-    {
-        return out;
-    }
-    char c = lexer->prev;
-    struct vector *vec = vector_create(100);
+    struct lexer_token_save out;
     char single_quote_flag = 0;
+    char c = lexer->prev;
     while (is_continuous_word(c) || single_quote_flag == 1)
     {
         if (c == '\0' || c == EOF)
@@ -137,13 +133,24 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
         }
         c = fgetc(lexer->input);
     }
+    lexer->prev = c;
+    return out;
+}
 
+static struct lexer_token_save get_next_token(struct lexer *lexer)
+{
+    struct lexer_token_save out = get_part_one(lexer);
+    if (out.curr_tok != TOKEN_NONE)
+    {
+        return out;
+    }
+    struct vector *vec = vector_create(100);
+    out = main_loop(lexer, vec);
     vector_append(vec, '\0');
 
     out = match_word(vec->data);
     out.tok_str = strdup(vec->data);
 
-    lexer->prev = c;
     vector_destroy(vec);
     return out;
 }

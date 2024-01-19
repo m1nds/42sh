@@ -1,60 +1,29 @@
 #define _POSIX_C_SOURCE 200809L
-#include "get_token_type.h"
+#include "lexer/get_token_type.h"
 
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "handle_special_cases.h"
+#include "lexer/handle_special_cases.h"
 
 struct lexer_token_save match_word(char *word)
 {
+    char *words[] = { "if",    "then", "elif", "else", "fi",  "while",
+                      "until", "for",  "in",   "do",   "done" };
+    enum token tokens[] = { TOKEN_IF, TOKEN_THEN,  TOKEN_ELIF,  TOKEN_ELSE,
+                            TOKEN_FI, TOKEN_WHILE, TOKEN_UNTIL, TOKEN_FOR,
+                            TOKEN_IN, TOKEN_DO,    TOKEN_DONE };
+    size_t len = 11;
     struct lexer_token_save out;
     out.curr_tok = TOKEN_WORD;
-    if (strcmp(word, "if") == 0)
+    for (size_t i = 0; i < len; i++)
     {
-        out.curr_tok = TOKEN_IF;
-        return out;
-    }
-    if (strcmp(word, "then") == 0)
-    {
-        out.curr_tok = TOKEN_THEN;
-        return out;
-    }
-    if (strcmp(word, "elif") == 0)
-    {
-        out.curr_tok = TOKEN_ELIF;
-        return out;
-    }
-    if (strcmp(word, "else") == 0)
-    {
-        out.curr_tok = TOKEN_ELSE;
-        return out;
-    }
-    if (strcmp(word, "fi") == 0)
-    {
-        out.curr_tok = TOKEN_FI;
-        return out;
-    }
-    if (strcmp(word, "for") == 0)
-    {
-        out.curr_tok = TOKEN_FOR;
-        return out;
-    }
-    if (strcmp(word, "in") == 0)
-    {
-        out.curr_tok = TOKEN_IN;
-        return out;
-    }
-    if (strcmp(word, "do") == 0)
-    {
-        out.curr_tok = TOKEN_DO;
-        return out;
-    }
-    if (strcmp(word, "done") == 0)
-    {
-        out.curr_tok = TOKEN_DONE;
-        return out;
+        if (strcmp(word, words[i]) == 0)
+        {
+            out.curr_tok = tokens[i];
+            return out;
+        }
     }
     return out;
 }
@@ -108,7 +77,6 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
     struct lexer_token_save out;
     out.curr_tok = TOKEN_NONE;
     out.tok_str = NULL;
-    char new_c;
     switch (c)
     {
     case EOF:
@@ -118,33 +86,17 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         return fill_out(lexer, out, TOKEN_SEMICOLON, &c);
     case '\'':
         return handle_single_quote(lexer, c);
+    case '<':
+    case '>':
+        return handle_redirects(lexer, c);
     case '\\':
         return handle_escape(lexer);
     case '\n':
         return fill_out(lexer, out, TOKEN_RETURN, &c);
     case '|':
-        out = fill_out(lexer, out, TOKEN_REDIR_PIPE, &new_c);
-        if (new_c == '|')
-        {
-            out = fill_out(lexer, out, TOKEN_OR, &new_c);
-        }
-        else
-        {
-            out.tok_str = strdup("|");
-        }
-        lexer->prev = new_c;
-        return out;
+        return handle_pipe_or(lexer);
     case '&':
-        new_c = fgetc(lexer->input);
-        if (new_c == '&')
-        {
-            out = fill_out(lexer, out, TOKEN_AND, &c);
-        }
-        else
-        {
-            out.curr_tok = TOKEN_NONE;
-        }
-        return out;
+        return handle_ands(lexer);
     case '!':
         return fill_out(lexer, out, TOKEN_NOT, &c);
     default:
