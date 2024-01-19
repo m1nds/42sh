@@ -9,11 +9,11 @@
 
 struct lexer_token_save match_word(char *word)
 {
-    char *words[] = {"if", "then", "elif", "else", "fi", "while", "until",
-                     "for", "in", "do", "done" };
-    enum token tokens[] = { TOKEN_IF, TOKEN_THEN, TOKEN_ELIF, TOKEN_ELSE,
-                          TOKEN_FI, TOKEN_WHILE, TOKEN_UNTIL, TOKEN_FOR,
-                          TOKEN_IN, TOKEN_DO, TOKEN_DONE };
+    char *words[] = { "if",    "then", "elif", "else", "fi",  "while",
+                      "until", "for",  "in",   "do",   "done" };
+    enum token tokens[] = { TOKEN_IF, TOKEN_THEN,  TOKEN_ELIF,  TOKEN_ELSE,
+                            TOKEN_FI, TOKEN_WHILE, TOKEN_UNTIL, TOKEN_FOR,
+                            TOKEN_IN, TOKEN_DO,    TOKEN_DONE };
     size_t len = 11;
     struct lexer_token_save out;
     out.curr_tok = TOKEN_WORD;

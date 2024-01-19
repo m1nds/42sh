@@ -38,7 +38,8 @@ struct lexer_token_save handle_escape(struct lexer *lexer)
     return out;
 }
 
-struct lexer_token_save handle_double_quote(struct lexer *lexer, struct vector *vec)
+struct lexer_token_save handle_double_quote(struct lexer *lexer,
+                                            struct vector *vec)
 {
     struct lexer_token_save out;
     char c = fgetc(lexer->input);
@@ -88,7 +89,8 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer, char c)
     return out;
 }
 
-struct lexer_token_save handle_assignment(struct lexer *lexer, struct vector *vec)
+struct lexer_token_save handle_assignment(struct lexer *lexer,
+                                          struct vector *vec)
 {
     struct lexer_token_save out;
     out.tok_str = NULL;

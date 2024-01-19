@@ -23,6 +23,7 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer, char c);
 /*
  * @def: Handles the case where the word contains a double quote
  */
-struct lexer_token_save handle_double_quote(struct lexer *lexer, struct vector *vec);
+struct lexer_token_save handle_double_quote(struct lexer *lexer,
+                                            struct vector *vec);
 
 #endif /* HANDLE_SPECIAL_CASES_H */
