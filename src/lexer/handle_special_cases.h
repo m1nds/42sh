@@ -26,4 +26,10 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer, char c);
 struct lexer_token_save handle_double_quote(struct lexer *lexer,
                                             struct vector *vec);
 
+/*
+ * @def: Handles the case where there's an = sign in a word
+ */
+struct lexer_token_save handle_assignment(struct lexer *lexer,
+                                          struct vector *vec);
+
 #endif /* HANDLE_SPECIAL_CASES_H */

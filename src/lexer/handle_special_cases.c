@@ -96,12 +96,12 @@ struct lexer_token_save handle_assignment(struct lexer *lexer,
     out.tok_str = NULL;
     out.curr_tok = TOKEN_ASSIGNMENT;
     size_t i = 0;
-    while (vector->data[i] != '\0')
+    while (vec->data[i] != '\0')
     {
-        if (vector->data[i] >= 'a' && vector->data <= 'z'
-            || vector->data[i] >= 'A' && vector->data <= 'Z'
-            || vector->data[i] >= '0' && vector->data[i] <= '9'
-            || vector->data[i] == '_')
+        if ((vec->data[i] >= 'a' && vec->data[i] <= 'z')
+            || (vec->data[i] >= 'A' && vec->data[i] <= 'Z')
+            || (vec->data[i] >= '0' && vec->data[i] <= '9')
+            || vec->data[i] == '_')
         {
             i++;
         }
