@@ -79,7 +79,8 @@ static struct lexer_token_save get_part_one(struct lexer *lexer)
     return out;
 }
 
-static struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
+static struct lexer_token_save main_loop(struct lexer *lexer,
+                                         struct vector *vec)
 {
     struct lexer_token_save out;
     char single_quote_flag = 0;
