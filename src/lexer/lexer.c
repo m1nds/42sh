@@ -45,8 +45,7 @@ void free_lexer(struct lexer *lexer)
 static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
-        && character != '\0' && character != EOF && character != '\t'
-        && character != '|' && character != '&' && character != '=';
+        && character != '\t' && character != '|' && character != '&';
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -65,15 +64,11 @@ static struct lexer_token_save get_part_one(struct lexer *lexer)
     {
         c = fgetc(lexer->input);
     }
-    if (c == '\\')
-    {
-        return handle_escape(lexer, c);
-    }
     // Remove all spaces before the word
     c = skip_blanks(lexer, c);
     if (c == '\\')
     {
-        return handle_escape(lexer, c);
+        return handle_escape(lexer);
     }
     if (c == '#')
     {
@@ -96,10 +91,45 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     char single_quote_flag = 0;
     while (is_continuous_word(c) || single_quote_flag == 1)
     {
-        if (c == '\'')
+        if (c == '\0' || c == EOF)
+        {
+            if (single_quote_flag == 0)
+            {
+                break;
+            }
+            if ((c == EOF || c == '\0') && lexer->input != stdin)
+            {
+                vector_destroy(vec);
+                out.curr_tok = TOKEN_STDIN;
+                return out;
+            }
+        }
+        else if (c == '\\')
+        {
+            c = fgetc(lexer->input);
+            if (c == '\n')
+            {
+                c = fgetc(lexer->input);
+            }
+            vector_append(vec, c);
+        }
+        else if (c == '\'')
         {
             single_quote_flag += 1;
             single_quote_flag %= 2;
+        }
+        else if (c == '"')
+        {
+            out = handle_double_quote(lexer, vec);
+            if (out.curr_tok == TOKEN_STDIN)
+            {
+                vector_destroy(vec);
+                return out;
+            }
+        }
+        else if (c == '=')
+        {
+            return handle_assignment(lexer, vec);
         }
         else
         {

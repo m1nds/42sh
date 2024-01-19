@@ -9,52 +9,21 @@
 
 struct lexer_token_save match_word(char *word)
 {
+    char *words[] = {"if", "then", "elif", "else", "fi", "while", "until",
+                     "for", "in", "do", "done" };
+    enum token tokens[] = { TOKEN_IF, TOKEN_THEN, TOKEN_ELIF, TOKEN_ELSE,
+                          TOKEN_FI, TOKEN_WHILE, TOKEN_UNTIL, TOKEN_FOR,
+                          TOKEN_IN, TOKEN_DO, TOKEN_DONE };
+    size_t len = 11;
     struct lexer_token_save out;
     out.curr_tok = TOKEN_WORD;
-    if (strcmp(word, "if") == 0)
+    for (size_t i = 0; i < len; i++)
     {
-        out.curr_tok = TOKEN_IF;
-        return out;
-    }
-    if (strcmp(word, "then") == 0)
-    {
-        out.curr_tok = TOKEN_THEN;
-        return out;
-    }
-    if (strcmp(word, "elif") == 0)
-    {
-        out.curr_tok = TOKEN_ELIF;
-        return out;
-    }
-    if (strcmp(word, "else") == 0)
-    {
-        out.curr_tok = TOKEN_ELSE;
-        return out;
-    }
-    if (strcmp(word, "fi") == 0)
-    {
-        out.curr_tok = TOKEN_FI;
-        return out;
-    }
-    if (strcmp(word, "for") == 0)
-    {
-        out.curr_tok = TOKEN_FOR;
-        return out;
-    }
-    if (strcmp(word, "in") == 0)
-    {
-        out.curr_tok = TOKEN_IN;
-        return out;
-    }
-    if (strcmp(word, "do") == 0)
-    {
-        out.curr_tok = TOKEN_DO;
-        return out;
-    }
-    if (strcmp(word, "done") == 0)
-    {
-        out.curr_tok = TOKEN_DONE;
-        return out;
+        if (strcmp(word, words[i]) == 0)
+        {
+            out.curr_tok = tokens[i];
+            return out;
+        }
     }
     return out;
 }
@@ -78,7 +47,7 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
     case '\'':
         return handle_single_quote(lexer, c);
     case '\\':
-        return handle_escape(lexer, c);
+        return handle_escape(lexer);
     case '\n':
         lexer->prev = fgetc(lexer->input);
         out.curr_tok = TOKEN_RETURN;
