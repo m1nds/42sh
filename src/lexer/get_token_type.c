@@ -64,6 +64,7 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
     struct lexer_token_save out;
     out.curr_tok = TOKEN_NONE;
     out.tok_str = NULL;
+    char new_c;
     switch (c)
     {
     case EOF:
@@ -86,7 +87,35 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         return out;
     case '|':
         out.curr_tok = TOKEN_REDIR_PIPE;
-        out.tok_str = strdup("|");
+        new_c = fgetc(lexer->input);
+        if (new_c == '|')
+        {
+            out.curr_tok = TOKEN_OR;
+            out.tok_str = strdup("||");
+            new_c = fgetc(lexer->input);
+        }
+        else
+        {
+            out.tok_str = strdup("|");
+        }
+        lexer->prev = new_c;
+        return out;
+    case '&':
+        new_c = fgetc(lexer->input);
+        if (new_c == '&')
+        {
+            out.curr_tok = TOKEN_AND;
+            out.tok_str = strdup("&&");
+            lexer->prev = fgetc(lexer->input);
+        }
+        else
+        {
+            out.curr_tok = TOKEN_NONE;
+        }
+        return out;
+    case '!':
+        out.curr_tok = TOKEN_NOT;
+        out.tok_str = strdup("!");
         lexer->prev = fgetc(lexer->input);
         return out;
     default:

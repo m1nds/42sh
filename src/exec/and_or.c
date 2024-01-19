@@ -10,7 +10,6 @@ int handle_and(struct ast *ast)
     {
         return -1;
     }
-
     size_t i = 0;
     while (ast->children[i])
     {
