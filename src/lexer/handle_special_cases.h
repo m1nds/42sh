@@ -1,7 +1,7 @@
 #ifndef HANDLE_SPECIAL_CASES_H
 #define HANDLE_SPECIAL_CASES_H
 
-#include "lexer.h"
+#include "lexer/lexer.h"
 #include "utils/vector.h"
 
 /*
@@ -31,5 +31,20 @@ struct lexer_token_save handle_double_quote(struct lexer *lexer,
  */
 struct lexer_token_save handle_assignment(struct lexer *lexer,
                                           struct vector *vec);
+
+/*
+ * @def: Returns a token to match the redirect
+ */
+struct lexer_token_save handle_redirects(struct lexer *lexer, char c);
+
+/*
+ * @def: Handles pipes and ors
+ */
+struct lexer_token_save handle_pipe_or(struct lexer *lexer);
+
+/*
+ * @def Handles and
+ */
+struct lexer_token_save handle_ands(struct lexer *lexer);
 
 #endif /* HANDLE_SPECIAL_CASES_H */

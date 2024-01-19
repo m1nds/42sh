@@ -1,5 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
-#include "handle_special_cases.h"
+#include "lexer/handle_special_cases.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -114,5 +114,95 @@ struct lexer_token_save handle_assignment(struct lexer *lexer,
     out.tok_str = strdup(vec->data);
     vector_destroy(vec);
     lexer->prev = fgetc(lexer->input);
+    return out;
+}
+
+struct lexer_token_save handle_redirects(struct lexer *lexer, char c)
+{
+    struct lexer_token_save out;
+    if (c == '>')
+    {
+        c = fgetc(lexer->input);
+        if (c == '>')
+        {
+            out.curr_tok = TOKEN_REDIR_APPEND;
+            out.tok_str = strdup(">>");
+            lexer->prev = fgetc(lexer->input);
+            return out;
+        }
+        if (c == '&')
+        {
+            out.curr_tok = TOKEN_REDIR_DUPIN;
+            out.tok_str = strdup(">&");
+            lexer->prev = fgetc(lexer->input);
+            return out;
+        }
+        if (c == '|')
+        {
+            c = fgetc(lexer->input);
+        }
+        out.curr_tok = TOKEN_REDIR_STDOUT;
+        out.tok_str = strdup(">");
+        lexer->prev = c;
+        return out;
+    }
+    if (c == '<')
+    {
+        c = fgetc(lexer->input);
+        if (c == '&')
+        {
+            out.curr_tok = TOKEN_REDIR_DUPOUT;
+            out.tok_str = strdup("<&");
+            lexer->prev = fgetc(lexer->input);
+            return out;
+        }
+        if (c == '>')
+        {
+            out.curr_tok = TOKEN_REDIR_INOUT;
+            out.tok_str = strdup("<>");
+            lexer->prev = fgetc(lexer->input);
+            return out;
+        }
+        out.curr_tok = TOKEN_REDIR_STDIN;
+        out.tok_str = strdup("<");
+        lexer->prev = c;
+        return out;
+    }
+    return out;
+}
+
+struct lexer_token_save handle_pipe_or(struct lexer *lexer)
+{
+    struct lexer_token_save out;
+    out.curr_tok = TOKEN_REDIR_PIPE;
+    char new_c = fgetc(lexer->input);
+    if (new_c == '|')
+    {
+        out.curr_tok = TOKEN_OR;
+        out.tok_str = strdup("||");
+        new_c = fgetc(lexer->input);
+    }
+    else
+    {
+        out.tok_str = strdup("|");
+    }
+    lexer->prev = new_c;
+    return out;
+}
+
+struct lexer_token_save handle_ands(struct lexer *lexer)
+{
+    struct lexer_token_save out;
+    char new_c = fgetc(lexer->input);
+    if (new_c == '&')
+    {
+        out.curr_tok = TOKEN_AND;
+        out.tok_str = strdup("&&");
+        lexer->prev = fgetc(lexer->input);
+    }
+    else
+    {
+        out.curr_tok = TOKEN_NONE;
+    }
     return out;
 }
