@@ -134,6 +134,8 @@ test_all "echo a | cat -e" "easy pipe"
 test_all "ls | cat -e | cat -e" "normal pipe"
 test_all "tree | cat -e | grep 42sh" "hard pipe"
 test_all "echo ab c |" "error pipe"
+test_all "true && false || true" "and_or1"
+test_all "false || ! false && true" "and_or_neg"
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"

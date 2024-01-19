@@ -46,14 +46,65 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
+    enum token token = lexer_peek(lexer).curr_tok;
+    while (token == TOKEN_AND || token == TOKEN_OR)
+    {
+        struct ast *node = NULL;
+        struct ast *child = NULL;
+        switch (token)
+        {
+        case TOKEN_AND:
+            node = ast_new(NODE_AND, 2, NULL);
+            node->children[0] = *res;
+            break;
+        case TOKEN_OR:
+            node = ast_new(NODE_OR, 2, NULL);
+            node->children[0] = *res;
+            break;
+        default:
+            break;
+        }
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
+        while (token == TOKEN_RETURN)
+        {
+            lexer_pop(lexer, true);
+            token = lexer_peek(lexer).curr_tok;
+        }
+        if (parse_pipeline(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            ast_free(node);
+            *res = NULL;
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        node->children[1] = child;
+        token = lexer_peek(lexer).curr_tok;
+        *res = node;
+    }
     return PARSER_OK;
 }
 
 enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
 {
-    if (parse_command(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+    enum token not_tk = lexer_peek(lexer).curr_tok;
+    if (not_tk == TOKEN_NOT)
     {
-        return PARSER_UNEXPECTED_TOKEN;
+        struct ast *not_ast = ast_new(NODE_NOT, 1, NULL);
+        struct ast *child = NULL;
+        lexer_pop(lexer, true);
+        if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        not_ast->children[0] = child;
+        *res = not_ast;
+    }
+    else
+    {
+        if (parse_command(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
     }
     enum token token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_REDIR_PIPE)

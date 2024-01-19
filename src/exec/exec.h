@@ -65,6 +65,23 @@ int handle_and(struct ast *ast);
 int handle_or(struct ast *ast);
 
 /*
+ * @def:   Evaluation handler for while loop.
+ * @param: struct ast *ast: AST node containing in Child[0] the compound_list
+ *                          repressenting the condition
+ *         in child[1] the compound_list to evaluate
+ * @ret:   return code of the last command node or -1 on error.
+ * */
+int handle_while(struct ast *ast);
+
+/*
+ * @def:   Evaluation handler for until loop.
+ * @param: struct ast *ast: AST node containing in Child[0] the compound_list
+ *                          repressenting the condition
+ *         in child[1] the compound_list to evaluate
+ * @ret:   return code of the last command node or -1 on error.
+ * */
+int handle_until(struct ast *ast);
+/*
  * @def:   Complete AST evaluation function
  * @param: struct ast *ast: the complete AST
  * @ret:   exit code or -1 if an error occurs
