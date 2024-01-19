@@ -53,16 +53,16 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
         struct ast *child = NULL;
         switch (token)
         {
-            case TOKEN_AND:
-                node = ast_new(NODE_AND, 2, NULL);
-                node->children[0] = *res;
-                break;
-            case TOKEN_OR:
-                node = ast_new(NODE_OR, 2, NULL);
-                node->children[0] = *res;
-                break;
-            default:
-                break;
+        case TOKEN_AND:
+            node = ast_new(NODE_AND, 2, NULL);
+            node->children[0] = *res;
+            break;
+        case TOKEN_OR:
+            node = ast_new(NODE_OR, 2, NULL);
+            node->children[0] = *res;
+            break;
+        default:
+            break;
         }
         lexer_pop(lexer, true);
         token = lexer_peek(lexer).curr_tok;
