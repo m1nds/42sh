@@ -169,7 +169,7 @@ int handle_redirect(struct ast *ast)
         }
         else if ((*current)->node_type == NODE_ASSIGN)
         {
-            // TODO: Need to implement variables.
+            setup_value((*current)->value[0], (*current)->value[1]);
         }
         else if ((*current)->node_type == NODE_REDIR_INOUT)
         {
