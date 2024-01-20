@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <stddef.h>
+
 #include "utils/hash_map.h"
 
 enum ast_type
