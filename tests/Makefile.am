@@ -5,11 +5,11 @@ test_CPPFLAGS = -I../src/
 
 test_LDADD = \
 		-lcriterion \
-		%D%/../src/ast/libast.a \
 		%D%/../src/input/libinput.a \
 		%D%/../src/exec/libexec.a \
 		%D%/../src/lexer/liblexer.a \
 		%D%/../src/parser/libparser.a \
+		%D%/../src/ast/libast.a \
 		%D%/../src/utils/libutils.a \
 		%D%/../src/builtin/libbuiltin.a
 

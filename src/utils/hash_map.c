@@ -22,7 +22,7 @@ struct hash_map *hash_map_init(size_t size)
     return h;
 }
 
-bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
+bool hash_map_insert(struct hash_map *hash_map, char *key, char *value,
                      bool *updated)
 {
     if (!hash_map)
@@ -41,6 +41,7 @@ bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
         {
             if (strcmp(x->key, key) == 0)
             {
+                free(x->value);
                 x->value = value;
                 *updated = true;
                 return true;
@@ -85,6 +86,8 @@ void hash_map_free(struct hash_map *hash_map)
         {
             struct pair_list *temp = pl;
             pl = pl->next;
+            free(temp->key);
+            free(temp->value);
             free(temp);
         }
     }
@@ -120,7 +123,7 @@ void hash_map_dump(struct hash_map *hash_map)
     }
 }
 
-const char *hash_map_get(const struct hash_map *hash_map, const char *key)
+char *hash_map_get(const struct hash_map *hash_map, char *key)
 {
     if (!hash_map || !key)
     {
@@ -146,7 +149,7 @@ const char *hash_map_get(const struct hash_map *hash_map, const char *key)
     return NULL;
 }
 
-bool hash_map_remove(struct hash_map *hash_map, const char *key)
+bool hash_map_remove(struct hash_map *hash_map, char *key)
 {
     if (!hash_map)
     {
@@ -168,6 +171,8 @@ bool hash_map_remove(struct hash_map *hash_map, const char *key)
     if (strcmp(lp->key, key) == 0)
     {
         hash_map->data[h] = lp->next;
+        free(lp->key);
+        free(lp->value);
         free(lp);
         return true;
     }
@@ -177,6 +182,8 @@ bool hash_map_remove(struct hash_map *hash_map, const char *key)
         if (strcmp(lp->key, key) == 0)
         {
             prev->next = lp->next;
+            free(lp->key);
+            free(lp->value);
             free(lp);
             return true;
         }
