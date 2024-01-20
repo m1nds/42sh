@@ -1,13 +1,11 @@
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
 #include "ast/ast.h"
 #include "exec/exec.h"
-
-#include <stdlib.h>
-#include <string.h>
 
 typedef int (*redirect_ptr)(void *);
 
@@ -103,7 +101,8 @@ static int redirect_output_append(void *arg)
     struct ast *ast = (struct ast *)arg;
     int user_flags = S_IWUSR | S_IWGRP | S_IWOTH;
 
-    int file_fd = open(ast->value[0], O_WRONLY | O_CREAT | O_APPEND, user_flags);
+    int file_fd =
+        open(ast->value[0], O_WRONLY | O_CREAT | O_APPEND, user_flags);
     if (file_fd == -1)
     {
         return -1;
@@ -127,13 +126,12 @@ static void redirect_inout(struct ast *ast, int *fds, size_t *i)
 
 redirect_ptr match_redirect_func(enum ast_type type)
 {
-    static redirect_ptr buffer[] = {
-        [NODE_REDIR_IN] = redirect_input,
-        [NODE_REDIR_OUT] = redirect_output,
-        [NODE_REDIR_OUTA] = redirect_output_append,
-        [NODE_REDIR_INAND] = redirect_input_and,
-        [NODE_REDIR_OUTAND] = redirect_output_and
-    };
+    static redirect_ptr buffer[] = { [NODE_REDIR_IN] = redirect_input,
+                                     [NODE_REDIR_OUT] = redirect_output,
+                                     [NODE_REDIR_OUTA] = redirect_output_append,
+                                     [NODE_REDIR_INAND] = redirect_input_and,
+                                     [NODE_REDIR_OUTAND] =
+                                         redirect_output_and };
 
     return buffer[type];
 }
