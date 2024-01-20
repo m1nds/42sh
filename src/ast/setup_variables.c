@@ -53,7 +53,7 @@ void setup_variables(int nb_args, char **args)
 {
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
-    setup_args_nb(nb_args);
+    setup_nb_args(nb_args);
     setup_random();
     setup_uid();
     setup_pid();

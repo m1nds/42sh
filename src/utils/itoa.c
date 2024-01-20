@@ -1,6 +1,6 @@
-#include <stddef.h>
+#include "utils/itoa.h"
 
-#include "my_itoa.h"
+#include <stddef.h>
 
 char *my_itoa(int value, char *s)
 {
