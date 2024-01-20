@@ -11,7 +11,7 @@ bin_PROGRAMS = 42sh
 		input/libinput.a \
 		lexer/liblexer.a \
 		parser/libparser.a \
-		utils/libutils.a \
 		exec/libexec.a \
 		ast/libast.a \
-		builtin/libbuiltin.a
+		builtin/libbuiltin.a\
+		utils/libutils.a

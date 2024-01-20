@@ -1,50 +1,40 @@
+#define _POSIX_C_SOURCE 200809L
 #include "utils/itoa.h"
 
 #include <stddef.h>
+#include <string.h>
 
-char *my_itoa(int value, char *s)
+#include "utils/vector.h"
+
+char *itoa_base(unsigned int value)
 {
-    size_t i = 0;
     if (value == 0)
     {
-        s[i++] = '0';
-        s[i] = '\0';
-
-        return s;
+        return strdup("0");
     }
-
-    int neg = (value < 0) ? 1 : 0;
-
-    if (neg)
-    {
-        value = -value;
-        s[i] = '-';
-        i++;
-    }
-
-    int save = value;
+    struct vector *vec = vector_create(100);
+    unsigned int save = value;
     while (save)
     {
-        s[i] = (save % 10) + '0';
-
+        vector_append(vec, (save % 10) + '0');
         save /= 10;
-        i++;
     }
 
-    s[i] = '\0';
+    vector_append(vec, '\0');
 
-    size_t start = neg;
-    size_t end = i - 1;
+    size_t start = 0;
+    size_t end = strlen(vec->data) - 1;
 
-    while (start < end)
+    while (start < end && end != 0)
     {
-        char tmp = s[start];
-        s[start] = s[end];
-        s[end] = tmp;
+        char tmp = vec->data[start];
+        vec->data[start] = vec->data[end];
+        vec->data[end] = tmp;
 
         start++;
         end--;
     }
-
+    char *s = strdup(vec->data);
+    vector_destroy(vec);
     return s;
 }

@@ -2,6 +2,7 @@
 
 #include "input.h"
 
+#include <err.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -45,7 +46,7 @@ int check_prettyprint(int *flags)
     return *flags & PRETTY_PRINT_FLAG;
 }
 
-FILE *get_input(int nbargs, char **args, int *flags, int *err)
+FILE *get_input(int nbargs, char **args, int *flags)
 {
     // Iterate over all arguments (skip the first one "./42sh")
     for (int i = 1; i < nbargs; i++)
@@ -67,7 +68,7 @@ FILE *get_input(int nbargs, char **args, int *flags, int *err)
             else
             {
                 // Set error code to 2 because "-c" option requires an argument
-                *err = 2;
+                errx(2, "option requires an argument");
                 return NULL;
             }
         }
@@ -76,7 +77,7 @@ FILE *get_input(int nbargs, char **args, int *flags, int *err)
         if (!fp)
         {
             // Set error code to 127 because the file doesn't exist.
-            *err = 127;
+            errx(127, "No such file or directory");
         }
         return fp;
     }

@@ -7,7 +7,7 @@
 #include "utils/hash_map.h"
 #include "utils/vector.h"
 
-struct hash_map *hm;
+extern struct hash_map *hm;
 
 char is_continuous_name(char c)
 {
@@ -47,7 +47,8 @@ void replace_variables(struct ast *ast)
                 char name_flag = 0;
                 while (ast->value[i][j] != '\0')
                 {
-                    if (is_continuous_name(ast->value[i][j]) == 0)
+                    if (is_continuous_name(ast->value[i][j]) == 0
+                        && name_flag == 1)
                     {
                         if (name_flag == 1)
                         {
@@ -90,6 +91,11 @@ void replace_variables(struct ast *ast)
                         }
                     }
                     j++;
+                }
+                char *val = hash_map_get(hm, name->data);
+                if (val != NULL)
+                {
+                    vector_append_string(final_command, val);
                 }
                 free(ast->value[i]);
                 ast->value[i] = strdup(final_command->data);

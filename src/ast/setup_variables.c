@@ -10,13 +10,16 @@
 #include "utils/itoa.h"
 #include "utils/vector.h"
 
-extern struct hash_map *hm;
+struct hash_map *hm;
 
 void setup_args(int nb_args, char **args)
 {
     struct vector *vec = vector_create(100);
     bool b;
-
+    if (args == NULL)
+    {
+        return;
+    }
     if (*args)
     {
         vector_append_string(vec, args[0]);
@@ -36,21 +39,26 @@ void setup_args(int nb_args, char **args)
         hash_map_insert(hm, strdup("*"), strdup(vec->data), &b);
     }
 
-    free(vec);
+    vector_destroy(vec);
 }
 
 void setup_args_n(int nb_args, char **args)
 {
+    if (args == NULL)
+    {
+        return;
+    }
     bool b;
     for (int i = 0; i < nb_args; i++)
     {
-        char *key = itoa_base(i + 1, "0123456789");
+        char *key = itoa_base(i + 1);
         hash_map_insert(hm, key, args[i], &b);
     }
 }
 
 void setup_variables(int nb_args, char **args)
 {
+    hm = hash_map_init(25);
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
     setup_nb_args(nb_args);
