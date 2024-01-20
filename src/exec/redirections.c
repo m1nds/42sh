@@ -76,20 +76,25 @@ int handle_redirect(struct ast *ast)
 
     while (*current)
     {
-        if ((*current)->node_type == NODE_COMMAND)
+        if ((*current)->node_type <= NODE_UNTIL)
         {
             command = *current;
+        }
+        else if ((*current)->node_type == NODE_ASSIGN)
+        {
+            // TODO: Need to implement variables.
         }
         else
         {
             redirect_ptr redir = match_redirect_func(ast->node_type);
             fds[i] = redir(*current);
+            fcntl(fds[i], F_SETFD, FD_CLOEXEC);
             i++;
         }
 
         current++;
     }
-    // TODO: Might need to use fcntl to avoid FD to be copied in childs.
+
     int out = (command != NULL) ? evaluate_ast(command) : 1;
 
     dup2(save_stdin, STDIN_FILENO);

@@ -81,6 +81,15 @@ int handle_while(struct ast *ast);
  * @ret:   return code of the last command node or -1 on error.
  * */
 int handle_until(struct ast *ast);
+
+/*
+ * @def:   Evaluation handler for redirections.
+ * @param: struct ast *ast: AST node containing in its children
+ *         something to evaluate and one or many redirections
+ * @ret:   return code of the last command node or -1 on error.
+ * */
+int handle_redirect(struct ast *ast);
+
 /*
  * @def:   Complete AST evaluation function
  * @param: struct ast *ast: the complete AST
