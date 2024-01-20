@@ -7,7 +7,7 @@
 
 #include "lexer/handle_special_cases.h"
 
-struct lexer_token_save match_word(char *word)
+struct lexer_token_save match_word(struct lexer *lexer, char *word)
 {
     char *words[] = { "if",    "then", "elif", "else", "fi",  "while",
                       "until", "for",  "in",   "do",   "done" };
@@ -24,6 +24,20 @@ struct lexer_token_save match_word(char *word)
             out.curr_tok = tokens[i];
             return out;
         }
+    }
+    if (lexer->prev == '>' || lexer->prev == '<')
+    {
+        // Check if word is an IO Number
+        size_t i = 0;
+        while (word[i] != '\0')
+        {
+            if (word[i] < '0' || word[i] > '9')
+            {
+                return out;
+            }
+            i++;
+        }
+        out.curr_tok = TOKEN_IO_NUMBER;
     }
     return out;
 }

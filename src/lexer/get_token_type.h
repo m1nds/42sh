@@ -6,7 +6,7 @@
 /*
  * @def: Matches the word and returns the appropriate token
  */
-struct lexer_token_save match_word(char *word);
+struct lexer_token_save match_word(struct lexer *lexer, char *word);
 
 /*
  * @def: Handles the case of most special characters

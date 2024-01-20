@@ -117,4 +117,8 @@ enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
  */
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 
+enum parser_status parse_prefix(struct ast **res, struct lexer *lexer);
+
+enum parser_status parse_redirection(struct ast **res, struct lexer *lexer);
+
 #endif /* !PARSER_H */

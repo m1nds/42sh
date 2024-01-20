@@ -148,6 +148,25 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     }
     if (parse_shell_command(res, lexer) == PARSER_OK)
     {
+        struct ast *redirect = NULL;
+        if (parse_redirection(&redirect, lexer) == PARSER_OK)
+        {
+            struct ast *parent = ast_new(NODE_REDIR, 2, NULL);
+            parent->children[0] = *res;
+            parent->children[1] = redirect;
+            size_t nb_children = 2;
+            redirect = NULL;
+            while (parse_redirection(&redirect, lexer) == PARSER_OK)
+            {
+                parent->children = realloc(
+                    parent->children, sizeof(struct ast) * (nb_children + 2));
+                parent->children[nb_children] = redirect;
+                redirect = NULL;
+                nb_children++;
+            }
+            parent->children[nb_children + 1] = NULL;
+            *res = parent;
+        }
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;
@@ -155,9 +174,32 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
 {
+    struct ast *result = ast_new(NODE_REDIR, 1, NULL);
+    size_t nb_children = 0;
+    char flag = 0;
+    if (parse_prefix(res, lexer) == PARSER_OK)
+    {
+        flag = 1;
+        result->children[0] = *res;
+        nb_children++;
+        struct ast *child = NULL;
+        while (parse_prefix(&child, lexer) == PARSER_OK)
+        {
+            result->children = realloc(result->children,
+                                       sizeof(struct ast) * (nb_children + 2));
+            result->children[nb_children] = child;
+            nb_children++;
+            child = NULL;
+        }
+        result->children[nb_children + 1] = NULL;
+    }
     struct lexer_token_save token = lexer_peek(lexer);
     if (token.curr_tok != TOKEN_WORD)
     {
+        if (flag == 1)
+        {
+            return PARSER_OK;
+        }
         return PARSER_UNEXPECTED_TOKEN;
     }
     if (parse_element(res, lexer) == PARSER_UNEXPECTED_TOKEN)
@@ -171,20 +213,34 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         struct ast *element = NULL;
         if (parse_element(&element, lexer) == PARSER_OK)
         {
-            command->value =
-                realloc(command->value, (loop + 2) * sizeof(char *));
-            command->value[loop] = element->value[0];
-            command->value[loop + 1] = NULL;
+            if (element->node_type == NODE_COMMAND)
+            {
+                command->value =
+                    realloc(command->value, (loop + 2) * sizeof(char *));
+                command->value[loop] = element->value[0];
+                command->value[loop + 1] = NULL;
+                element->value[0] = NULL;
+                ast_free(element);
+                loop++;
+            }
+            else
+            {
+                result->children = realloc(
+                    result->children, sizeof(struct ast) * (nb_children + 2));
+                result->children[nb_children] = element;
+                nb_children++;
+            }
         }
         else
         {
             break;
         }
-        element->value[0] = NULL;
-        ast_free(element);
-        loop++;
     }
-    *res = command;
+    result->children =
+        realloc(result->children, sizeof(struct ast) * (nb_children + 2));
+    result->children[nb_children] = command;
+    result->children[nb_children + 1] = NULL;
+    *res = result;
     return PARSER_OK;
 }
 
@@ -198,6 +254,10 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
         // Add token in ast
         struct ast *word = ast_new(NODE_COMMAND, 0, string);
         *res = word;
+        return PARSER_OK;
+    }
+    if (parse_redirection(res, lexer) == PARSER_OK)
+    {
         return PARSER_OK;
     }
     return PARSER_UNEXPECTED_TOKEN;

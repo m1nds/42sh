@@ -11,9 +11,9 @@ typedef int (*redirect_ptr)(void *);
 int redirect_input(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
-    int user_flags = S_IRUSR | S_IRGRP | S_IROTH;
+    int user_flags = 0644; /*S_IRUSR | S_IRGRP | S_IROTH*/
 
-    int file_fd = open(ast->value[0], O_RDONLY, user_flags);
+    int file_fd = open(ast->value[0], O_RDWR, user_flags);
     if (file_fd == -1)
     {
         return -1;
@@ -27,9 +27,9 @@ int redirect_input(void *arg)
 int redirect_output(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
-    int user_flags = S_IWUSR | S_IWGRP | S_IWOTH;
+    int user_flags = 0644; /*S_IWUSR | S_IWGRP | S_IWOTH*/
 
-    int file_fd = open(ast->value[0], O_WRONLY | O_CREAT, user_flags);
+    int file_fd = open(ast->value[0], O_RDWR | O_CREAT | O_TRUNC, user_flags);
     if (file_fd == -1)
     {
         return -1;
@@ -86,7 +86,7 @@ int handle_redirect(struct ast *ast)
         }
         else
         {
-            redirect_ptr redir = match_redirect_func(ast->node_type);
+            redirect_ptr redir = match_redirect_func((*current)->node_type);
             fds[i] = redir(*current);
             fcntl(fds[i], F_SETFD, FD_CLOEXEC);
             i++;

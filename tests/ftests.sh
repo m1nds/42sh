@@ -151,6 +151,8 @@ test_all "echo a&&ls" "and no space"
 test_all "echo a||ls; ls" "or no space"
 test_all "echo a || echo b && echo c && echo d || echo e || echo f && echo g" "a lot of and ors"
 test_all "false || ! true && ! echo a && echo b || ls && ! false || echo c && ! echo d || ls" "a lot of and_ors and negs"
+test_all "echo a > file" "simple output redirect"
+test_all "cat -e < test.sh" "simple input redirect"
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
