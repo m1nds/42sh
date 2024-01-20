@@ -113,7 +113,7 @@ static void true_print_ast(struct ast *ast, size_t tabs)
         size_t i = 0;
         while (ast->value[i] != NULL)
         {
-            printf("%s ", ast->value[i]);
+            printf("|%s| ", ast->value[i]);
             i++;
         }
         printf("\n");
