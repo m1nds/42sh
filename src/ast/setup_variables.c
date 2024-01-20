@@ -56,6 +56,12 @@ void setup_args_n(int nb_args, char **args)
     }
 }
 
+void setup_value(char *key, char *value)
+{
+    bool b;
+    hash_map_insert(hm, key, value, &b);
+}
+
 void setup_variables(int nb_args, char **args)
 {
     hm = hash_map_init(25);

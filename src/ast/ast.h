@@ -57,6 +57,8 @@ void ast_free(struct ast *ast);
  * */
 void print_ast(struct ast *ast);
 
+void setup_value(char *key, char *value);
+
 void replace_variables(struct ast *ast);
 
 #endif /* ! AST_H */
