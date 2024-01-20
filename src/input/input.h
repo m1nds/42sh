@@ -55,8 +55,7 @@ int check_prettyprint(int *flags);
  * @args flags: a pointer to an int, the first bit is set to 1 if the option
  * "--verbose" is within args, the second bit is set to 1 if the option
  * "--pretty-print" is within args.
- * @args err: in order to return the error code
  */
-FILE *get_input(int nbargs, char **args, int *flags, int *err);
+FILE *get_input(int nbargs, char **args, int *flags);
 
 #endif /* ! INPUT_H */
