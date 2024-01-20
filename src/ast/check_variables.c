@@ -18,14 +18,25 @@ void replace_variables(struct ast *ast, struct hash_map *hm)
             size_t i = 0;
             while (ast->value[i] != NULL)
             {
-                if (ast->value[i][0] == '$')
+                size_t j = 0;
+                while (ast->value[i][j] != '\0')
                 {
-                    const char *val = hash_map_get(hm, ast->value[i] + 1);
-                    if (val != NULL)
+                    if (ast->value[i][j] == '$')
                     {
-                        ast->value[i] = realloc(ast->value[i], strlen(val) + 1);
-                        ast->value[i] = strcpy(ast->value[i], val);
+                        const char *val =
+                            hash_map_get(hm, ast->value[i] + j + 1);
+                        if (val != NULL)
+                        {
+                            ast->value[i] =
+                                realloc(ast->value[i], j + strlen(val) + 1);
+                            strcpy(ast->value[i] + j, val);
+                        }
+                        else
+                        {
+                            ast->value[i][j] = '\0';
+                        }
                     }
+                    j++;
                 }
                 i++;
             }
