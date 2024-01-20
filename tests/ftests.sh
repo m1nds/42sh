@@ -9,90 +9,143 @@ fail=0
 
 test_stdin() {
     echo "$1" | ./42sh 1> output1 2> /dev/null
-    echo "$1" | bash --posix 1> output2 2> /dev/null
-
-    flag=0
-
-    out1=$(cat -e output1)
-    out2=$(cat -e output2)
-
-    echo "$1" | ./42sh > /dev/null 2> /dev/null
     code1=$?
-    echo "$1" | bash --posix > /dev/null 2> /dev/null
+    echo "$1" | bash --posix 1> output2 2> /dev/null
     code2=$?
 
+    flag=0
     diff output1 output2 > /dev/null
-    check=$?
 
-    if [ $check -eq 1 ] && [ "$code1" -ne "$code2" ]; then
-        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STDIN\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+    if [ $? -ne 0 ] && [ "$code1" -ne "$code2" ]; then
+        out1=$(cat -e output1)
+        out2=$(cat -e output2)
+        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: FILE\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
         echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
-        return 1
     fi
 
+    if [ $# -ne 2 ]; then
+        arg="$1"
+        testname="$2"
+        shift 2
+        while [ $# -ne 0 ]; do
+
+            echo "$arg" | ./42sh 1> /dev/null 2> /dev/null
+            cat "$1" > output1
+            echo "$arg" | bash --posix 1> /dev/null 2> /dev/null
+
+            diff output1 "$1" > /dev/null
+
+            if [ $? -ne 0 ]; then
+                flag=1
+
+                out1=$(cat -e output1)
+                out2=$(cat -e "$1")
+                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STDIN\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+            fi
+            shift 1
+        done
+    fi
+    if [ $flag -ne 0 ];then
+        return 1
+    fi
     return 0
 }
 
 test_file() {
-    echo "$1" > file
+    echo "$1" > .file
 
-    ./42sh file > output1 2> /dev/null
-    bash --posix file > output2 2> /dev/null
-
-    flag=0
-
-    out1=$(cat -e output1)
-    out2=$(cat -e output2)
-
-    ./42sh file > /dev/null 2> /dev/null
+    ./42sh .file > output1 2> /dev/null
     code1=$?
-    bash --posix file > /dev/null 2> /dev/null
+    bash --posix .file > output2 2> /dev/null
     code2=$?
 
+    flag=0
     diff output1 output2 > /dev/null
-    check=$?
 
-    if [ $check -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+    if [ $? -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+        out1=$(cat -e output1)
+        out2=$(cat -e output2)
         echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: FILE\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
         echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
+    fi
+    if [ $# -ne 2 ]; then
+        arg="$1"
+        testname="$2"
+        shift 2
+        while [ $# -ne 0 ]; do
+
+            ./42sh .file 1> /dev/null 2> /dev/null
+            cat "$1" > output1
+            bash --posix .file 1> /dev/null 2> /dev/null
+
+            diff output1 "$1" > /dev/null
+
+            if [ $? -ne 0 ]; then
+                flag=1
+
+                out1=$(cat -e output1)
+                out2=$(cat -e "$1")
+                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STDIN\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+            fi
+            shift 1
+        done
+    fi
+    if [ $flag -ne 0 ];then
         return 1
     fi
-
     return 0
 }
 
 test_string() {
     ./42sh -c "$1" > output1 2> /dev/null
-    bash --posix -c "$1" > output2 2> /dev/null
-
-    flag=0
-
-    out1=$(cat -e output1)
-    out2=$(cat -e output2)
-
-    ./42sh -c "$1" > /dev/null 2> /dev/null
     code1=$?
-    bash --posix -c "$1" > /dev/null 2> /dev/null
+    bash --posix -c "$1" > output2 2> /dev/null
     code2=$?
 
+    flag=0
     diff output1 output2 > /dev/null
-    check=$?
-    if [ $check -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+
+    if [ $? -ne 0 ] || [ "$code1" -ne "$code2" ]; then
+        out1=$(cat -e output1)
+        out2=$(cat -e output2)
         echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STRING\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
         echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
+    fi
+    if [ $# -ne 2 ]; then
+        arg="$1"
+        testname="$2"
+        shift 2
+        while [ $# -ne 0 ]; do
+
+            ./42sh -c "$arg" 1> /dev/null 2> /dev/null
+            cat "$1" > output1
+            bash --posix -c "$arg" 1> /dev/null 2> /dev/null
+
+            diff output1 "$1" > /dev/null
+
+            if [ $? -ne 0 ]; then
+                flag=1
+
+                out1=$(cat -e output1)
+                out2=$(cat -e "$1")
+                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STDIN\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+            fi
+            shift 1
+        done
+    fi
+    if [ $flag -ne 0 ];then
         return 1
     fi
-
     return 0
 }
 
 test_all() {
-    echo -e "Running TEST : $2..."
-    test_string "$1" "$2"
+    echo "RUNNING TEST : $2..."
+    test_string "$@"
     one=$?
-    test_file "$1" "$2"
+    test_file "$@"
     two=$?
-    test_stdin "$1" "$2"
+    test_stdin "$@"
     three=$?
 
     if [ $(($one + $two + $three)) -eq 0 ]; then
@@ -101,6 +154,15 @@ test_all() {
         fail=$(($fail + 1))
     fi
 }
+# LIST OF FUNCTIONAL TESTS
+#
+# .test output1 output2 are reserved for the function
+# do not use them
+#
+# exemple :
+#   test_all "argument" "name_of_test" "redirect_file_1" "redirect_file_2"
+#
+# you should only provide redirect_file if your argument make a redirect in a file
 
 test_all "true;" "true;"
 test_all "echo a ; echo b" "double_echo"
@@ -151,12 +213,12 @@ test_all "echo a&&ls" "and no space"
 test_all "echo a||ls; ls" "or no space"
 test_all "echo a || echo b && echo c && echo d || echo e || echo f && echo g" "a lot of and ors"
 test_all "false || ! true && ! echo a && echo b || ls && ! false || echo c && ! echo d || ls" "a lot of and_ors and negs"
-test_all "echo a > file" "simple output redirect"
+test_all "echo a > file" "simple output redirect" "file"
 test_all "cat -e < test.sh" "simple input redirect"
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
-rm output1 output2 file 2> /dev/null > /dev/null
+rm output1 output2 file .file 2> /dev/null > /dev/null
 
 
 if [ "$fail" -eq 0 ]; then
