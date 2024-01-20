@@ -25,6 +25,13 @@ struct vector *vector_create(size_t capacity);
 void vector_append(struct vector *vector, char data);
 
 /*
+ * @def: appends a string without the \0 at the end of the vector
+ * @args vector: the vector where the string is appended
+ *       data: the string to be appended
+ */
+void vector_append_string(struct vector *vector, char *str);
+
+/*
  * @def: destroys a vector
  * @args vector: the vector to be freed
  */

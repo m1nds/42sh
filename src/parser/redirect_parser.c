@@ -1,9 +1,38 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
+#include <string.h>
 
 #include "parser/parser.h"
+#include "utils/vector.h"
 
 enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
 {
+    enum token token = lexer_peek(lexer).curr_tok;
+    if (token == TOKEN_ASSIGNMENT)
+    {
+        char *name = lexer_peek(lexer).tok_str;
+        struct ast *assignment = ast_new(NODE_ASSIGN, 0, name);
+        struct vector *vec = vector_create(100);
+        lexer_pop(lexer, false);
+        token = lexer_peek(lexer).curr_tok;
+        while (token >= TOKEN_IF && token <= TOKEN_WORD)
+        {
+            char *value = lexer_peek(lexer).tok_str;
+            vector_append_string(vec, value);
+            lexer_pop(lexer, true);
+            if (token != TOKEN_ASSIGNMENT)
+            {
+                break;
+            }
+            vector_append(vec, '=');
+            token = lexer_peek(lexer).curr_tok;
+        }
+        vector_append(vec, '\0');
+        assignment->value[1] = strdup(vec->data);
+        vector_destroy(vec);
+        *res = assignment;
+        return PARSER_OK;
+    }
     if (parse_redirection(res, lexer) == PARSER_OK)
     {
         return PARSER_OK;

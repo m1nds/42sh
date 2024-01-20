@@ -35,6 +35,16 @@ void vector_append(struct vector *vector, char value)
     vector->size++;
 }
 
+void vector_append_string(struct vector *vector, char *str)
+{
+    size_t i = 0;
+    while (str[i] != '\0')
+    {
+        vector_append(vector, str[i]);
+        i++;
+    }
+}
+
 void vector_destroy(struct vector *vector)
 {
     free(vector->data);
