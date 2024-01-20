@@ -12,10 +12,11 @@
  * @def:    An array containing the string associated with an enum ast_type
  *          at the ast_type index
  * */
-char *token_to_string[] = { "Command: ", ";\n",      "If\n", "|\n",
-                            "!\n",       "&&\n",     "||\n", "While\n",
-                            "Until\n",   "Redirs\n", "< ",   "> ",
-                            ">> ",       "<& ",      ">& ",  "<> " };
+char *token_to_string[] = { "Command: ", ";\n",       "If\n", "|\n",
+                            "!\n",       "&&\n",      "||\n", "While\n",
+                            "Until\n",   "Prefixs\n", "< ",   "> ",
+                            ">> ",       "<& ",       ">& ",  "<> ",
+                            "Assign " };
 
 struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
 {
