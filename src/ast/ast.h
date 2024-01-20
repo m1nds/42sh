@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <stddef.h>
+#include "utils/hash_map.h"
 
 enum ast_type
 {
@@ -54,5 +55,7 @@ void ast_free(struct ast *ast);
  * @ret:   None
  * */
 void print_ast(struct ast *ast);
+
+void replace_variables(struct ast *ast, struct hash_map *hm);
 
 #endif /* ! AST_H */
