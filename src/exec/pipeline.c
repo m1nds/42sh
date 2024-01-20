@@ -1,6 +1,7 @@
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -47,16 +48,29 @@ int **allocate_pipes(size_t len)
     return p;
 }
 
-int close_pids(int *pids, size_t len)
+int close_pids(int *pids, int *builtins, size_t len)
 {
     int out = -1;
+    int builtin = 0;
+
     for (size_t i = 0; i < len; i++)
     {
-        waitpid(pids[i], &out, 0);
+        if (pids[i] != -1)
+        {
+            builtin = 0;
+            waitpid(pids[i], &out, 0);
+        }
+        else
+        {
+            builtin = 1;
+            out = builtins[i];
+        }
     }
 
     free(pids);
-    return out;
+    free(builtins);
+
+    return (builtin) ? out : WEXITSTATUS(out);
 }
 
 void redirect(int mode, int **p, int i)
@@ -81,33 +95,38 @@ void redirect(int mode, int **p, int i)
     }
 }
 
-int exec_command(struct ast *current, struct exec_frame *frame, int *pids)
+int exec_command(struct ast *current, struct exec_frame *frame, int *pids,
+                 int *builtin)
 {
     int save_stdin = dup(STDIN_FILENO);
     int save_stdout = dup(STDOUT_FILENO);
 
     redirect(frame->mode, frame->p, frame->i);
 
-    int pid = fork();
-    if (pid == -1)
+    int check = check_builtin(current->value);
+    int save_pid = -1;
+    if (check == -1)
     {
-        exit(-1);
+        int pid = fork();
+        if (pid == -1)
+        {
+            exit(-1);
+        }
+        else if (!pid)
+        {
+            close_pipes(frame->p, 1);
+            free(pids);
+
+            if (execvp(current->value[0], current->value) == -1)
+            {
+                errx(127, "unknown command!\n");
+            }
+        }
+        save_pid = pid;
     }
-    else if (!pid)
+    else
     {
-        close_pipes(frame->p, 1);
-        free(pids);
-
-        int check = check_builtin(current->value);
-        if (check != -1)
-        {
-            exit(check);
-        }
-
-        if (execvp(current->value[0], current->value) == -1)
-        {
-            errx(127, "unknown command!\n");
-        }
+        *builtin = 1;
     }
 
     dup2(save_stdin, STDIN_FILENO);
@@ -116,7 +135,7 @@ int exec_command(struct ast *current, struct exec_frame *frame, int *pids)
     close(save_stdin);
     close(save_stdout);
 
-    return pid;
+    return (check == -1) ? save_pid : check;
 }
 
 int handle_pipe(struct ast *ast)
@@ -148,10 +167,16 @@ int handle_pipe(struct ast *ast)
         return -1;
     }
 
+    int *builtins = calloc(len, sizeof(int));
+    memset(builtins, -1, len * sizeof(int));
+
+    int is_builtin = 0;
+
     struct exec_frame frame = { .mode = 0, .p = p, .i = 0 };
     current = ast->children;
 
-    pids[0] = exec_command(*current, &frame, pids);
+    pids[0] = exec_command(*current, &frame, pids, &is_builtin);
+    builtins[0] = (is_builtin) ? pids[0] : -1;
 
     current++;
 
@@ -159,16 +184,19 @@ int handle_pipe(struct ast *ast)
     frame.i = 1;
     while (*current && frame.i < len - 1)
     {
-        pids[frame.i] = exec_command(*current, &frame, pids);
+        pids[frame.i] = exec_command(*current, &frame, pids, &is_builtin);
+        builtins[frame.i] = (is_builtin) ? pids[frame.i] : -1;
+
         frame.i++;
         current++;
     }
 
     frame.mode = 2;
-    pids[frame.i] = exec_command(*current, &frame, pids);
+    pids[frame.i] = exec_command(*current, &frame, pids, &is_builtin);
+    builtins[frame.i] = (is_builtin) ? pids[frame.i] : -1;
 
     close_pipes(p, 1);
-    int out = close_pids(pids, len);
+    int out = close_pids(pids, builtins, len);
 
-    return WEXITSTATUS(out);
+    return out;
 }
