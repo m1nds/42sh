@@ -28,6 +28,8 @@ int evaluate_ast(struct ast *ast)
         return handle_while(ast);
     case NODE_UNTIL:
         return handle_until(ast);
+    case NODE_REDIR:
+        return handle_redirect(ast);
     default:
         return -1;
     }

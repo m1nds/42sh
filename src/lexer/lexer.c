@@ -45,7 +45,8 @@ void free_lexer(struct lexer *lexer)
 static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
-        && character != '\t' && character != '|' && character != '&';
+        && character != '\t' && character != '|' && character != '&'
+        && character != '<' && character != '>';
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -133,6 +134,7 @@ static struct lexer_token_save main_loop(struct lexer *lexer,
         }
         c = fgetc(lexer->input);
     }
+    out.curr_tok = TOKEN_NONE;
     lexer->prev = c;
     return out;
 }
@@ -146,9 +148,12 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
     struct vector *vec = vector_create(100);
     out = main_loop(lexer, vec);
+    if (out.curr_tok != TOKEN_NONE)
+    {
+        return out;
+    }
     vector_append(vec, '\0');
-
-    out = match_word(vec->data);
+    out = match_word(lexer, vec->data);
     out.tok_str = strdup(vec->data);
 
     vector_destroy(vec);

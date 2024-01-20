@@ -5,6 +5,10 @@
 
 int check_builtin(char **value)
 {
+    if (value == NULL)
+    {
+        return -1;
+    }
     if (strcmp("echo", value[0]) == 0)
     {
         return echo_builtin(value);

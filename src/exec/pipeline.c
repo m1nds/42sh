@@ -116,11 +116,11 @@ int exec_command(struct ast *current, struct exec_frame *frame, int *pids,
         {
             close_pipes(frame->p, 1);
             free(pids);
-
-            if (execvp(current->value[0], current->value) == -1)
+            exit(evaluate_ast(current));
+            /*if (execvp(current->value[0], current->value) == -1)
             {
                 errx(127, "unknown command!\n");
-            }
+            }*/
         }
         save_pid = pid;
     }

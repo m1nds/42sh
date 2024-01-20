@@ -31,18 +31,16 @@ int main(int argc, char **argv)
         }
     }
     struct lexer *lexer = create_lexer(input);
-    /*enum token token = TOKEN_IF;
+    /*enum token token = TOKEN_NONE;
     while (token != TOKEN_EOF)
     {
-        char *string = get_token_string(lexer);
-        printf("%s ", string);
-        token = lexer_pop(lexer);
-        if (token == TOKEN_WORD)
-        {
-            free(string);
-        }
+        token = lexer_peek(lexer).curr_tok;
+        char *string = lexer_peek(lexer).tok_str;
+        printf("Token : %i, String : %s\n", token, string);
+        lexer_pop(lexer, true);
     }
-    printf("\n");*/
+    printf("\n");
+    */
     struct ast *ast = NULL;
     enum parser_status status = parse_input(&ast, lexer);
     if (check_prettyprint(&options))
