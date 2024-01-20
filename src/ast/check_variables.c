@@ -4,17 +4,15 @@
 #include <string.h>
 
 #include "ast/ast.h"
-#include "utils/vector.h"
 #include "utils/hash_map.h"
+#include "utils/vector.h"
 
 struct hash_map *hm;
 
 char is_continuous_name(char c)
 {
-    if ((c >= 'a' && c <= 'z')
-        || (c >= 'A' && c <= 'Z')
-        || (c >= '0' && c<= '9')
-        || c == '_')
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+        || (c >= '0' && c <= '9') || c == '_')
     {
         return 1;
     }
@@ -62,7 +60,8 @@ void replace_variables(struct ast *ast)
                                 else
                                 {
                                     vector_append(final_command, '$');
-                                    vector_append(final_command, ast->value[i][j]);
+                                    vector_append(final_command,
+                                                  ast->value[i][j]);
                                 }
                             }
                             char *val = hash_map_get(hm, name->data);
