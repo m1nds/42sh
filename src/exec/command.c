@@ -39,7 +39,7 @@ int handle_command(struct ast *ast)
     {
         return 0;
     }
-
+    // replace_variables(ast);
     int cb = check_builtin(ast->value);
     if (cb != -1)
     {

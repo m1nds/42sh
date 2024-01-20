@@ -56,22 +56,22 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
         switch (token)
         {
         case TOKEN_REDIR_STDIN:
-            redirect = ast_new(NODE_REDIR_IN, 0, io_number);
+            redirect = ast_new(NODE_REDIR_IN, 0, NULL);
             break;
         case TOKEN_REDIR_STDOUT:
-            redirect = ast_new(NODE_REDIR_OUT, 0, io_number);
+            redirect = ast_new(NODE_REDIR_OUT, 0, NULL);
             break;
         case TOKEN_REDIR_APPEND:
-            redirect = ast_new(NODE_REDIR_OUTA, 0, io_number);
+            redirect = ast_new(NODE_REDIR_OUTA, 0, NULL);
             break;
         case TOKEN_REDIR_DUPIN:
-            redirect = ast_new(NODE_REDIR_INAND, 0, io_number);
+            redirect = ast_new(NODE_REDIR_INAND, 0, NULL);
             break;
         case TOKEN_REDIR_DUPOUT:
-            redirect = ast_new(NODE_REDIR_OUTAND, 0, io_number);
+            redirect = ast_new(NODE_REDIR_OUTAND, 0, NULL);
             break;
         case TOKEN_REDIR_INOUT:
-            redirect = ast_new(NODE_REDIR_INOUT, 0, io_number);
+            redirect = ast_new(NODE_REDIR_INOUT, 0, NULL);
             break;
         default:
             return PARSER_UNEXPECTED_TOKEN;
@@ -82,15 +82,10 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
         {
             char *string = lexer_peek(lexer).tok_str;
             lexer_pop(lexer, false);
-            size_t nb_values = 2;
-            if (io_number != NULL)
-            {
-                nb_values++;
-            }
-            redirect->value =
-                realloc(redirect->value, sizeof(char *) * nb_values);
-            redirect->value[nb_values - 2] = string;
-            redirect->value[nb_values - 1] = NULL;
+            redirect->value = realloc(redirect->value, sizeof(char *) * 3);
+            redirect->value[0] = string;
+            redirect->value[1] = io_number;
+            redirect->value[2] = NULL;
             *res = redirect;
             return PARSER_OK;
         }

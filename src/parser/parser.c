@@ -1,10 +1,13 @@
+#define _POSIX_C_SOURCE 200809L
 #include "parser/parser.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "lexer/token.h"
 #include "parser/list_parser.h"
+#include "utils/vector.h"
 
 void print_error(char *message, struct lexer *lexer)
 {
@@ -249,10 +252,24 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
     struct lexer_token_save token = lexer_peek(lexer);
     if (token.curr_tok >= TOKEN_IF && token.curr_tok <= TOKEN_WORD)
     {
-        char *string = token.tok_str;
-        lexer_pop(lexer, false);
+        struct vector *vec = vector_create(100);
+        while (token.curr_tok >= TOKEN_IF && token.curr_tok <= TOKEN_WORD)
+        {
+            char *string = token.tok_str;
+            vector_append_string(vec, string);
+            lexer_pop(lexer, true);
+            if (token.curr_tok != TOKEN_ASSIGNMENT)
+            {
+                break;
+            }
+            vector_append(vec, '=');
+            token = lexer_peek(lexer);
+        }
         // Add token in ast
-        struct ast *word = ast_new(NODE_COMMAND, 0, string);
+        vector_append(vec, '\0');
+        char *str = strdup(vec->data);
+        vector_destroy(vec);
+        struct ast *word = ast_new(NODE_COMMAND, 0, str);
         *res = word;
         return PARSER_OK;
     }

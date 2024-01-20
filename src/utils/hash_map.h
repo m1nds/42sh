@@ -6,7 +6,7 @@
 
 struct pair_list
 {
-    const char *key;
+    char *key;
     char *value;
     struct pair_list *next;
 };
@@ -22,7 +22,7 @@ struct hash_map
  * @args str: string to hash
  * @return: index in hash table
  */
-size_t hash(const char *str);
+size_t hash(char *str);
 
 /*
  * @def: function to init the hash map
@@ -40,7 +40,7 @@ struct hash_map *hash_map_init(size_t size);
  * else false
  * @return: return the bool updated
  */
-bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
+bool hash_map_insert(struct hash_map *hash_map, char *key, char *value,
                      bool *updated);
 /*
  * @def: free the hash map
@@ -60,7 +60,7 @@ void hash_map_dump(struct hash_map *hash_map);
  * @args key: key of the element to search
  * @return: return the value of the searched element
  */
-const char *hash_map_get(const struct hash_map *hash_map, const char *key);
+char *hash_map_get(const struct hash_map *hash_map, char *key);
 
 /*
  * @def: remove an element from the hash map
@@ -68,6 +68,6 @@ const char *hash_map_get(const struct hash_map *hash_map, const char *key);
  * @args key: key of the element to remove
  * @return: true if the element has been removed else false
  */
-bool hash_map_remove(struct hash_map *hash_map, const char *key);
+bool hash_map_remove(struct hash_map *hash_map, char *key);
 
 #endif /* ! HASH_MAP_H */
