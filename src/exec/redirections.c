@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -8,23 +9,35 @@
 
 typedef int (*redirect_ptr)(void *);
 
-int redirect_input(void *arg)
+static int retrieve_fd(char *str)
+{
+    if (str == NULL)
+    {
+        return -1;
+    }
+
+    return atoi(str);
+}
+
+static int redirect_input(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
     int user_flags = 0644; /*S_IRUSR | S_IRGRP | S_IROTH*/
-
     int file_fd = open(ast->value[0], O_RDWR, user_flags);
     if (file_fd == -1)
     {
         return -1;
     }
 
-    dup2(file_fd, STDIN_FILENO);
+    int io_number = retrieve_fd(ast->value[1]);
+    int fd_to_switch = (io_number == -1) ? STDIN_FILENO : io_number;
+
+    dup2(file_fd, fd_to_switch);
 
     return file_fd;
 }
 
-int redirect_output(void *arg)
+static int redirect_output(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
     int user_flags = 0644; /*S_IWUSR | S_IWGRP | S_IWOTH*/
@@ -35,16 +48,90 @@ int redirect_output(void *arg)
         return -1;
     }
 
-    dup2(file_fd, STDOUT_FILENO);
+    int io_number = retrieve_fd(ast->value[1]);
+    int fd_to_switch = (io_number == -1) ? STDOUT_FILENO : io_number;
+
+    dup2(file_fd, fd_to_switch);
 
     return file_fd;
 }
 
+static int redirect_input_and(void *arg)
+{
+    struct ast *ast = (struct ast *)arg;
+
+    int dest = retrieve_fd(ast->value[0]);
+
+    if (strcmp(ast->value[1], "-") == 0)
+    {
+        close(dest);
+        return -1;
+    }
+
+    int src = retrieve_fd(ast->value[1]);
+    int fd_to_switch = (dest == -1) ? STDIN_FILENO : dest;
+
+    dup2(src, fd_to_switch);
+
+    return -1;
+}
+
+static int redirect_output_and(void *arg)
+{
+    struct ast *ast = (struct ast *)arg;
+
+    int dest = retrieve_fd(ast->value[0]);
+
+    if (strcmp(ast->value[1], "-") == 0)
+    {
+        close(dest);
+        return -1;
+    }
+
+    int src = retrieve_fd(ast->value[1]);
+    int fd_to_switch = (dest == -1) ? STDOUT_FILENO : dest;
+
+    dup2(src, fd_to_switch);
+
+    return -1;
+}
+
+static int redirect_output_append(void *arg)
+{
+    struct ast *ast = (struct ast *)arg;
+    int user_flags = S_IWUSR | S_IWGRP | S_IWOTH;
+
+    int file_fd =
+        open(ast->value[0], O_WRONLY | O_CREAT | O_APPEND, user_flags);
+    if (file_fd == -1)
+    {
+        return -1;
+    }
+
+    int io_number = retrieve_fd(ast->value[1]);
+    int fd_to_switch = (io_number == -1) ? STDOUT_FILENO : io_number;
+
+    dup2(file_fd, fd_to_switch);
+
+    return file_fd;
+}
+
+static void redirect_inout(struct ast *ast, int *fds, size_t *i)
+{
+    fds[(*i)++] = redirect_input(ast);
+    fds[(*i)++] = redirect_output_append(ast);
+    fcntl(fds[*i - 1], F_SETFD, FD_CLOEXEC);
+    fcntl(fds[*i - 2], F_SETFD, FD_CLOEXEC);
+}
+
 redirect_ptr match_redirect_func(enum ast_type type)
 {
-    static redirect_ptr buffer[] = {
-        [NODE_REDIR_IN] = redirect_input, [NODE_REDIR_OUT] = redirect_output
-    };
+    static redirect_ptr buffer[] = { [NODE_REDIR_IN] = redirect_input,
+                                     [NODE_REDIR_OUT] = redirect_output,
+                                     [NODE_REDIR_OUTA] = redirect_output_append,
+                                     [NODE_REDIR_INAND] = redirect_input_and,
+                                     [NODE_REDIR_OUTAND] =
+                                         redirect_output_and };
 
     return buffer[type];
 }
@@ -71,7 +158,7 @@ int handle_redirect(struct ast *ast)
     struct ast **current = ast->children;
     struct ast *command = NULL;
 
-    int *fds = malloc(len * sizeof(int));
+    int *fds = malloc(2 * len * sizeof(int));
     size_t i = 0;
 
     while (*current)
@@ -83,6 +170,10 @@ int handle_redirect(struct ast *ast)
         else if ((*current)->node_type == NODE_ASSIGN)
         {
             // TODO: Need to implement variables.
+        }
+        else if ((*current)->node_type == NODE_REDIR_INOUT)
+        {
+            redirect_inout(*current, fds, &i);
         }
         else
         {
