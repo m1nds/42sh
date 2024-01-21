@@ -5,6 +5,7 @@
 
 /*
  * @def: Matches the word and returns the appropriate token
+ *       Also checks if the word is a io_number
  */
 struct lexer_token_save match_word(struct lexer *lexer, char *word);
 

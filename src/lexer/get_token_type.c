@@ -25,26 +25,11 @@ struct lexer_token_save match_word(struct lexer *lexer, char *word)
             return out;
         }
     }
-    if (lexer->prev == '>' || lexer->prev == '<')
-    {
-        // Check if word is an IO Number
-        size_t i = 0;
-        while (word[i] != '\0')
-        {
-            if (word[i] < '0' || word[i] > '9')
-            {
-                return out;
-            }
-            i++;
-        }
-        out.curr_tok = TOKEN_IO_NUMBER;
-    }
-    return out;
+    return handle_io_number(lexer, word);
 }
 
 struct lexer_token_save fill_out(struct lexer *lexer,
-                                 struct lexer_token_save out, enum token token,
-                                 char *c)
+                                 struct lexer_token_save out, enum token token)
 {
     switch (token)
     {
@@ -59,20 +44,6 @@ struct lexer_token_save fill_out(struct lexer *lexer,
     case TOKEN_RETURN:
         out.curr_tok = token;
         out.tok_str = strdup("\n");
-        lexer->prev = fgetc(lexer->input);
-        return out;
-    case TOKEN_REDIR_PIPE:
-        out.curr_tok = token;
-        *c = fgetc(lexer->input);
-        return out;
-    case TOKEN_OR:
-        out.curr_tok = token;
-        out.tok_str = strdup("||");
-        *c = fgetc(lexer->input);
-        return out;
-    case TOKEN_AND:
-        out.curr_tok = token;
-        out.tok_str = strdup("&&");
         lexer->prev = fgetc(lexer->input);
         return out;
     case TOKEN_NOT:
@@ -95,24 +66,22 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
     {
     case EOF:
     case '\0':
-        return fill_out(lexer, out, TOKEN_EOF, &c);
+        return fill_out(lexer, out, TOKEN_EOF);
     case ';':
-        return fill_out(lexer, out, TOKEN_SEMICOLON, &c);
-    case '\'':
-        return handle_single_quote(lexer, c);
+        return fill_out(lexer, out, TOKEN_SEMICOLON);
     case '<':
     case '>':
         return handle_redirects(lexer, c);
     case '\\':
         return handle_escape(lexer);
     case '\n':
-        return fill_out(lexer, out, TOKEN_RETURN, &c);
+        return fill_out(lexer, out, TOKEN_RETURN);
     case '|':
         return handle_pipe_or(lexer);
     case '&':
         return handle_ands(lexer);
     case '!':
-        return fill_out(lexer, out, TOKEN_NOT, &c);
+        return fill_out(lexer, out, TOKEN_NOT);
     default:
         break;
     }
