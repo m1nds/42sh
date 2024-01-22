@@ -5,7 +5,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "token.h"
+#include "lexer/token.h"
+#include "utils/vector.h"
 
 struct lexer_token_save
 {
@@ -32,6 +33,11 @@ struct lexer *create_lexer(FILE *input);
  * @args lexer: the lexer that needs to be freed
  */
 void free_lexer(struct lexer *lexer);
+
+/*
+ * @def: The main loop of the lexer. Stores the word in vec.
+ */
+struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec);
 
 /*
  * @def: Returns the next token without moving the lexer

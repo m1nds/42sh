@@ -18,7 +18,7 @@ struct lexer *create_lexer(FILE *input)
     }
     result->input = input;
     result->pos = 0;
-    result->prev = EOF;
+    result->prev = -10;
     result->ls.curr_tok = TOKEN_NONE;
     // result->stack = create_stack();
     return result;
@@ -46,7 +46,8 @@ static bool is_continuous_word(char character)
 {
     return character != ' ' && character != ';' && character != '\n'
         && character != '\t' && character != '|' && character != '&'
-        && character != '<' && character != '>';
+        && character != '<' && character != '>' && character != EOF
+        && character != '\0';
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -61,9 +62,13 @@ static void ignore_line(struct lexer *lexer)
 static struct lexer_token_save get_part_one(struct lexer *lexer)
 {
     char c = lexer->prev;
-    if (c == EOF)
+    if (c == -10)
     {
         c = fgetc(lexer->input);
+    }
+    if (c == '\\')
+    {
+        return handle_escape(lexer);
     }
     // Remove all spaces before the word
     c = skip_blanks(lexer, c);
@@ -80,40 +85,34 @@ static struct lexer_token_save get_part_one(struct lexer *lexer)
     return out;
 }
 
-static struct lexer_token_save main_loop(struct lexer *lexer,
-                                         struct vector *vec)
+struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
 {
     struct lexer_token_save out;
-    char single_quote_flag = 0;
+    out.curr_tok = TOKEN_NONE;
     char c = lexer->prev;
-    while (is_continuous_word(c) || single_quote_flag == 1)
+    while (is_continuous_word(c))
     {
-        if (c == '\0' || c == EOF)
-        {
-            if (single_quote_flag == 0)
-            {
-                break;
-            }
-            if ((c == EOF || c == '\0') && lexer->input != stdin)
-            {
-                vector_destroy(vec);
-                out.curr_tok = TOKEN_STDIN;
-                return out;
-            }
-        }
-        else if (c == '\\')
+        if (c == '\\')
         {
             c = fgetc(lexer->input);
             if (c == '\n')
             {
                 c = fgetc(lexer->input);
+                continue;
             }
+            // This is to differentiate if and i\f
+            // Yes, they are treated differently
+            out.curr_tok = TOKEN_WORD;
             vector_append(vec, c);
         }
         else if (c == '\'')
         {
-            single_quote_flag += 1;
-            single_quote_flag %= 2;
+            out = handle_single_quote(lexer, vec);
+            if (out.curr_tok == TOKEN_STDIN)
+            {
+                vector_destroy(vec);
+                return out;
+            }
         }
         else if (c == '"')
         {
@@ -124,7 +123,7 @@ static struct lexer_token_save main_loop(struct lexer *lexer,
                 return out;
             }
         }
-        else if (c == '=')
+        else if (c == '=' && out.curr_tok != TOKEN_WORD)
         {
             return handle_assignment(lexer, vec);
         }
@@ -134,7 +133,6 @@ static struct lexer_token_save main_loop(struct lexer *lexer,
         }
         c = fgetc(lexer->input);
     }
-    out.curr_tok = TOKEN_NONE;
     lexer->prev = c;
     return out;
 }
@@ -148,14 +146,16 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
     struct vector *vec = vector_create(100);
     out = main_loop(lexer, vec);
-    if (out.curr_tok != TOKEN_NONE)
+    if (out.curr_tok != TOKEN_NONE && out.curr_tok != TOKEN_WORD)
     {
         return out;
     }
     vector_append(vec, '\0');
-    out = match_word(lexer, vec->data);
+    if (out.curr_tok == TOKEN_NONE)
+    {
+        out = match_word(lexer, vec->data);
+    }
     out.tok_str = strdup(vec->data);
-
     vector_destroy(vec);
     return out;
 }

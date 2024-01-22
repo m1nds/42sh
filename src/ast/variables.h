@@ -1,22 +1,16 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
+#define _POSIX_C_SOURCE 200809L
 #include <stdbool.h>
 #include <stdlib.h>
-#include <unistd.h>
-#define _POSIX_C_SOURCE 200809L
 #include <string.h>
+#include <unistd.h>
 
 #include "utils/hash_map.h"
 #include "utils/itoa.h"
 
 extern struct hash_map *hm;
-
-static inline void set_exit_value(int value)
-{
-    bool b;
-    hash_map_insert(hm, strdup("?"), itoa_base(value), &b);
-}
 
 static inline char *get_exit_value()
 {

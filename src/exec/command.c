@@ -43,6 +43,8 @@ int handle_command(struct ast *ast)
     int cb = check_builtin(ast->value);
     if (cb != -1)
     {
+        // Set $? to cb
+        set_exit_value(cb);
         return cb;
     }
 
@@ -61,6 +63,7 @@ int handle_command(struct ast *ast)
 
     int status;
     waitpid(pid, &status, 0);
-
+    // Set $? to status
+    set_exit_value(WEXITSTATUS(status));
     return WEXITSTATUS(status);
 }

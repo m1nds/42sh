@@ -18,7 +18,8 @@ struct lexer_token_save handle_escape(struct lexer *lexer);
 /*
  * @def: Handles the case where the word contains with a single quote
  */
-struct lexer_token_save handle_single_quote(struct lexer *lexer, char c);
+struct lexer_token_save handle_single_quote(struct lexer *lexer,
+                                            struct vector *vec);
 
 /*
  * @def: Handles the case where the word contains a double quote
@@ -46,5 +47,10 @@ struct lexer_token_save handle_pipe_or(struct lexer *lexer);
  * @def Handles and
  */
 struct lexer_token_save handle_ands(struct lexer *lexer);
+
+/*
+ * @def: Checks if word is an io_number
+ */
+struct lexer_token_save handle_io_number(struct lexer *lexer, char *word);
 
 #endif /* HANDLE_SPECIAL_CASES_H */
