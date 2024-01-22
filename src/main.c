@@ -10,11 +10,14 @@
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 
+extern struct hash_map *hm;
+
 void free_heap(struct lexer *lexer, struct ast *ast, FILE *input)
 {
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);
+    hash_map_free(hm);
 }
 
 int main(int argc, char **argv)
@@ -35,17 +38,18 @@ int main(int argc, char **argv)
     struct ast *ast = NULL;
     enum parser_status status = parse_input(&ast, lexer);
     setup_variables(0, NULL);
-    if (check_prettyprint(&options))
-    {
-        print_ast(ast);
-    }
     int return_code = 0;
     while (status == PARSER_OK)
     {
+        if (check_prettyprint(&options))
+        {
+            print_ast(ast);
+        }
         if (ast != NULL)
         {
             return_code = evaluate_ast(ast);
         }
+        fflush(stdout);
         ast_free(ast);
         ast = NULL;
         enum token token = lexer_peek(lexer).curr_tok;
@@ -53,7 +57,6 @@ int main(int argc, char **argv)
         {
             break;
         }
-        fflush(NULL);
         status = parse_input(&ast, lexer);
         // printf("Parser is OK!\n");
     }

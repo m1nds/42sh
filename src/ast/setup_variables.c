@@ -14,12 +14,12 @@ struct hash_map *hm;
 
 void setup_args(int nb_args, char **args)
 {
-    struct vector *vec = vector_create(100);
-    bool b;
     if (args == NULL)
     {
         return;
     }
+    struct vector *vec = vector_create(100);
+    bool b;
     if (*args)
     {
         vector_append_string(vec, args[0]);

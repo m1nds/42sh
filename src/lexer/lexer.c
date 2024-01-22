@@ -127,6 +127,19 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
         {
             return handle_assignment(lexer, vec);
         }
+        else if (c == '$')
+        {
+            vector_append(vec, c);
+            c = fgetc(lexer->input);
+            if (c == '{')
+            {
+                out = handle_brackets(lexer, vec);
+                if (out.curr_tok == TOKEN_STDIN)
+                {
+                    return out;
+                }
+            }
+        }
         else
         {
             vector_append(vec, c);
@@ -166,7 +179,7 @@ struct lexer_token_save lexer_peek(struct lexer *lexer)
     {
         lexer->ls = get_next_token(lexer);
     }
-
+    // printf("%i\n", lexer->ls.curr_tok);
     return lexer->ls;
 }
 
@@ -175,13 +188,13 @@ void lexer_pop(struct lexer *lexer, bool to_free)
     if (lexer->ls.curr_tok == TOKEN_NONE)
     {
         get_next_token(lexer);
-        lexer->ls = get_next_token(lexer);
+        lexer->ls.curr_tok = TOKEN_NONE;
     }
     if (to_free)
     {
         free(lexer->ls.tok_str);
     }
-    lexer->ls = get_next_token(lexer);
+    lexer->ls.curr_tok = TOKEN_NONE;
 }
 
 /*void lexer_savestate(struct lexer *lexer)

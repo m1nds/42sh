@@ -53,4 +53,10 @@ struct lexer_token_save handle_ands(struct lexer *lexer);
  */
 struct lexer_token_save handle_io_number(struct lexer *lexer, char *word);
 
+/*
+ * @def: Handles the case where there are brackets after a $
+ */
+struct lexer_token_save handle_brackets(struct lexer *lexer,
+                                        struct vector *vec);
+
 #endif /* HANDLE_SPECIAL_CASES_H */

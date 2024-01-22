@@ -135,6 +135,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
     {
         size_t j = 0;
         char name_flag = 0;
+        char brackets_flag = 0;
         while (strings[i][j] != '\0')
         {
             if (is_continuous_name(strings[i][j], strlen(name->data)) == 0
@@ -159,10 +160,11 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                 vector_destroy(name);
                 name = vector_create(100);
                 name_flag = 0;
-                if (strings[i][j] == '}')
+                if (strings[i][j] == '}' && brackets_flag == 1)
                 {
                     j++;
                 }
+                brackets_flag = 0;
                 continue;
             }
             else if (strings[i][j] == '$')
@@ -172,6 +174,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                 if (strings[i][j] == '{')
                 {
                     preprocessing_brackets(strings[i], name, &j);
+                    brackets_flag = 1;
                 }
                 continue;
             }
@@ -212,6 +215,8 @@ void preprocessing_strings(char **strings, struct vector *final_command,
         name = vector_create(100);
         i++;
     }
+    vector_destroy(final_command);
+    vector_destroy(name);
 }
 // Replace function name by preprocessing
 void replace_variables(struct ast *ast)
