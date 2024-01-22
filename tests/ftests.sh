@@ -17,9 +17,10 @@ test_stdin() {
     diff output1 output2 > /dev/null
 
     if [ $? -ne 0 ] && [ "$code1" -ne "$code2" ]; then
+        flag=1
         out1=$(cat -e output1)
         out2=$(cat -e output2)
-        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: FILE\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+        echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STDIN\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
         echo -e "  Return Code: ${GREEN}expected :${NC}  $code2  ${RED}got :${NC}  $code1\n"
     fi
 
@@ -63,6 +64,7 @@ test_file() {
     diff output1 output2 > /dev/null
 
     if [ $? -eq 1 ] || [ "$code1" -ne "$code2" ]; then
+        flag=1
         out1=$(cat -e output1)
         out2=$(cat -e output2)
         echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: FILE\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
@@ -85,7 +87,7 @@ test_file() {
 
                 out1=$(cat -e output1)
                 out2=$(cat -e "$1")
-                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STDIN\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: FILE\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
             fi
             shift 1
         done
@@ -106,6 +108,7 @@ test_string() {
     diff output1 output2 > /dev/null
 
     if [ $? -ne 0 ] || [ "$code1" -ne "$code2" ]; then
+        flag=1
         out1=$(cat -e output1)
         out2=$(cat -e output2)
         echo -e "  ${RED}ERROR${NC} IN TEST : \"$2\"\n  Type: STRING\n  Print: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
@@ -128,7 +131,7 @@ test_string() {
 
                 out1=$(cat -e output1)
                 out2=$(cat -e "$1")
-                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STDIN\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
+                echo -e "  ${RED}ERROR${NC} IN TEST : \"$testname\"\n  Type: STRING\n  redirect in $1: ${GREEN}expected :${NC}\n$out2\n  ${RED}got :${NC}\n$out1"
             fi
             shift 1
         done
@@ -215,6 +218,15 @@ test_all "echo a || echo b && echo c && echo d || echo e || echo f && echo g" "a
 test_all "false || ! true && ! echo a && echo b || ls && ! false || echo c && ! echo d || ls" "a lot of and_ors and negs"
 test_all "echo a > file" "simple output redirect" "file"
 test_all "cat -e < test.sh" "simple input redirect"
+test_all 'echo "\""' "escaping double quote in double quotes"
+test_all 'a=test; echo "$a"$a' "variables in and out of double quotes"
+test_all 'a=test; echo '"'$a'"'$a' "variables in and out of single quotes"
+test_all 'a=test echo $a' "environment variable test with echo"
+test_all 'TREE_CHARSET=abcd tree' "environment variable test with tree"
+test_all 'a=test; echo ${a}' "variable with brackets"
+test_all 'false; echo $?' 'test $? with builtin'
+test_all 'ls ls; echo $?' 'test $? with executable'
+test_all 'lss; echo $?' 'test $? with executable not found'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"

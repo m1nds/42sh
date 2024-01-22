@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200112L
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -169,7 +170,7 @@ int handle_redirect(struct ast *ast)
         }
         else if ((*current)->node_type == NODE_ASSIGN)
         {
-            setup_value((*current)->value[0], (*current)->value[1]);
+            setenv((*current)->value[0], (*current)->value[1], 1);
         }
         else if ((*current)->node_type == NODE_REDIR_INOUT)
         {

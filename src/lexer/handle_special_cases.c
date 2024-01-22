@@ -44,6 +44,7 @@ struct lexer_token_save handle_double_quote(struct lexer *lexer,
                                             struct vector *vec)
 {
     struct lexer_token_save out;
+    vector_append(vec, '"');
     char c = fgetc(lexer->input);
     while (c != '\"')
     {
@@ -57,9 +58,25 @@ struct lexer_token_save handle_double_quote(struct lexer *lexer,
             c = fgetc(lexer->input);
         }
         // Handle stuff, like \, $ etc...
+        if (c == '\\')
+        {
+            vector_append(vec, c);
+            c = fgetc(lexer->input);
+            if (c != '$' && c != '`' && c != '"' && c != '\\' && c != '\n')
+            {
+                vector_append(vec, '\\');
+            }
+            if (c != '\n')
+            {
+                vector_append(vec, c);
+            }
+            c = fgetc(lexer->input);
+            continue;
+        }
         vector_append(vec, c);
         c = fgetc(lexer->input);
     }
+    vector_append(vec, '"');
     out.curr_tok = TOKEN_WORD;
     return out;
 }
@@ -68,6 +85,7 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer,
                                             struct vector *vec)
 {
     struct lexer_token_save out;
+    vector_append(vec, '\'');
     char c = fgetc(lexer->input);
     while (c != '\'')
     {
@@ -83,6 +101,7 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer,
         vector_append(vec, c);
         c = fgetc(lexer->input);
     }
+    vector_append(vec, '\'');
     out.curr_tok = TOKEN_WORD;
     return out;
 }

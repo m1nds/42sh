@@ -62,6 +62,12 @@ void setup_value(char *key, char *value)
     hash_map_insert(hm, key, value, &b);
 }
 
+void set_exit_value(int value)
+{
+    bool b;
+    hash_map_insert(hm, strdup("?"), itoa_base(value), &b);
+}
+
 void setup_variables(int nb_args, char **args)
 {
     hm = hash_map_init(25);
