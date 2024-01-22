@@ -138,7 +138,9 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
                 {
                     return out;
                 }
+                c = fgetc(lexer->input);
             }
+            continue;
         }
         else
         {

@@ -252,7 +252,5 @@ struct lexer_token_save handle_brackets(struct lexer *lexer, struct vector *vec)
         vector_append(vec, c);
         c = fgetc(lexer->input);
     }
-    // To get rid of the }
-    fgetc(lexer->input);
     return out;
 }
