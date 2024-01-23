@@ -39,17 +39,17 @@ struct lexer_token_save fill_out(struct lexer *lexer,
     case TOKEN_SEMICOLON:
         out.curr_tok = token;
         out.tok_str = strdup(";");
-        lexer->prev = fgetc(lexer->input);
+        lexer->prev = -10;
         return out;
     case TOKEN_RETURN:
         out.curr_tok = token;
         out.tok_str = strdup("\n");
-        lexer->prev = fgetc(lexer->input);
+        lexer->prev = -10;
         return out;
     case TOKEN_NOT:
         out.curr_tok = token;
         out.tok_str = strdup("!");
-        lexer->prev = fgetc(lexer->input);
+        lexer->prev = -10;
         return out;
     default:
         break;

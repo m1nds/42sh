@@ -170,7 +170,15 @@ int handle_redirect(struct ast *ast)
         }
         else if ((*current)->node_type == NODE_ASSIGN)
         {
-            setenv((*current)->value[0], (*current)->value[1], 1);
+            // Not great but it works for now
+            if (len == 1)
+            {
+                setup_value((*current)->value[0], (*current)->value[1]);
+            }
+            else
+            {
+                setenv((*current)->value[0], (*current)->value[1], 1);
+            }
         }
         else if ((*current)->node_type == NODE_REDIR_INOUT)
         {

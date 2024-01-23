@@ -201,8 +201,10 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     {
         if (flag == 1)
         {
+            *res = result;
             return PARSER_OK;
         }
+        ast_free(result);
         return PARSER_UNEXPECTED_TOKEN;
     }
     if (parse_element(res, lexer) == PARSER_UNEXPECTED_TOKEN)
