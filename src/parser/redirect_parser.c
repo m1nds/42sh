@@ -28,7 +28,9 @@ enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
             token = lexer_peek(lexer).curr_tok;
         }
         vector_append(vec, '\0');
+        assignment->value = realloc(assignment->value, 3 * sizeof(struct ast));
         assignment->value[1] = strdup(vec->data);
+        assignment->value[2] = NULL;
         vector_destroy(vec);
         *res = assignment;
         return PARSER_OK;

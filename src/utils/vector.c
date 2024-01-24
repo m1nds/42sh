@@ -12,7 +12,7 @@ struct vector *vector_create(size_t capacity)
     }
 
     new->capacity = capacity;
-    new->data = calloc(capacity, sizeof(sizeof(char)));
+    new->data = calloc(capacity, sizeof(char));
 
     if (new->data == NULL)
     {
