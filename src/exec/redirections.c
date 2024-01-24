@@ -1,5 +1,6 @@
-#define _POSIX_C_SOURCE 200112L
+#define _POSIX_C_SOURCE 200809L
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -61,7 +62,7 @@ static int redirect_input_and(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
 
-    int dest = retrieve_fd(ast->value[0]);
+    int dest = retrieve_fd(ast->value[1]);
 
     if (strcmp(ast->value[1], "-") == 0)
     {
@@ -69,7 +70,7 @@ static int redirect_input_and(void *arg)
         return -1;
     }
 
-    int src = retrieve_fd(ast->value[1]);
+    int src = retrieve_fd(ast->value[0]);
     int fd_to_switch = (dest == -1) ? STDIN_FILENO : dest;
 
     dup2(src, fd_to_switch);
@@ -81,7 +82,7 @@ static int redirect_output_and(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
 
-    int dest = retrieve_fd(ast->value[0]);
+    int dest = retrieve_fd(ast->value[1]);
 
     if (strcmp(ast->value[1], "-") == 0)
     {
@@ -89,7 +90,7 @@ static int redirect_output_and(void *arg)
         return -1;
     }
 
-    int src = retrieve_fd(ast->value[1]);
+    int src = retrieve_fd(ast->value[0]);
     int fd_to_switch = (dest == -1) ? STDOUT_FILENO : dest;
 
     dup2(src, fd_to_switch);
@@ -149,13 +150,27 @@ size_t children_len(struct ast **children)
     return i;
 }
 
+bool no_command(struct ast **children)
+{
+    size_t i = 0;
+    while (children[i] != NULL)
+    {
+        if (children[i]->node_type == NODE_COMMAND)
+        {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
 int handle_redirect(struct ast *ast)
 {
     int save_stdin = dup(STDIN_FILENO);
     int save_stdout = dup(STDOUT_FILENO);
 
     size_t len = children_len(ast->children);
-
+    bool no_commands = no_command(ast->children);
     struct ast **current = ast->children;
     struct ast *command = NULL;
 
@@ -171,9 +186,10 @@ int handle_redirect(struct ast *ast)
         else if ((*current)->node_type == NODE_ASSIGN)
         {
             // Not great but it works for now
-            if (len == 1)
+            if (no_commands)
             {
-                setup_value((*current)->value[0], (*current)->value[1]);
+                setup_value(strdup((*current)->value[0]),
+                            strdup((*current)->value[1]));
             }
             else
             {

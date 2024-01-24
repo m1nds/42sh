@@ -39,17 +39,27 @@ struct lexer_token_save fill_out(struct lexer *lexer,
     case TOKEN_SEMICOLON:
         out.curr_tok = token;
         out.tok_str = strdup(";");
-        lexer->prev = -10;
+        lexer->prev = CHAR_NONE;
         return out;
     case TOKEN_RETURN:
         out.curr_tok = token;
         out.tok_str = strdup("\n");
-        lexer->prev = -10;
+        lexer->prev = CHAR_NONE;
         return out;
     case TOKEN_NOT:
         out.curr_tok = token;
         out.tok_str = strdup("!");
-        lexer->prev = -10;
+        lexer->prev = CHAR_NONE;
+        return out;
+    case TOKEN_LEFT_BRACKET:
+        out.curr_tok = token;
+        out.tok_str = strdup("{");
+        lexer->prev = CHAR_NONE;
+        return out;
+    case TOKEN_RIGHT_BRACKET:
+        out.curr_tok = token;
+        out.tok_str = strdup("}");
+        lexer->prev = CHAR_NONE;
         return out;
     default:
         break;
@@ -82,6 +92,10 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         return handle_ands(lexer);
     case '!':
         return fill_out(lexer, out, TOKEN_NOT);
+    case '{':
+        return fill_out(lexer, out, TOKEN_LEFT_BRACKET);
+    case '}':
+        return fill_out(lexer, out, TOKEN_RIGHT_BRACKET);
     default:
         break;
     }

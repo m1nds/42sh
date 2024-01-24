@@ -227,6 +227,10 @@ test_all 'a=test; echo ${a}' "variable with brackets"
 test_all 'false; echo $?' 'test $? with builtin'
 test_all 'ls ls; echo $?' 'test $? with executable'
 test_all 'lss; echo $?' 'test $? with executable not found'
+test_all 'a=b b=c > test; echo $a$b' 'test two variables set' 'test'
+test_all 'i\f true; then echo a; fi' 'test i\f'
+test_all 'lss >test 1>&2' 'test >& part one' 'test'
+test_all 'lss 1>&2 > test' 'test >& part two' 'test'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
