@@ -31,6 +31,8 @@ void vector_append(struct vector *vector, char data);
  */
 void vector_append_string(struct vector *vector, char *str);
 
+char vector_pop(struct vector *vector);
+
 /*
  * @def: destroys a vector
  * @args vector: the vector to be freed

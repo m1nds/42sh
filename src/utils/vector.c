@@ -45,6 +45,19 @@ void vector_append_string(struct vector *vector, char *str)
     }
 }
 
+char vector_pop(struct vector *vector)
+{
+    if (vector->size == 0)
+    {
+        return 0;
+    }
+
+    char out = vector->data[vector->size - 1];
+    vector->size--;
+
+    return out;
+}
+
 void vector_destroy(struct vector *vector)
 {
     free(vector->data);

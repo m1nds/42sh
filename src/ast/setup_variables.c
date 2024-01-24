@@ -62,6 +62,11 @@ void setup_value(char *key, char *value)
     hash_map_insert(hm, key, value, &b);
 }
 
+char *get_value(char *key)
+{
+    return hash_map_get(hm, key);
+}
+
 void set_exit_value(int value)
 {
     bool b;

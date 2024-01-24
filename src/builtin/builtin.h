@@ -13,4 +13,7 @@ static inline int false_builtin(void)
 
 int echo_builtin(char **list_str);
 
+
+int cd_builtin(char **args);
+
 #endif /* !BUILTIN_H */
