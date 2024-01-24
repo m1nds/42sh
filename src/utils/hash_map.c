@@ -172,7 +172,7 @@ bool hash_map_remove(struct hash_map *hash_map, char *key)
     if (strcmp(lp->key, key) == 0)
     {
         hash_map->data[h] = lp->next;
-        free(lp->key);
+        // free(lp->key);
         free(lp->value);
         free(lp);
         return true;
@@ -183,7 +183,7 @@ bool hash_map_remove(struct hash_map *hash_map, char *key)
         if (strcmp(lp->key, key) == 0)
         {
             prev->next = lp->next;
-            free(lp->key);
+            // free(lp->key);
             free(lp->value);
             free(lp);
             return true;

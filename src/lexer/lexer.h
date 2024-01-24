@@ -1,6 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#define CHAR_NONE -10
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@ struct lexer
     size_t pos;
     char prev;
     struct lexer_token_save ls;
+    struct lexer_token_save ls_next;
 };
 
 /*
@@ -44,6 +46,12 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec);
  * @args lexer: the lexer to peek
  */
 struct lexer_token_save lexer_peek(struct lexer *lexer);
+
+/*
+ * @def: Returns the token after the next token without moving the lexer
+ * @args lexer: the lexer to next peek
+ */
+struct lexer_token_save lexer_next_peek(struct lexer *lexer);
 
 /*
  * @def: Returns the next token and moves the lexer to be after that token

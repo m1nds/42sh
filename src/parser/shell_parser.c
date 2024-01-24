@@ -6,6 +6,22 @@
 
 enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
 {
+    enum token token = lexer_peek(lexer).curr_tok;
+    if (token == TOKEN_LEFT_BRACKET)
+    {
+        lexer_pop(lexer, true);
+        if (parse_compound_list(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        token = lexer_peek(lexer).curr_tok;
+        if (token != TOKEN_RIGHT_BRACKET)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        lexer_pop(lexer, true);
+        return PARSER_OK;
+    }
     if (parse_rule_if(res, lexer) == PARSER_UNEXPECTED_TOKEN
         && parse_rule_while(res, lexer) == PARSER_UNEXPECTED_TOKEN
         && parse_rule_until(res, lexer) == PARSER_UNEXPECTED_TOKEN)
@@ -221,3 +237,16 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
         return PARSER_UNEXPECTED_TOKEN;
     }
 }
+
+/*enum parse_status parse_funcdec(struct ast **res, struct lexer *lexer)
+{
+    struct lexer_token_save t = lexer_peek(lexer);
+    enum token token = t.curr_tok;
+    if (token != TOKEN_WORD)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    struct ast *function = ast_new(NODE_FUNCTION, 0, t.tok_str);
+    lexer_pop(lexer, false);
+    enum token token = lexer_peek(lexer);
+}*/

@@ -143,6 +143,30 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
     return PARSER_OK;
 }
 
+enum parser_status __parse_redirects(struct ast **res, struct lexer *lexer)
+{
+    struct ast *redirect = NULL;
+    if (parse_redirection(&redirect, lexer) == PARSER_OK)
+    {
+        struct ast *parent = ast_new(NODE_REDIR, 2, NULL);
+        parent->children[0] = *res;
+        parent->children[1] = redirect;
+        size_t nb_children = 2;
+        redirect = NULL;
+        while (parse_redirection(&redirect, lexer) == PARSER_OK)
+        {
+            parent->children = realloc(parent->children,
+                                       sizeof(struct ast) * (nb_children + 2));
+            parent->children[nb_children] = redirect;
+            redirect = NULL;
+            nb_children++;
+        }
+        parent->children[nb_children + 1] = NULL;
+        *res = parent;
+    }
+    return PARSER_OK;
+}
+
 enum parser_status parse_command(struct ast **res, struct lexer *lexer)
 {
     if (parse_simple_command(res, lexer) == PARSER_OK)
@@ -151,27 +175,12 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     }
     if (parse_shell_command(res, lexer) == PARSER_OK)
     {
-        struct ast *redirect = NULL;
-        if (parse_redirection(&redirect, lexer) == PARSER_OK)
-        {
-            struct ast *parent = ast_new(NODE_REDIR, 2, NULL);
-            parent->children[0] = *res;
-            parent->children[1] = redirect;
-            size_t nb_children = 2;
-            redirect = NULL;
-            while (parse_redirection(&redirect, lexer) == PARSER_OK)
-            {
-                parent->children = realloc(
-                    parent->children, sizeof(struct ast) * (nb_children + 2));
-                parent->children[nb_children] = redirect;
-                redirect = NULL;
-                nb_children++;
-            }
-            parent->children[nb_children + 1] = NULL;
-            *res = parent;
-        }
-        return PARSER_OK;
+        return __parse_redirects(res, lexer);
     }
+    /*if (parse_funcdec(res, lexer) == PARSER_OK)
+    {
+        return __parse_redirects(res, lexer);
+    }*/
     return PARSER_UNEXPECTED_TOKEN;
 }
 

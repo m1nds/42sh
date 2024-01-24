@@ -18,8 +18,9 @@ struct lexer *create_lexer(FILE *input)
     }
     result->input = input;
     result->pos = 0;
-    result->prev = -10;
+    result->prev = CHAR_NONE;
     result->ls.curr_tok = TOKEN_NONE;
+    result->ls_next.curr_tok = TOKEN_NONE;
     // result->stack = create_stack();
     return result;
 }
@@ -47,7 +48,7 @@ static bool is_continuous_word(char character)
     return character != ' ' && character != ';' && character != '\n'
         && character != '\t' && character != '|' && character != '&'
         && character != '<' && character != '>' && character != EOF
-        && character != '\0';
+        && character != '\0' && character != '{' && character != '}';
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -62,7 +63,7 @@ static void ignore_line(struct lexer *lexer)
 static struct lexer_token_save get_part_one(struct lexer *lexer)
 {
     char c = lexer->prev;
-    if (c == -10)
+    if (c == CHAR_NONE)
     {
         c = fgetc(lexer->input);
     }
@@ -185,18 +186,38 @@ struct lexer_token_save lexer_peek(struct lexer *lexer)
     return lexer->ls;
 }
 
+struct lexer_token_save lexer_next_peek(struct lexer *lexer)
+{
+    if (lexer->ls.curr_tok == TOKEN_NONE)
+    {
+        lexer->ls = get_next_token(lexer);
+    }
+    if (lexer->ls_next.curr_tok == TOKEN_NONE)
+    {
+        lexer->ls = get_next_token(lexer);
+    }
+    // printf("%i\n", lexer->ls.curr_tok);
+    return lexer->ls_next;
+}
 void lexer_pop(struct lexer *lexer, bool to_free)
 {
     if (lexer->ls.curr_tok == TOKEN_NONE)
     {
         get_next_token(lexer);
-        lexer->ls.curr_tok = TOKEN_NONE;
     }
     if (to_free)
     {
         free(lexer->ls.tok_str);
     }
-    lexer->ls.curr_tok = TOKEN_NONE;
+    if (lexer->ls_next.curr_tok != TOKEN_NONE)
+    {
+        lexer->ls = lexer->ls_next;
+        lexer->ls_next.curr_tok = TOKEN_NONE;
+    }
+    else
+    {
+        lexer->ls.curr_tok = TOKEN_NONE;
+    }
 }
 
 /*void lexer_savestate(struct lexer *lexer)
