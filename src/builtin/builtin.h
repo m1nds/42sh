@@ -13,4 +13,8 @@ static inline int false_builtin(void)
 
 int echo_builtin(char **list_str);
 
+int unset(char **list_str);
+
+int dot(char **list_str);
+
 #endif /* !BUILTIN_H */

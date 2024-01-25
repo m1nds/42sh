@@ -1,1 +1,1 @@
-echo this :)
+echo this
