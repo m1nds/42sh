@@ -1,4 +1,4 @@
-SUBDIRS = utils ast exec input lexer parser builtin
+SUBDIRS = utils ast exec input lexer parser builtin variables
 
 bin_PROGRAMS = 42sh
 
@@ -14,4 +14,5 @@ bin_PROGRAMS = 42sh
 		exec/libexec.a \
 		ast/libast.a \
 		builtin/libbuiltin.a\
+		variables/libvariables.a\
 		utils/libutils.a

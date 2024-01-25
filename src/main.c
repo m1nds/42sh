@@ -4,26 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ast/variables.h"
 #include "exec/exec.h"
 #include "input/input.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
+#include "variables/variables.h"
 
-extern struct hash_map *hm;
+extern struct hash_map *hm_vars;
 
 void free_heap(struct lexer *lexer, struct ast *ast, FILE *input)
 {
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);
-    hash_map_free(hm);
+    hash_map_free(hm_vars);
 }
 
-int main(int argc, char **argv)
+int main_execution_loop(FILE *input, int options)
 {
-    int options = 0;
-    FILE *input = get_input(argc, argv, &options);
     struct lexer *lexer = create_lexer(input);
     /*enum token token = TOKEN_NONE;
     while (token != TOKEN_EOF)
@@ -68,4 +66,11 @@ int main(int argc, char **argv)
     }
     free_heap(lexer, ast, input);
     return return_code;
+}
+
+int main(int argc, char **argv)
+{
+    int options = 0;
+    FILE *input = get_input(argc, argv, &options);
+    return main_execution_loop(input, options);
 }

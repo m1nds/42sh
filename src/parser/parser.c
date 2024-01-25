@@ -148,16 +148,36 @@ enum parser_status __parse_redirects(struct ast **res, struct lexer *lexer)
     struct ast *redirect = NULL;
     if (parse_redirection(&redirect, lexer) == PARSER_OK)
     {
-        struct ast *parent = ast_new(NODE_REDIR, 2, NULL);
-        parent->children[0] = *res;
-        parent->children[1] = redirect;
+        struct ast *parent = NULL;
+        if ((*res)->node_type == NODE_FUNCTION)
+        {
+            parent = ast_new(NODE_FUNCTION, 1, (*res)->value[0]);
+            parent->children[0] = ast_new(NODE_REDIR, 2, NULL);
+            parent->children[0]->children[0] = (*res)->children[0];
+            parent->children[0]->children[1] = redirect;
+        }
+        else
+        {
+            parent = ast_new(NODE_REDIR, 2, NULL);
+            parent->children[0] = *res;
+            parent->children[1] = redirect;
+        }
         size_t nb_children = 2;
         redirect = NULL;
         while (parse_redirection(&redirect, lexer) == PARSER_OK)
         {
-            parent->children = realloc(parent->children,
-                                       sizeof(struct ast) * (nb_children + 2));
-            parent->children[nb_children] = redirect;
+            if (parent->node_type == NODE_REDIR)
+            {
+                parent->children = realloc(
+                    parent->children, sizeof(struct ast) * (nb_children + 2));
+                parent->children[nb_children] = redirect;
+            }
+            else
+            {
+                parent->children[0]->children = realloc(
+                    parent->children, sizeof(struct ast) * (nb_children + 2));
+                parent->children[0]->children[nb_children] = redirect;
+            }
             redirect = NULL;
             nb_children++;
         }
@@ -169,6 +189,14 @@ enum parser_status __parse_redirects(struct ast **res, struct lexer *lexer)
 
 enum parser_status parse_command(struct ast **res, struct lexer *lexer)
 {
+    enum token token = lexer_next_peek(lexer).curr_tok;
+    if (token == TOKEN_LEFT_PARENTHESES)
+    {
+        if (parse_funcdec(res, lexer) == PARSER_OK)
+        {
+            return __parse_redirects(res, lexer);
+        }
+    }
     if (parse_simple_command(res, lexer) == PARSER_OK)
     {
         return PARSER_OK;
@@ -177,10 +205,6 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     {
         return __parse_redirects(res, lexer);
     }
-    /*if (parse_funcdec(res, lexer) == PARSER_OK)
-    {
-        return __parse_redirects(res, lexer);
-    }*/
     return PARSER_UNEXPECTED_TOKEN;
 }
 
@@ -206,7 +230,7 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
         result->children[nb_children + 1] = NULL;
     }
     struct lexer_token_save token = lexer_peek(lexer);
-    if (token.curr_tok != TOKEN_WORD)
+    if (token.curr_tok != TOKEN_WORD && token.curr_tok != TOKEN_ESCAPED_WORD)
     {
         if (flag == 1)
         {

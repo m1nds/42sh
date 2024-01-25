@@ -37,6 +37,10 @@ void vector_append(struct vector *vector, char value)
 
 void vector_append_string(struct vector *vector, char *str)
 {
+    if (str == NULL)
+    {
+        return;
+    }
     size_t i = 0;
     while (str[i] != '\0')
     {

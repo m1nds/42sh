@@ -10,8 +10,9 @@ test_LDADD = \
 		%D%/../src/lexer/liblexer.a \
 		%D%/../src/parser/libparser.a \
 		%D%/../src/ast/libast.a \
-		%D%/../src/utils/libutils.a \
-		%D%/../src/builtin/libbuiltin.a
+		%D%/../src/builtin/libbuiltin.a \
+		%D%/../src/variables/libvariables.a \
+		%D%/../src/utils/libutils.a
 
 check-local: test
 	cp %D%/../src/42sh .

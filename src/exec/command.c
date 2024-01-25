@@ -7,6 +7,7 @@
 #include "ast/ast.h"
 #include "builtin/builtin.h"
 #include "exec/exec.h"
+#include "variables/preprocessing.h"
 
 /*int check_builtin(char **value)
 {

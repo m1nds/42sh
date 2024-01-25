@@ -19,6 +19,7 @@ AC_CONFIG_FILES([
                     src/lexer/Makefile
                     src/parser/Makefile
                     src/builtin/Makefile
+                    src/variables/Makefile
                     tests/Makefile
                 ])
 AC_OUTPUT

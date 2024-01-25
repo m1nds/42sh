@@ -8,6 +8,7 @@
 
 #include "ast/ast.h"
 #include "exec/exec.h"
+#include "variables/variables.h"
 
 typedef int (*redirect_ptr)(void *);
 
