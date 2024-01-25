@@ -43,7 +43,7 @@ struct lexer_token_save handle_escape(struct lexer *lexer)
 struct lexer_token_save handle_double_quote(struct lexer *lexer,
                                             struct vector *vec)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     vector_append(vec, '"');
     char c = fgetc(lexer->input);
     while (c != '\"')
@@ -80,7 +80,7 @@ struct lexer_token_save handle_double_quote(struct lexer *lexer,
 struct lexer_token_save handle_single_quote(struct lexer *lexer,
                                             struct vector *vec)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     vector_append(vec, '\'');
     char c = fgetc(lexer->input);
     while (c != '\'')
@@ -101,7 +101,7 @@ struct lexer_token_save handle_single_quote(struct lexer *lexer,
 struct lexer_token_save handle_assignment(struct lexer *lexer,
                                           struct vector *vec)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     out.tok_str = NULL;
     out.curr_tok = TOKEN_ASSIGNMENT;
     size_t i = 0;
@@ -128,7 +128,7 @@ struct lexer_token_save handle_assignment(struct lexer *lexer,
 
 struct lexer_token_save handle_redirects(struct lexer *lexer, char c)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     if (c == '>')
     {
         c = fgetc(lexer->input);
@@ -182,7 +182,7 @@ struct lexer_token_save handle_redirects(struct lexer *lexer, char c)
 
 struct lexer_token_save handle_pipe_or(struct lexer *lexer)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     out.curr_tok = TOKEN_REDIR_PIPE;
     char new_c = fgetc(lexer->input);
     if (new_c == '|')
@@ -201,7 +201,7 @@ struct lexer_token_save handle_pipe_or(struct lexer *lexer)
 
 struct lexer_token_save handle_ands(struct lexer *lexer)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     char new_c = fgetc(lexer->input);
     if (new_c == '&')
     {
@@ -218,7 +218,7 @@ struct lexer_token_save handle_ands(struct lexer *lexer)
 
 struct lexer_token_save handle_io_number(struct lexer *lexer, char *word)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     out.curr_tok = TOKEN_WORD;
     if (lexer->prev == '>' || lexer->prev == '<')
     {
@@ -239,7 +239,7 @@ struct lexer_token_save handle_io_number(struct lexer *lexer, char *word)
 
 struct lexer_token_save handle_brackets(struct lexer *lexer, struct vector *vec)
 {
-    struct lexer_token_save out;
+    struct lexer_token_save out = { .curr_tok = TOKEN_NONE, .tok_str = NULL };
     out.curr_tok = TOKEN_WORD;
     char c = fgetc(lexer->input);
     while (c != '}')
