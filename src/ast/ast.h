@@ -23,8 +23,8 @@ enum ast_type
     NODE_REDIR_INAND,
     NODE_REDIR_OUTAND,
     NODE_REDIR_INOUT,
-    NODE_ASSIGN
-
+    NODE_ASSIGN,
+    NODE_FUNCTION
 };
 
 struct ast

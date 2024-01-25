@@ -117,8 +117,29 @@ enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
  */
 enum parser_status parse_compound_list(struct ast **res, struct lexer *lexer);
 
+/*
+ * @def: Parses a prefix that can be before a command
+ *
+ * prefix =
+ *  ASSIGNMENT_WORD
+ *  | redirection
+ *  ;
+ */
 enum parser_status parse_prefix(struct ast **res, struct lexer *lexer);
 
+/*
+ * @def: Parses a single redirection that can be preceded by a io_number
+ *
+ * redirection = [IONUMBER] ( '>' | '<' | '>>' | '>&' | '<&' | '>|' | '<>' )
+ *               WORD ;
+ */
 enum parser_status parse_redirection(struct ast **res, struct lexer *lexer);
+
+/*
+ * @def: Parses a function comprised of its name and definition
+ *
+ * funcdec = WORD '(' ')' {'\n'} shell_command ;
+ */
+enum parser_status parse_funcdec(struct ast **res, struct lexer *lexer);
 
 #endif /* !PARSER_H */

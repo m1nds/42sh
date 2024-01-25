@@ -9,12 +9,12 @@
 FILE *get_string(char *str)
 {
     // Open a stream with a string str and returns it.
-    return fmemopen(str, strlen(str), "r+");
+    return fmemopen(str, strlen(str), "r");
 }
 
 FILE *get_file(const char *file)
 {
-    return fopen(file, "r+");
+    return fopen(file, "r");
 }
 
 int set_flags(const char *arg, int *flags)
