@@ -39,5 +39,9 @@ int check_builtin(char **value)
         return export(value);
     }
 
+    if (strcmp("exit", value[0]) == 0)
+    {
+        return exit_builtin(value);
+    }
     return -1;
 }
