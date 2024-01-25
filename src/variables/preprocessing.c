@@ -6,8 +6,7 @@
 #include "ast/ast.h"
 #include "utils/hash_map.h"
 #include "utils/vector.h"
-
-extern struct hash_map *hm_vars;
+#include "variables/variables.h"
 
 char is_continuous_name(char c, size_t len)
 {
@@ -56,6 +55,7 @@ void preprocessing_single_quotes(char *string, struct vector *vec, size_t *i)
 void preprocessing_double_quotes(char *string, struct vector *final_command,
                                  struct vector **command_name, size_t *i)
 {
+    struct hash_map *hm_vars = get_variables();
     struct vector *name = *command_name;
     char name_flag = 0;
     (*i)++;
@@ -76,6 +76,10 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
                 }
             }
             char *val = hash_map_get(hm_vars, name->data);
+            if (val == NULL)
+            {
+                val = getenv(name->data);
+            }
             if (val != NULL)
             {
                 vector_append_string(final_command, val);
@@ -116,6 +120,10 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
     if (name_flag == 1)
     {
         char *val = hash_map_get(hm_vars, name->data);
+        if (val == NULL)
+        {
+            val = getenv(name->data);
+        }
         if (val != NULL)
         {
             vector_append_string(final_command, val);
@@ -130,6 +138,7 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
 void preprocessing_strings(char **strings, struct vector *final_command,
                            struct vector *name)
 {
+    struct hash_map *hm_vars = get_variables();
     size_t i = 0;
     while (strings[i] != NULL)
     {
@@ -153,6 +162,10 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                     }
                 }
                 char *val = hash_map_get(hm_vars, name->data);
+                if (val == NULL)
+                {
+                    val = getenv(name->data);
+                }
                 if (val != NULL)
                 {
                     vector_append_string(final_command, val);
@@ -203,6 +216,10 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             j++;
         }
         char *val = hash_map_get(hm_vars, name->data);
+        if (val == NULL)
+        {
+            val = getenv(name->data);
+        }
         if (val != NULL)
         {
             vector_append_string(final_command, val);

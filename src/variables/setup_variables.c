@@ -10,9 +10,6 @@
 #include "utils/vector.h"
 #include "variables/variables.h"
 
-struct hash_map *hm_vars;
-struct hash_map *hm_funcs;
-
 void setup_args(int nb_args, char **args)
 {
     if (args == NULL)
@@ -65,6 +62,16 @@ void set_exit_value(int value)
 {
     char *str = itoa_base(value);
     hash_map_insert(hm_vars, strdup("?"), str);
+}
+
+struct hash_map *get_variables(void)
+{
+    return hm_vars;
+}
+
+struct hash_map *get_functions(void)
+{
+    return hm_funcs;
 }
 
 void setup_variables(int nb_args, char **args)

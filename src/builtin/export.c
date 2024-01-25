@@ -1,14 +1,13 @@
-#define _POSIX_C_SOURCE 200112L
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "utils/hash_map.h"
-
-extern struct hash_map *hm;
+#include "variables/variables.h"
 
 int export(char **list_str)
 {
+    struct hash_map *hm_vars = get_variables();
     int err = 0;
     size_t i = 1;
     while (list_str[i] != NULL)
@@ -22,7 +21,7 @@ int export(char **list_str)
         char *val = strtok(NULL, "=");
         if (val == NULL)
         {
-            val = hash_map_get(hm, name);
+            val = hash_map_get(hm_vars, name);
             if (val != NULL)
             {
                 err = setenv(name, val, 1);

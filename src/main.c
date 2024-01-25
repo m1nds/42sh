@@ -10,14 +10,15 @@
 #include "parser/parser.h"
 #include "variables/variables.h"
 
-extern struct hash_map *hm_vars;
-
 void free_heap(struct lexer *lexer, struct ast *ast, FILE *input)
 {
+    struct hash_map *hm_vars = get_variables();
+    struct hash_map *hm_funcs = get_functions();
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);
     hash_map_free(hm_vars);
+    hash_map_free(hm_funcs);
 }
 
 int main_execution_loop(FILE *input, int options)

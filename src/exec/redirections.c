@@ -8,6 +8,7 @@
 
 #include "ast/ast.h"
 #include "exec/exec.h"
+#include "variables/preprocessing.h"
 #include "variables/variables.h"
 
 typedef int (*redirect_ptr)(void *);
@@ -165,6 +166,20 @@ bool no_command(struct ast **children)
     return true;
 }
 
+void preprocess_command(struct ast **children)
+{
+    size_t i = 0;
+    while (children[i] != NULL)
+    {
+        if (children[i]->node_type == NODE_COMMAND)
+        {
+            replace_variables(children[i]);
+            return;
+        }
+        i++;
+    }
+}
+
 int handle_redirect(struct ast *ast)
 {
     int save_stdin = dup(STDIN_FILENO);
@@ -172,6 +187,10 @@ int handle_redirect(struct ast *ast)
 
     size_t len = children_len(ast->children);
     bool no_commands = no_command(ast->children);
+    if (no_commands == false)
+    {
+        preprocess_command(ast->children);
+    }
     struct ast **current = ast->children;
     struct ast *command = NULL;
 
@@ -212,7 +231,7 @@ int handle_redirect(struct ast *ast)
         current++;
     }
 
-    int out = (command != NULL) ? evaluate_ast(command) : 1;
+    int out = (command != NULL) ? handle_command(command, false) : 1;
 
     dup2(save_stdin, STDIN_FILENO);
     dup2(save_stdout, STDOUT_FILENO);

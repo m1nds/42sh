@@ -10,10 +10,15 @@
 #include "utils/hash_map.h"
 #include "utils/itoa.h"
 
-extern struct hash_map *hm_vars;
+static struct hash_map *hm_vars = NULL;
+static struct hash_map *hm_funcs = NULL;
 
 static inline char *get_exit_value()
 {
+    if (hm_funcs == NULL)
+    {
+        return hash_map_get(hm_vars, "?");
+    }
     return hash_map_get(hm_vars, "?");
 }
 
@@ -62,6 +67,10 @@ static inline char *get_uid()
 {
     return hash_map_get(hm_vars, "UID");
 }
+
+struct hash_map *get_variables(void);
+
+struct hash_map *get_functions(void);
 
 void setup_value(char *key, char *value);
 

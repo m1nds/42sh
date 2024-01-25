@@ -12,7 +12,7 @@ int evaluate_ast(struct ast *ast)
     switch (ast->node_type)
     {
     case NODE_COMMAND:
-        return handle_command(ast);
+        return handle_command(ast, true);
     case NODE_SEMICOLON:
         return handle_semicolon(ast);
     case NODE_IF:
