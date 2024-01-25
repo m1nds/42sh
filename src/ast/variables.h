@@ -19,8 +19,8 @@ static inline char *get_exit_value()
 
 static inline void setup_nb_args(int nb_args)
 {
-    bool b;
-    hash_map_insert(hm, strdup("#"), itoa_base(nb_args), &b);
+    char *value = itoa_base(nb_args);
+    hash_map_insert(hm, strdup("#"), value);
 }
 
 static inline char *get_nb_args()
@@ -30,8 +30,8 @@ static inline char *get_nb_args()
 
 static inline void setup_pid()
 {
-    bool b;
-    hash_map_insert(hm, strdup("$"), itoa_base(getpid()), &b);
+    char *value = itoa_base(getpid());
+    hash_map_insert(hm, strdup("$"), value);
 }
 
 static inline char *get_pid()
@@ -41,9 +41,8 @@ static inline char *get_pid()
 
 static inline void setup_random()
 {
-    bool b;
-    hash_map_insert(hm, strdup("RANDOM"),
-                    itoa_base((int)((rand() * (size_t)hm) % 32768)), &b);
+    char *value = itoa_base((int)((rand() * (size_t)hm) % 32768));
+    hash_map_insert(hm, strdup("RANDOM"), value);
 }
 
 static inline char *get_random()
@@ -55,8 +54,8 @@ static inline char *get_random()
 
 static inline void setup_uid()
 {
-    bool b;
-    hash_map_insert(hm, strdup("UID"), itoa_base(getuid()), &b);
+    char *out = itoa_base(getuid());
+    hash_map_insert(hm, strdup("UID"), out);
 }
 
 static inline char *get_uid()

@@ -7,7 +7,7 @@
 struct pair_list
 {
     char *key;
-    char *value;
+    void *value;
     struct pair_list *next;
 };
 
@@ -40,8 +40,7 @@ struct hash_map *hash_map_init(size_t size);
  * else false
  * @return: return the bool updated
  */
-bool hash_map_insert(struct hash_map *hash_map, char *key, char *value,
-                     bool *updated);
+bool hash_map_insert(struct hash_map *hash_map, char *key, void *value);
 /*
  * @def: free the hash map
  * @args hash_map: the hash map to free
@@ -60,7 +59,7 @@ void hash_map_dump(struct hash_map *hash_map);
  * @args key: key of the element to search
  * @return: return the value of the searched element
  */
-char *hash_map_get(const struct hash_map *hash_map, char *key);
+void *hash_map_get(const struct hash_map *hash_map, char *key);
 
 /*
  * @def: remove an element from the hash map

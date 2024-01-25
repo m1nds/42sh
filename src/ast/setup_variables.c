@@ -19,7 +19,6 @@ void setup_args(int nb_args, char **args)
         return;
     }
     struct vector *vec = vector_create(100);
-    bool b;
     if (*args)
     {
         vector_append_string(vec, args[0]);
@@ -35,8 +34,8 @@ void setup_args(int nb_args, char **args)
 
     if (strcmp(vec->data, "") != 0)
     {
-        hash_map_insert(hm, strdup("@"), strdup(vec->data), &b);
-        hash_map_insert(hm, strdup("*"), strdup(vec->data), &b);
+        hash_map_insert(hm, strdup("@"), strdup(vec->data));
+        hash_map_insert(hm, strdup("*"), strdup(vec->data));
     }
 
     vector_destroy(vec);
@@ -48,24 +47,23 @@ void setup_args_n(int nb_args, char **args)
     {
         return;
     }
-    bool b;
+
     for (int i = 0; i < nb_args; i++)
     {
         char *key = itoa_base(i + 1);
-        hash_map_insert(hm, key, args[i], &b);
+        hash_map_insert(hm, key, args[i]);
     }
 }
 
 void setup_value(char *key, char *value)
 {
-    bool b;
-    hash_map_insert(hm, key, value, &b);
+    hash_map_insert(hm, key, value);
 }
 
 void set_exit_value(int value)
 {
-    bool b;
-    hash_map_insert(hm, strdup("?"), itoa_base(value), &b);
+    char *str = itoa_base(value);
+    hash_map_insert(hm, strdup("?"), str);
 }
 
 void setup_variables(int nb_args, char **args)
