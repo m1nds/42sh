@@ -227,6 +227,11 @@ test_all 'a=test; echo ${a}' "variable with brackets"
 test_all 'false; echo $?' 'test $? with builtin'
 test_all 'ls ls; echo $?' 'test $? with executable'
 test_all 'lss; echo $?' 'test $? with executable not found'
+test_all 'abc=ABC; def=DEF; echo 123$abc$def456; unset abc def; echo 123$abc$def456' 'test unset with simple variable'
+test_all '. ./test.sh' 'dot with /'
+test_all 'PATH=. . test.sh' 'dot using PATH'
+
+#test_all 'abc=ABC; def=DEF; echo avant $abc $def; unset abc def; echo apres $abc $def' 'test unset with simple variable not working'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
