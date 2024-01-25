@@ -34,5 +34,10 @@ int check_builtin(char **value)
         return dot(value);
     }
 
+    if (strcmp("export", value[0]) == 0)
+    {
+        return export(value);
+    }
+
     return -1;
 }
