@@ -15,7 +15,7 @@ int dot(char **list_ptr)
     {
         if (list_ptr[1][i] == '/')
         {
-            char *const argv[] = {"./42sh", list_ptr[1], NULL}; 
+            char *const argv[] = { "./42sh", list_ptr[1], NULL };
             int is_exe = execvp("./42sh", argv);
             return is_exe;
         }
@@ -33,7 +33,7 @@ int dot(char **list_ptr)
     {
         subpath = realloc(subpath, strlen(subpath) + strlen(list_ptr[1]) + 1);
         subpath = strcat(subpath, list_ptr[1]);
-        char *const argv[] = {"42sh", subpath, NULL};
+        char *const argv[] = { "42sh", subpath, NULL };
         int is_exe = execvp("42sh", argv);
         if (is_exe != -1)
         {

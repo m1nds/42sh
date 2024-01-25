@@ -43,7 +43,6 @@ static int unset_fun(char **list_str, size_t i)
 {
     if (list_str[i])
     {
-
     }
     return 0;
 }
