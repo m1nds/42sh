@@ -1,6 +1,7 @@
 #include "exec.h"
 
 #include "ast/ast.h"
+#include "variables/variables.h"
 
 int evaluate_ast(struct ast *ast)
 {

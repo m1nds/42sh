@@ -1,5 +1,3 @@
-#define _POSIX_C_SOURCE 200112L
-
 #include <err.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -7,7 +5,7 @@
 
 #include "utils/hash_map.h"
 
-extern struct hash_map *hm;
+extern struct hash_map *hm_vars;
 
 static int unset_var(char **list_str, size_t i)
 {
@@ -18,7 +16,7 @@ static int unset_var(char **list_str, size_t i)
 
     while (list_str[i] != NULL)
     {
-        hash_map_remove(hm, list_str[i]);
+        hash_map_remove(hm_vars, list_str[i]);
         i++;
     }
     return 0;

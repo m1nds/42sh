@@ -7,7 +7,7 @@
 #include "utils/hash_map.h"
 #include "utils/vector.h"
 
-extern struct hash_map *hm;
+extern struct hash_map *hm_vars;
 
 char is_continuous_name(char c, size_t len)
 {
@@ -75,7 +75,7 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
                     vector_append(final_command, '$');
                 }
             }
-            char *val = hash_map_get(hm, name->data);
+            char *val = hash_map_get(hm_vars, name->data);
             if (val != NULL)
             {
                 vector_append_string(final_command, val);
@@ -115,7 +115,7 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
     }
     if (name_flag == 1)
     {
-        char *val = hash_map_get(hm, name->data);
+        char *val = hash_map_get(hm_vars, name->data);
         if (val != NULL)
         {
             vector_append_string(final_command, val);
@@ -152,7 +152,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                         vector_append(final_command, '$');
                     }
                 }
-                char *val = hash_map_get(hm, name->data);
+                char *val = hash_map_get(hm_vars, name->data);
                 if (val != NULL)
                 {
                     vector_append_string(final_command, val);
@@ -202,7 +202,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             }
             j++;
         }
-        char *val = hash_map_get(hm, name->data);
+        char *val = hash_map_get(hm_vars, name->data);
         if (val != NULL)
         {
             vector_append_string(final_command, val);

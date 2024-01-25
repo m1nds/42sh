@@ -48,7 +48,7 @@ static bool is_continuous_word(char character)
     return character != ' ' && character != ';' && character != '\n'
         && character != '\t' && character != '|' && character != '&'
         && character != '<' && character != '>' && character != EOF
-        && character != '\0' && character != '{' && character != '}';
+        && character != '\0' && character != '(' && character != ')';
 }
 
 static void ignore_line(struct lexer *lexer)
@@ -103,7 +103,7 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
             }
             // This is to differentiate if and i\f
             // Yes, they are treated differently
-            out.curr_tok = TOKEN_WORD;
+            out.curr_tok = TOKEN_ESCAPED_WORD;
             vector_append(vec, c);
         }
         else if (c == '\'')
@@ -162,7 +162,8 @@ static struct lexer_token_save get_next_token(struct lexer *lexer)
     }
     struct vector *vec = vector_create(100);
     out = main_loop(lexer, vec);
-    if (out.curr_tok != TOKEN_NONE && out.curr_tok != TOKEN_WORD)
+    if (out.curr_tok != TOKEN_NONE && out.curr_tok != TOKEN_WORD
+        && out.curr_tok != TOKEN_ESCAPED_WORD)
     {
         return out;
     }
@@ -194,7 +195,7 @@ struct lexer_token_save lexer_next_peek(struct lexer *lexer)
     }
     if (lexer->ls_next.curr_tok == TOKEN_NONE)
     {
-        lexer->ls = get_next_token(lexer);
+        lexer->ls_next = get_next_token(lexer);
     }
     // printf("%i\n", lexer->ls.curr_tok);
     return lexer->ls_next;

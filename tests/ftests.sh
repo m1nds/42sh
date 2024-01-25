@@ -235,6 +235,15 @@ test_all 'abc=ABC; def=DEF; echo 123$abc$def456; unset abc def; echo 123$abc$def
 #test_all 'abc=ABC; def=DEF; echo avant $abc $def; unset abc def; echo apres $abc $def' 'test unset with simple variable not working'
 test_all '. ./test.sh' 'dot with /'
 test_all 'PATH=. . test.sh' 'dot using PATH'
+test_all '{ echo a; echo b; } | tr b h' 'test raw compound list'
+test_all '{echo a; echo b; } | tr b h' 'error 1 compound list'
+test_all '{ echo a; echo b } | tr b h' 'error 2 compound list'
+test_all 'echo ! a' '! is not a reserved word moment'
+test_all 'a=; echo $a' 'variable set to nothing'
+#test_all 'test(){ ls;}; test; test; test' 'testing basic function'
+#test_all 'test(          )if true; then echo a; else echo b; fi' 'slightly harder function'
+test_all 'if(){ echo b;};' 'incorrect function name 1'
+test_all 'i\f(){ echo b;};' 'incorrect function name 2'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"

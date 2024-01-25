@@ -238,15 +238,43 @@ enum parser_status parse_else_clause(struct ast **res, struct lexer *lexer)
     }
 }
 
-/*enum parse_status parse_funcdec(struct ast **res, struct lexer *lexer)
+enum parser_status parse_funcdec(struct ast **res, struct lexer *lexer)
 {
     struct lexer_token_save t = lexer_peek(lexer);
     enum token token = t.curr_tok;
-    if (token != TOKEN_WORD)
+    if (token != TOKEN_WORD && TOKEN_ESCAPED_WORD)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
-    struct ast *function = ast_new(NODE_FUNCTION, 0, t.tok_str);
+    struct ast *function = ast_new(NODE_FUNCTION, 1, t.tok_str);
     lexer_pop(lexer, false);
-    enum token token = lexer_peek(lexer);
-}*/
+    token = lexer_peek(lexer).curr_tok;
+    if (token != TOKEN_LEFT_PARENTHESES)
+    {
+        ast_free(function);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    token = lexer_peek(lexer).curr_tok;
+    if (token != TOKEN_RIGHT_PARENTHESES)
+    {
+        ast_free(function);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    token = lexer_peek(lexer).curr_tok;
+    while (token == TOKEN_RETURN)
+    {
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
+    }
+    struct ast *shell_command = NULL;
+    if (parse_shell_command(&shell_command, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        ast_free(function);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    function->children[0] = shell_command;
+    *res = function;
+    return PARSER_OK;
+}

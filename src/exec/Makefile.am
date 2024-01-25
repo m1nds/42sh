@@ -12,5 +12,5 @@ libexec_a_SOURCES = exec.h \
 					loop.c \
 					redirections.c
 
-libexec_a_CPPFLAGS = -I../
+libexec_a_CPPFLAGS = -I../ -D_POSIX_C_SOURCE=200809L
 libexec_a_CFLAGS = -std=c99 -Werror -Wall -Wextra -Wvla -pedantic

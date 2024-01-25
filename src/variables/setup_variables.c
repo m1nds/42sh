@@ -5,12 +5,13 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "ast/variables.h"
 #include "utils/hash_map.h"
 #include "utils/itoa.h"
 #include "utils/vector.h"
+#include "variables/variables.h"
 
-struct hash_map *hm;
+struct hash_map *hm_vars;
+struct hash_map *hm_funcs;
 
 void setup_args(int nb_args, char **args)
 {
@@ -34,8 +35,8 @@ void setup_args(int nb_args, char **args)
 
     if (strcmp(vec->data, "") != 0)
     {
-        hash_map_insert(hm, strdup("@"), strdup(vec->data));
-        hash_map_insert(hm, strdup("*"), strdup(vec->data));
+        hash_map_insert(hm_vars, strdup("@"), strdup(vec->data));
+        hash_map_insert(hm_vars, strdup("*"), strdup(vec->data));
     }
 
     vector_destroy(vec);
@@ -51,24 +52,25 @@ void setup_args_n(int nb_args, char **args)
     for (int i = 0; i < nb_args; i++)
     {
         char *key = itoa_base(i + 1);
-        hash_map_insert(hm, key, args[i]);
+        hash_map_insert(hm_vars, key, args[i]);
     }
 }
 
 void setup_value(char *key, char *value)
 {
-    hash_map_insert(hm, key, value);
+    hash_map_insert(hm_vars, key, value);
 }
 
 void set_exit_value(int value)
 {
     char *str = itoa_base(value);
-    hash_map_insert(hm, strdup("?"), str);
+    hash_map_insert(hm_vars, strdup("?"), str);
 }
 
 void setup_variables(int nb_args, char **args)
 {
-    hm = hash_map_init(25);
+    hm_vars = hash_map_init(25);
+    hm_funcs = hash_map_init(25);
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
     setup_nb_args(nb_args);
