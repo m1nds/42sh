@@ -24,5 +24,15 @@ int check_builtin(char **value)
         return false_builtin();
     }
 
+    if (strcmp("unset", value[0]) == 0)
+    {
+        return unset(value);
+    }
+
+    if (strcmp(".", value[0]) == 0)
+    {
+        return dot(value);
+    }
+
     return -1;
 }

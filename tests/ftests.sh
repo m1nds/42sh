@@ -231,6 +231,10 @@ test_all 'a=b b=c > test; echo $a$b' 'test two variables set' 'test'
 test_all 'i\f true; then echo a; fi' 'test i\f'
 test_all 'lss >test 1>&2' 'test >& part one' 'test'
 test_all 'lss 1>&2 > test' 'test >& part two' 'test'
+test_all 'abc=ABC; def=DEF; echo 123$abc$def456; unset abc def; echo 123$abc$def456' 'test unset with simple variable'
+#test_all 'abc=ABC; def=DEF; echo avant $abc $def; unset abc def; echo apres $abc $def' 'test unset with simple variable not working'
+test_all '. ./test.sh' 'dot with /'
+test_all 'PATH=. . test.sh' 'dot using PATH'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
