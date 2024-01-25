@@ -40,7 +40,7 @@ bool hash_map_insert(struct hash_map *hash_map, char *key, void *value)
             {
                 free(x->value);
                 free(key);
-                //memcpy(x->value, value, size);
+                // memcpy(x->value, value, size);
                 x->value = value;
                 return true;
             }
