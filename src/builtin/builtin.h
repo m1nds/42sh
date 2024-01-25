@@ -17,4 +17,6 @@ int unset(char **list_str);
 
 int dot(char **list_str);
 
+int export(char **list_str);
+
 #endif /* !BUILTIN_H */
