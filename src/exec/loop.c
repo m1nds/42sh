@@ -51,3 +51,13 @@ int handle_until(struct ast *ast)
 
     return retour;
 }
+
+int handle_for(struct ast *ast)
+{
+    if (ast->node_type != NODE_FOR)
+    {
+        return -1;
+    }
+    printf("for loop\n");
+    return 0;
+}

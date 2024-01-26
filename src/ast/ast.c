@@ -16,7 +16,7 @@ char *token_to_string[] = { "Command: ", ";\n",       "If\n", "|\n",
                             "!\n",       "&&\n",      "||\n", "While\n",
                             "Until\n",   "Prefixs\n", "< ",   "> ",
                             ">> ",       "<& ",       ">& ",  "<> ",
-                            "Assign ",   "Function " };
+                            "Assign ",   "Function ", "For\n" };
 
 struct ast *ast_new(enum ast_type type, size_t nb_child, char *value)
 {

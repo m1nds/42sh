@@ -1,6 +1,7 @@
 #include "shell_parser.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "parser.h"
 
@@ -24,11 +25,128 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
     }
     if (parse_rule_if(res, lexer) == PARSER_UNEXPECTED_TOKEN
         && parse_rule_while(res, lexer) == PARSER_UNEXPECTED_TOKEN
-        && parse_rule_until(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+        && parse_rule_until(res, lexer) == PARSER_UNEXPECTED_TOKEN
+        && parse_rule_for(res, lexer) == PARSER_UNEXPECTED_TOKEN)
     {
         return PARSER_UNEXPECTED_TOKEN;
     }
     return PARSER_OK;
+}
+
+enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer)
+{
+    enum token token = lexer_peek(lexer).curr_tok;
+    if (token != TOKEN_FOR)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+
+    token = lexer_peek(lexer).curr_tok;
+    char *t;
+    if (token >= TOKEN_IF && token <= TOKEN_WORD)
+    {
+        struct ast *element = NULL;
+        parse_element(&element, lexer);
+        t = element->value[0];
+        element->value[0] = NULL;
+        ast_free(element);
+    }
+    else
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    struct ast *node_for = ast_new(NODE_FOR, 1, t);
+
+    token = lexer_peek(lexer).curr_tok;
+    if (token == TOKEN_SEMICOLON)
+    {
+        lexer_pop(lexer, true);
+    }
+    else
+    {
+        // skip any '\n'
+        token = lexer_peek(lexer).curr_tok;
+        while (token == TOKEN_RETURN)
+        {
+            lexer_pop(lexer, true);
+            token = lexer_peek(lexer).curr_tok;
+        }
+        if (token == TOKEN_IN)
+        {
+            lexer_pop(lexer, true);
+
+            token = lexer_peek(lexer).curr_tok;
+            size_t loop = 1;
+            while (token >= TOKEN_IF && token <= TOKEN_WORD)
+            {
+                struct ast *element = NULL;
+                parse_element(&element, lexer);
+                t = element->value[0];
+                element->value[0] = NULL;
+                ast_free(element);
+                node_for->value =
+                    realloc(node_for->value, sizeof(char *) * (loop + 2));
+                node_for->value[loop] = t;
+                node_for->value[loop + 1] = NULL;
+                token = lexer_peek(lexer).curr_tok;
+                loop++;
+            }
+            if (token != TOKEN_SEMICOLON && token != TOKEN_RETURN)
+            {
+                *res = node_for;
+                print_error("Error while parsing value at check of for", lexer);
+                return PARSER_UNEXPECTED_TOKEN;
+            }
+            lexer_pop(lexer, true);
+        }
+        else if (token != TOKEN_DO)
+        {
+            *res = node_for;
+            print_error("Error while parsing value of for", lexer);
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        else
+        {
+            node_for->value = realloc(node_for->value, sizeof(char *) * 3);
+            node_for->value[1] = calloc(3, sizeof(char));
+            node_for->value[1] = strcpy(node_for->value[1], "$@");
+            node_for->value[2] = NULL;
+        }
+    }
+
+    // skip any'\n'
+    token = lexer_peek(lexer).curr_tok;
+    while (token == TOKEN_RETURN)
+    {
+        lexer_pop(lexer, true);
+        token = lexer_peek(lexer).curr_tok;
+    }
+
+    if (token != TOKEN_DO)
+    {
+        *res = node_for;
+        print_error("Error while parsing do", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    lexer_pop(lexer, true);
+    struct ast *first_child = NULL;
+    if (parse_compound_list(&first_child, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        *res = node_for;
+        print_error("Error while parsing first child of for", lexer);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    node_for->children[0] = first_child;
+    token = lexer_peek(lexer).curr_tok;
+    *res = node_for;
+    if (token == TOKEN_DONE)
+    {
+        lexer_pop(lexer, true);
+        return PARSER_OK;
+    }
+    print_error("Error while parsing done", lexer);
+    return PARSER_UNEXPECTED_TOKEN;
 }
 
 enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer)

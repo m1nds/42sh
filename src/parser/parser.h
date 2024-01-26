@@ -76,6 +76,7 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer);
  * shell_command = rule_if
  *               | rule_while
  *               | rule_until
+ *               | rule_for
  *               ;
  */
 enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer);
@@ -109,6 +110,14 @@ enum parser_status parse_rule_while(struct ast **res, struct lexer *lexer);
  * until_rule  =   'until' compound_list 'do' compound_list 'done' ;
  */
 enum parser_status parse_rule_until(struct ast **res, struct lexer *lexer);
+
+/**
+ * @def: Parses a element comprised of a rule for
+ *
+ * for_rule  =   'for' WORD ( [';'] | [{'\n'} 'in' { WORD } (';' | '\n')])
+ *               {'\n'} 'do' compound_list 'done';
+ */
+enum parser_status parse_rule_for(struct ast **res, struct lexer *lexer);
 
 /**
  * @def: Parses a element comprised of a compound_list
