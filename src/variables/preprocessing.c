@@ -145,6 +145,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
         size_t j = 0;
         char name_flag = 0;
         char brackets_flag = 0;
+        char quote_flag = 0;
         while (strings[i][j] != '\0')
         {
             if (is_continuous_name(strings[i][j], strlen(name->data)) == 0
@@ -194,12 +195,14 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             else if (strings[i][j] == '\'')
             {
                 preprocessing_single_quotes(strings[i], final_command, &j);
+                quote_flag = 1;
                 continue;
             }
             else if (strings[i][j] == '"')
             {
                 preprocessing_double_quotes(strings[i], final_command, &name,
                                             &j);
+                quote_flag = 1;
                 continue;
             }
             else
@@ -225,7 +228,20 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             vector_append_string(final_command, val);
         }
         free(strings[i]);
-        strings[i] = strdup(final_command->data);
+        if (strlen(final_command->data) == 0 && quote_flag == 0)
+        {
+            size_t j = i;
+            for (; strings[j + 1] != NULL; j++)
+            {
+                strings[j] = strings[j + 1];
+            }
+            strings[j] = NULL;
+            i--;
+        }
+        else
+        {
+            strings[i] = strdup(final_command->data);
+        }
         vector_destroy(final_command);
         vector_destroy(name);
         final_command = vector_create(100);
