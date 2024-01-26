@@ -52,6 +52,7 @@ int main_execution_loop(FILE *input, int options)
         {
             if (return_code == 999)
             {
+                struct hash_map *hm_vars = get_variables();
                 char *ret = hash_map_get(hm_vars, "?");
                 if (ret == NULL)
                 {
