@@ -48,6 +48,26 @@ int main_execution_loop(FILE *input, int options)
         {
             return_code = evaluate_ast(ast);
         }
+        if (return_code >= 999)
+        {
+            if (return_code == 999)
+            {
+                char *ret = hash_map_get(hm_vars, "?");
+                if (ret == NULL)
+                {
+                    return_code = 0;
+                }
+                else
+                {
+                    return_code = atoi(ret);
+                }
+            }
+            else
+            {
+                return_code -= 1000;
+            }
+            break;
+        }
         fflush(stdout);
         ast_free(ast);
         ast = NULL;
@@ -66,7 +86,7 @@ int main_execution_loop(FILE *input, int options)
         return 2;
     }
     free_heap(lexer, ast, input);
-    return return_code;
+    return (return_code % 256);
 }
 
 int main(int argc, char **argv)

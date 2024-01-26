@@ -14,6 +14,10 @@ int handle_semicolon(struct ast *ast)
     while (*current_child)
     {
         out = evaluate_ast(*current_child);
+        if (out >= 999)
+        {
+            return out;
+        }
         current_child++;
     }
 

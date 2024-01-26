@@ -10,6 +10,10 @@ int handle_if(struct ast *ast)
     }
 
     int condition = evaluate_ast(ast->children[0]);
+    if (condition >= 999)
+    {
+        return condition;
+    }
     if (condition == true_builtin())
     {
         return evaluate_ast(ast->children[1]);

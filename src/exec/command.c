@@ -45,6 +45,10 @@ int handle_command(struct ast *ast, bool replace)
         replace_variables(ast);
     }
     int cb = check_builtin(ast->value);
+    if (cb >= 999)
+    {
+        return cb;
+    }
     if (cb != -1)
     {
         // Set $? to cb

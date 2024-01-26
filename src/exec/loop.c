@@ -12,11 +12,23 @@ int handle_while(struct ast *ast)
     }
 
     int condition = evaluate_ast(ast->children[0]);
+    if (condition >= 999)
+    {
+        return condition;
+    }
     int retour = 0;
     while (condition == 0)
     {
         retour = evaluate_ast(ast->children[1]);
+        if (retour >= 999)
+        {
+            return retour;
+        }
         condition = evaluate_ast(ast->children[0]);
+        if (condition >= 999)
+        {
+            return condition;
+        }
     }
 
     return retour;
