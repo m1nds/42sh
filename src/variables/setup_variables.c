@@ -76,12 +76,13 @@ struct hash_map *get_functions(void)
 
 void setup_variables(int nb_args, char **args)
 {
+    srand(time(NULL));
     hm_vars = hash_map_init(25);
     hm_funcs = hash_map_init(25);
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
     setup_nb_args(nb_args);
-    setup_random();
+    setup_random(NULL);
     setup_uid();
     setup_pid();
     set_exit_value(0);

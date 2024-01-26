@@ -104,6 +104,7 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
             // This is to differentiate if and i\f
             // Yes, they are treated differently
             out.curr_tok = TOKEN_ESCAPED_WORD;
+            vector_append(vec, '\\');
             vector_append(vec, c);
         }
         else if (c == '\'')

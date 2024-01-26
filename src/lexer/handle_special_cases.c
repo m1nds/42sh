@@ -26,7 +26,9 @@ struct lexer_token_save handle_escape(struct lexer *lexer)
     }
     else
     {
+        vector_append(vec, '\\');
         vector_append(vec, c);
+        lexer->prev = fgetc(lexer->input);
     }
     struct lexer_token_save out = main_loop(lexer, vec);
     if (out.curr_tok != TOKEN_NONE)
