@@ -245,6 +245,10 @@ test_all 'a=; echo $a' 'variable set to nothing'
 test_all 'if(){ echo b;};' 'incorrect function name 1'
 #test_all 'i\f(){ echo b;};' 'incorrect function name 2'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
+test_all '. file; exit' 'exit without parameter'
+test_all 'true && exit' 'and exit'
+test_all 'false || exit' 'or exit'
+test_all 'echo a; exit 5; echo b' 'exit before echo'
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
 rm output1 output2 file .file 2> /dev/null > /dev/null

@@ -10,6 +10,10 @@ int handle_negation(struct ast *ast)
     }
 
     int val = evaluate_ast(ast->children[0]);
+    if (val >= 999)
+    {
+        return val;
+    }
     if (val == true_builtin())
     {
         return false_builtin();

@@ -14,6 +14,10 @@ int handle_and(struct ast *ast)
     while (ast->children[i])
     {
         int val = evaluate_ast(ast->children[i]);
+        if (val >= 999)
+        {
+            return val;
+        }
         if (val == false_builtin())
         {
             return false_builtin();
@@ -34,6 +38,10 @@ int handle_or(struct ast *ast)
     while (ast->children[i])
     {
         int val = evaluate_ast(ast->children[i]);
+        if (val >= 999)
+        {
+            return val;
+        }
         if (val == true_builtin())
         {
             return true_builtin();

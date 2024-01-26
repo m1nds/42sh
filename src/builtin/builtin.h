@@ -19,4 +19,6 @@ int dot(char **list_str);
 
 int export(char **list_str);
 
+int exit_builtin(char **list_str);
+
 #endif /* !BUILTIN_H */
