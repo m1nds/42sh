@@ -86,6 +86,15 @@ int handle_while(struct ast *ast);
 int handle_until(struct ast *ast);
 
 /*
+ * @def:   Evaluation handler for for loop.
+ * @param: struct ast *ast: AST node containing in Child[0] the compound_list
+ *         in value[0] the variables that need to be assign at each loop
+ *         in value[1_n-1] the different value it need to take
+ * @ret:   return code of the last command node or -1 on error.
+ * */
+int handle_for(struct ast *ast);
+
+/*
  * @def:   Evaluation handler for redirections.
  * @param: struct ast *ast: AST node containing in its children
  *         something to evaluate and one or many redirections
