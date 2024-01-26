@@ -75,7 +75,15 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
                     vector_append(final_command, '$');
                 }
             }
-            char *val = hash_map_get(hm_vars, name->data);
+            char *val = NULL;
+            if (strcmp(name->data, "RANDOM") == 0)
+            {
+                val = get_random(name->data);
+            }
+            else
+            {
+                val = hash_map_get(hm_vars, name->data);
+            }
             if (val == NULL)
             {
                 val = getenv(name->data);
@@ -119,7 +127,15 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
     }
     if (name_flag == 1)
     {
-        char *val = hash_map_get(hm_vars, name->data);
+        char *val = NULL;
+        if (strcmp(name->data, "RANDOM") == 0)
+        {
+            val = get_random(name->data);
+        }
+        else
+        {
+            val = hash_map_get(hm_vars, name->data);
+        }
         if (val == NULL)
         {
             val = getenv(name->data);
@@ -162,7 +178,16 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                         vector_append(final_command, '$');
                     }
                 }
-                char *val = hash_map_get(hm_vars, name->data);
+                vector_append(name, '\0');
+                char *val = NULL;
+                if (strcmp(name->data, "RANDOM") == 0)
+                {
+                    val = get_random(name->data);
+                }
+                else
+                {
+                    val = hash_map_get(hm_vars, name->data);
+                }
                 if (val == NULL)
                 {
                     val = getenv(name->data);
@@ -207,6 +232,10 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             }
             else
             {
+                if (strings[i][j] == '\\')
+                {
+                    j++;
+                }
                 if (name_flag == 0)
                 {
                     vector_append(final_command, strings[i][j]);
@@ -218,7 +247,16 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             }
             j++;
         }
-        char *val = hash_map_get(hm_vars, name->data);
+        vector_append(name, '\0');
+        char *val = NULL;
+        if (strcmp(name->data, "RANDOM") == 0)
+        {
+            val = get_random(name->data);
+        }
+        else
+        {
+            val = hash_map_get(hm_vars, name->data);
+        }
         if (val == NULL)
         {
             val = getenv(name->data);
@@ -228,6 +266,7 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             vector_append_string(final_command, val);
         }
         free(strings[i]);
+        vector_append(final_command, '\0');
         if (strlen(final_command->data) == 0 && quote_flag == 0)
         {
             size_t j = i;
@@ -262,7 +301,14 @@ void replace_variables(struct ast *ast)
     struct vector *name = vector_create(100);
     if (ast->value != NULL)
     {
-        preprocessing_strings(ast->value, final_command, name);
+        if (ast->node_type == NODE_ASSIGN)
+        {
+            preprocessing_strings(ast->value + 1, final_command, name);
+        }
+        else
+        {
+            preprocessing_strings(ast->value, final_command, name);
+        }
     }
     if (ast->children != NULL)
     {

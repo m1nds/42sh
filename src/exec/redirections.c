@@ -208,6 +208,11 @@ int handle_redirect(struct ast *ast)
             // Not great but it works for now
             if (no_commands)
             {
+                replace_variables(*current);
+                if ((*current)->value[1] == NULL)
+                {
+                    (*current)->value[1] = strdup("");
+                }
                 setup_value(strdup((*current)->value[0]),
                             strdup((*current)->value[1]));
             }

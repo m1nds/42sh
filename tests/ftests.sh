@@ -243,6 +243,7 @@ test_all 'a=; echo $a' 'variable set to nothing'
 #test_all 'test(){ ls;}; test; test; test' 'testing basic function'
 #test_all 'test(          )if true; then echo a; else echo b; fi' 'slightly harder function'
 test_all 'if(){ echo b;};' 'incorrect function name 1'
+#DO NOT UNCOMMENT
 #test_all 'i\f(){ echo b;};' 'incorrect function name 2'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 test_all '. file; exit' 'exit without parameter'
@@ -253,10 +254,15 @@ test_all 'export TREE_CHARSET=abcd; tree' 'test export with tree'
 test_all 'TREE_CHARSET=abcd; export TREE_CHARSET; tree' 'test weird export with tree'
 test_all '""' 'test empty single quotes'
 test_all "''" 'test empty double quotes'
-#test_all 'export a=b; echo $a' 'test export with echo'
+test_all 'export a=b; echo $a' 'test export with echo'
+test_all 'a="b" '"b='$a'"' a=; echo $a$b $a | cat -e' 'test weird variables definition 1'
+test_all 'a=b b=$a a=c; echo $a$b $a | cat -e' 'test weird variables definition 2'
+test_all 'a=; echo a $a a | cat -e' 'test weird variables definition 3'
+test_all 'a=; echo a "$a" a | cat -e' 'test weird variables definition 4'
+
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
-rm output1 output2 file .file 2> /dev/null > /dev/null
+rm output1 output2 file 2> /dev/null > /dev/null
 
 
 if [ "$fail" -eq 0 ]; then
