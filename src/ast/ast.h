@@ -52,6 +52,11 @@ struct ast *ast_new(enum ast_type type, size_t nb_child, char *value);
 void ast_free(struct ast *ast);
 
 /*
+ * @def: Creates a deep copy of the ast passed in argument
+ */
+struct ast *ast_deep_copy(struct ast *ast);
+
+/*
  * @def:   print on stdout the ast recursively on its children
  * @param: struct ast *ast: the ast node that should be printed
  * @ret:   None

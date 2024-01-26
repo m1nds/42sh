@@ -93,6 +93,39 @@ void ast_free(struct ast *ast)
     free(ast);
 }
 
+struct ast *ast_deep_copy(struct ast *ast)
+{
+    if (ast == NULL)
+    {
+        return NULL;
+    }
+    struct ast *copy = ast_new(ast->node_type, 0, NULL);
+    size_t i = 0;
+    if (ast->children != NULL)
+    {
+        while (ast->children[i] != NULL)
+        {
+            copy->children =
+                realloc(copy->children, sizeof(struct ast) * (i + 2));
+            copy->children[i] = ast_deep_copy(ast->children[i]);
+            i++;
+        }
+        copy->children[i] = NULL;
+    }
+    i = 0;
+    if (ast->value != NULL)
+    {
+        while (ast->value[i] != NULL)
+        {
+            copy->value = realloc(copy->value, sizeof(char *) * (i + 2));
+            copy->value[i] = strdup(ast->value[i]);
+            i++;
+        }
+        copy->value[i] = NULL;
+    }
+    return copy;
+}
+
 static void print_tabs(size_t tabs)
 {
     for (size_t i = 0; i < tabs; i++)
