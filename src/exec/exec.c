@@ -31,6 +31,9 @@ int evaluate_ast(struct ast *ast)
         return handle_until(ast);
     case NODE_REDIR:
         return handle_redirect(ast);
+    case NODE_FUNCTION:
+        insert_function(ast);
+        return 0;
     case NODE_ASSIGN:
         setup_value(ast->value[0], ast->value[1]);
         return 0;

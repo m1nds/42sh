@@ -8,6 +8,7 @@
 #include "builtin/builtin.h"
 #include "exec/exec.h"
 #include "variables/preprocessing.h"
+#include "variables/variables.h"
 
 /*int check_builtin(char **value)
 {
@@ -49,11 +50,31 @@ int handle_command(struct ast *ast, bool replace)
     {
         return cb;
     }
+
     if (cb != -1)
     {
         // Set $? to cb
         set_exit_value(cb);
         return cb;
+    }
+
+    struct hash_map *hm_funcs = get_functions();
+    struct ast *ast_fun = hash_map_get(hm_funcs, ast->value[0]);
+
+    if (ast_fun != NULL)
+    {
+        cb = evaluate_ast(ast_fun);
+        if (cb >= 999)
+        {
+            return cb;
+        }
+
+        if (cb != -1)
+        {
+            // Set $? to cb
+            set_exit_value(cb);
+            return cb;
+        }
     }
 
     int pid = fork();

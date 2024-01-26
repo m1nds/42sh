@@ -94,6 +94,13 @@ int handle_until(struct ast *ast);
 int handle_redirect(struct ast *ast);
 
 /*
+ * @def: Insert a new function in the function's hash map
+ * @param: struct ast *ast: AST node containing the function
+ * @ret: nothing
+ * */
+void insert_function(struct ast *ast);
+
+/*
  * @def:   Complete AST evaluation function
  * @param: struct ast *ast: the complete AST
  * @ret:   exit code or -1 if an error occurs
