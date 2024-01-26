@@ -3,11 +3,11 @@
 #include <string.h>
 
 #include "utils/hash_map.h"
-
-extern struct hash_map *hm_vars;
+#include "variables/variables.h"
 
 int export(char **list_str)
 {
+    struct hash_map *hm_vars = get_variables();
     int err = 0;
     size_t i = 1;
     while (list_str[i] != NULL)

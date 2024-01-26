@@ -29,7 +29,7 @@
     return -1;
 }*/
 
-int handle_command(struct ast *ast)
+int handle_command(struct ast *ast, bool replace)
 {
     if (ast->node_type != NODE_COMMAND)
     {
@@ -40,7 +40,10 @@ int handle_command(struct ast *ast)
     {
         return 0;
     }
-    replace_variables(ast);
+    if (replace == true)
+    {
+        replace_variables(ast);
+    }
     int cb = check_builtin(ast->value);
     if (cb >= 999)
     {

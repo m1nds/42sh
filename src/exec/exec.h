@@ -1,6 +1,7 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "ast/ast.h"
@@ -22,9 +23,11 @@ int handle_pipe(struct ast *ast);
 /*
  * @def:   Evaluation handler for commands. Checks if it is a builtin.
  * @param: struct ast *ast: ast node containing a command in the value field.
+ *         bool replace: determines if the command should have its
+ *                       variables replaced
  * @ret:   exit code of the executed command or -1 on error.
  * */
-int handle_command(struct ast *ast);
+int handle_command(struct ast *ast, bool replace);
 
 /*
  * @def:   Evaluation handler for if conditions.

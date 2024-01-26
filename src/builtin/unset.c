@@ -4,11 +4,11 @@
 #include <stdlib.h>
 
 #include "utils/hash_map.h"
-
-extern struct hash_map *hm_vars;
+#include "variables/variables.h"
 
 static int unset_var(char **list_str, size_t i)
 {
+    struct hash_map *hm_vars = get_variables();
     if (list_str[i] == NULL)
     {
         errx(1, "not enough arguments");
