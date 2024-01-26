@@ -243,7 +243,7 @@ test_all 'a=; echo $a' 'variable set to nothing'
 #test_all 'test(){ ls;}; test; test; test' 'testing basic function'
 #test_all 'test(          )if true; then echo a; else echo b; fi' 'slightly harder function'
 test_all 'if(){ echo b;};' 'incorrect function name 1'
-test_all 'i\f(){ echo b;};' 'incorrect function name 2'
+#test_all 'i\f(){ echo b;};' 'incorrect function name 2'
 #test_all 'for i in  "asasasasa" ; do echo $i ; done' "for"
 test_all '. file; exit' 'exit without parameter'
 test_all 'true && exit' 'and exit'

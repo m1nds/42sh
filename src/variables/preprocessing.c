@@ -260,12 +260,9 @@ void replace_variables(struct ast *ast)
     }
     struct vector *final_command = vector_create(100);
     struct vector *name = vector_create(100);
-    if (ast->node_type == NODE_COMMAND)
+    if (ast->value != NULL)
     {
-        if (ast->value != NULL)
-        {
-            preprocessing_strings(ast->value, final_command, name);
-        }
+        preprocessing_strings(ast->value, final_command, name);
     }
     if (ast->children != NULL)
     {
