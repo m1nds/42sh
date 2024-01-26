@@ -36,7 +36,6 @@ int handle_command(struct ast *ast, bool replace)
     {
         return -1;
     }
-
     if (ast->value == NULL)
     {
         return 0;

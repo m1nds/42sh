@@ -77,7 +77,7 @@ static struct lexer_token_save get_part_one(struct lexer *lexer)
     {
         return handle_escape(lexer);
     }
-    if (c == '#')
+    while (c == '#')
     {
         ignore_line(lexer);
         c = fgetc(lexer->input);

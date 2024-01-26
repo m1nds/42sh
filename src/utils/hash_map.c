@@ -1,10 +1,12 @@
-#include "hash_map.h"
+#include "utils/hash_map.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "ast/ast.h"
 
 struct hash_map *hash_map_init(size_t size)
 {
@@ -85,7 +87,15 @@ void hash_map_free(struct hash_map *hash_map)
             struct pair_list *temp = pl;
             pl = pl->next;
             free(temp->key);
-            free(temp->value);
+            struct ast *ast = temp->value;
+            if (ast->node_type >= NODE_COMMAND && ast->node_type <= NODE_FOR)
+            {
+                ast_free(ast);
+            }
+            else
+            {
+                free(temp->value);
+            }
             free(temp);
         }
     }

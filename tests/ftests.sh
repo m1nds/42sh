@@ -240,8 +240,8 @@ test_all '{echo a; echo b; } | tr b h' 'error 1 compound list'
 test_all '{ echo a; echo b } | tr b h' 'error 2 compound list'
 test_all 'echo ! a' '! is not a reserved word moment'
 test_all 'a=; echo $a' 'variable set to nothing'
-#test_all 'test(){ ls;}; test; test; test' 'testing basic function'
-#test_all 'test(          )if true; then echo a; else echo b; fi' 'slightly harder function'
+test_all 'test(){ ls;}; test; test; test' 'testing basic function'
+test_all 'test(          )if true; then echo a; else echo b; fi; test; test' 'slightly harder function'
 test_all 'if(){ echo b;};' 'incorrect function name 1'
 #DO NOT UNCOMMENT
 #test_all 'i\f(){ echo b;};' 'incorrect function name 2'
@@ -259,7 +259,7 @@ test_all 'a="b" '"b='$a'"' a=; echo $a$b $a | cat -e' 'test weird variables defi
 test_all 'a=b b=$a a=c; echo $a$b $a | cat -e' 'test weird variables definition 2'
 test_all 'a=; echo a $a a | cat -e' 'test weird variables definition 3'
 test_all 'a=; echo a "$a" a | cat -e' 'test weird variables definition 4'
-
+test_all 'foo(){ bar(){ echo foobar;} }; bar; foo; bar;' 'functions within functions'
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
 rm output1 output2 file 2> /dev/null > /dev/null
