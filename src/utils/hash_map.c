@@ -8,7 +8,7 @@
 
 #include "ast/ast.h"
 
-struct hash_map *hash_map_init(size_t size)
+struct hash_map *hash_map_init(size_t size, enum hash_map_type type)
 {
     struct hash_map *h = malloc(sizeof(struct hash_map));
     if (!h)
@@ -16,6 +16,7 @@ struct hash_map *hash_map_init(size_t size)
         return NULL;
     }
     h->size = size;
+    h->type = type;
     h->data = calloc(size, sizeof(struct pair_list *));
     if (!(h->data))
     {
@@ -87,10 +88,9 @@ void hash_map_free(struct hash_map *hash_map)
             struct pair_list *temp = pl;
             pl = pl->next;
             free(temp->key);
-            struct ast *ast = temp->value;
-            if (ast->node_type >= NODE_COMMAND && ast->node_type <= NODE_FOR)
+            if (hash_map->type == HASH_MAP_AST)
             {
-                ast_free(ast);
+                ast_free(temp->value);
             }
             else
             {

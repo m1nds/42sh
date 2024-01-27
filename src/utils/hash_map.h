@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+enum hash_map_type
+{
+    HASH_MAP_STRING,
+    HASH_MAP_AST,
+};
+
 struct pair_list
 {
     char *key;
@@ -15,6 +21,7 @@ struct hash_map
 {
     struct pair_list **data;
     size_t size;
+    enum hash_map_type type;
 };
 
 /*
@@ -29,7 +36,7 @@ size_t hash(char *str);
  * @args size: size of the hash map
  * @return: the initialised hash map
  */
-struct hash_map *hash_map_init(size_t size);
+struct hash_map *hash_map_init(size_t size, enum hash_map_type type);
 
 /*
  * @def: function to insert element in hash map
