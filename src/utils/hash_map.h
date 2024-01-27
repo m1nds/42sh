@@ -76,4 +76,11 @@ void *hash_map_get(const struct hash_map *hash_map, char *key);
  */
 bool hash_map_remove(struct hash_map *hash_map, char *key);
 
+/*
+ * @def: Returns a deep_copy of the hash_map passed in parameter
+ * @args hash_map: The hash_map to copy
+ * @return: A copy of the hash_map
+ */
+struct hash_map *hash_map_copy(struct hash_map *hash_map);
+
 #endif /* ! HASH_MAP_H */

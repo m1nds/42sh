@@ -47,6 +47,10 @@ int handle_command(struct ast *ast, bool replace)
     int cb = check_builtin(ast->value);
     if (cb >= 999)
     {
+        if (cb >= 1000)
+        {
+            set_exit_value(cb - 1000);
+        }
         return cb;
     }
 
@@ -65,6 +69,10 @@ int handle_command(struct ast *ast, bool replace)
         cb = evaluate_ast(ast_fun);
         if (cb >= 999)
         {
+            if (cb >= 1000)
+            {
+                set_exit_value(cb - 1000);
+            }
             return cb;
         }
 
