@@ -1,8 +1,8 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "utils/vector.h"
 
@@ -43,7 +43,7 @@ bool handle_dots(struct vector *out, const char *ptr, int len)
         const char *last_slash = get_last_slash(out);
         if (last_slash != NULL)
         {
-            out->size = (size_t) (last_slash - out->data);
+            out->size = (size_t)(last_slash - out->data);
         }
         return 1;
     }
@@ -84,13 +84,13 @@ struct vector *canonical_path(struct vector *path)
     return can;
 }
 
-int handle_no_args(char *home, char* pwd_save)
+int handle_no_args(char *home, char *pwd_save)
 {
     int out = 0;
     if (home != NULL && ((out = chdir(home)) != -1))
     {
-            setenv("PWD", home, 1);
-            setenv("OLDPWD", pwd_save, 1);
+        setenv("PWD", home, 1);
+        setenv("OLDPWD", pwd_save, 1);
     }
 
     return (out != -1);
