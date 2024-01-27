@@ -260,6 +260,15 @@ test_all 'a=b b=$a a=c; echo $a$b $a | cat -e' 'test weird variables definition 
 test_all 'a=; echo a $a a | cat -e' 'test weird variables definition 3'
 test_all 'a=; echo a "$a" a | cat -e' 'test weird variables definition 4'
 test_all 'foo(){ bar(){ echo foobar;} }; bar; foo; bar;' 'functions within functions'
+test_all 'cd /acu' 'test cd invalid'
+test_all 'echo $PWD; cd ../tests/../; echo $PWD; echo $OLDPWD' 'test cd path concatenation'
+test_all 'echo $PWD; cd /acu; echo $PWD; echo $OLDPWD' 'test cd invalid with $PWD'
+test_all 'echo $PWD; cd /home; echo $PWD; echo $OLDPWD' 'test cd easy'
+test_all 'echo $PWD; cd; echo $PWD; echo $OLDPWD' 'test cd with no args'
+test_all 'echo $PWD; cd /tmp; cd -; echo $PWD; echo $OLDPWD' 'test cd with -'
+test_all 'echo $PWD; cd ///////.//////./././././//home//////; echo $PWD; echo $OLDPWD' 'test cd easy with noise'
+test_all 'echo $PWD; cd /home/../tmp/../home; echo $PWD; echo $OLDPWD' 'test cd double dots'
+test_all 'echo $PWD; cd ///////home/././../tmp/.././././home///////; echo $PWD; echo $OLDPWD' 'test cd double dots with noise'
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
 rm output1 output2 file 2> /dev/null > /dev/null

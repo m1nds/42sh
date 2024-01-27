@@ -96,15 +96,42 @@ int handle_no_args(char *home, char *pwd_save)
     return (out != -1);
 }
 
+int handle_dash(char *pwd_save, char *oldpwd_save)
+{
+    int out = oldpwd_save != NULL;
+    if (oldpwd_save != NULL && (out = chdir(oldpwd_save)) != -1)
+    {
+        setenv("PWD", oldpwd_save, 1);
+        setenv("OLDPWD", pwd_save, 1);
+    }
+
+    if (out == -1)
+    {
+        fprintf(stderr, "OLDPWD is not set!\n");
+    }
+    else
+    {
+        fprintf(stdout, "%s\n", oldpwd_save);
+    }
+
+    return (out != -1);
+}
+
 int cd_builtin(char **args)
 {
     char *home = getenv("HOME");
     char *pwd_save = getenv("PWD");
+    char *oldpwd_save = getenv("OLDPWD");
 
     char *path = args[1];
     if (path == NULL)
     {
         return handle_no_args(home, pwd_save);
+    }
+
+    if (strcmp(path, "-") == 0)
+    {
+        return handle_dash(pwd_save, oldpwd_save);
     }
 
     struct vector *cp = vector_create(50);
@@ -125,7 +152,8 @@ int cd_builtin(char **args)
 
     struct vector *can = canonical_path(cp);
 
-    if (chdir(can->data) != -1)
+    int out = 0;
+    if ((out = chdir(can->data)) != -1)
     {
         setenv("PWD", can->data, 1);
         setenv("OLDPWD", pwd_save, 1);
@@ -134,5 +162,8 @@ int cd_builtin(char **args)
     vector_destroy(can);
     vector_destroy(cp);
 
-    return 0;
+    if (out == -1)
+        fprintf(stderr, "failed to change directory!\n");
+
+    return (out != -1) ? 0 : 1;
 }
