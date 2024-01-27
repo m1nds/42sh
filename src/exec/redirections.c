@@ -180,6 +180,61 @@ void preprocess_command(struct ast **children)
     }
 }
 
+void handle_assign(struct ast *ast, char ***env_variables,
+                   size_t *nb_env_variables, bool no_commands)
+{
+    char **environment_variables = *env_variables;
+    size_t nb_environment_variables = *nb_env_variables;
+    replace_variables(ast);
+    // Handles the case where the variable is set to nothing
+    if (ast->value[1] == NULL)
+    {
+        ast->value[1] = strdup("");
+    }
+    char *key = ast->value[0];
+    char *value = ast->value[1];
+    if (no_commands)
+    {
+        setup_value(strdup(key), strdup(value));
+    }
+    else
+    {
+        nb_environment_variables += 2;
+        environment_variables =
+            realloc(environment_variables,
+                    sizeof(char *) * (nb_environment_variables + 1));
+        environment_variables[nb_environment_variables - 2] = key;
+        environment_variables[nb_environment_variables - 1] = getenv(key);
+        environment_variables[nb_environment_variables] = NULL;
+        setenv(key, value, 1);
+    }
+    *env_variables = environment_variables;
+    *nb_env_variables = nb_environment_variables;
+}
+
+void reset_env_variables(char **env_variables)
+{
+    if (env_variables == NULL)
+    {
+        return;
+    }
+    size_t i = 0;
+    while (env_variables[i] != NULL /* && env_variables[i + 1] != NULL*/)
+    {
+        char *key = env_variables[i];
+        char *value = env_variables[i + 1];
+        if (value == NULL)
+        {
+            unsetenv(key);
+        }
+        else
+        {
+            setenv(key, value, 1);
+        }
+        i += 2;
+    }
+}
+
 int handle_redirect(struct ast *ast)
 {
     int save_stdin = dup(STDIN_FILENO);
@@ -193,7 +248,8 @@ int handle_redirect(struct ast *ast)
     }
     struct ast **current = ast->children;
     struct ast *command = NULL;
-
+    char **env_variables = NULL;
+    size_t nb_env_variables = 0;
     int *fds = malloc(2 * len * sizeof(int));
     size_t i = 0;
 
@@ -205,21 +261,8 @@ int handle_redirect(struct ast *ast)
         }
         else if ((*current)->node_type == NODE_ASSIGN)
         {
-            // Not great but it works for now
-            if (no_commands)
-            {
-                replace_variables(*current);
-                if ((*current)->value[1] == NULL)
-                {
-                    (*current)->value[1] = strdup("");
-                }
-                setup_value(strdup((*current)->value[0]),
-                            strdup((*current)->value[1]));
-            }
-            else
-            {
-                setenv((*current)->value[0], (*current)->value[1], 1);
-            }
+            handle_assign(*current, &env_variables, &nb_env_variables,
+                          no_commands);
         }
         else if ((*current)->node_type == NODE_REDIR_INOUT)
         {
@@ -236,11 +279,12 @@ int handle_redirect(struct ast *ast)
         current++;
     }
 
-    int out = (command != NULL) ? handle_command(command, false) : 1;
+    int out = (command != NULL) ? handle_command(command, false) : 0;
 
     dup2(save_stdin, STDIN_FILENO);
     dup2(save_stdout, STDOUT_FILENO);
-
+    reset_env_variables(env_variables);
+    free(env_variables);
     for (size_t c = 0; c < i; c++)
         if (fds[c] != -1)
             close(fds[c]);
