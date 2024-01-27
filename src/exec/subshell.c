@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <sys/wait.h>
 
 #include "ast/ast.h"
 #include "exec/exec.h"
@@ -14,8 +15,15 @@ int handle_subshell(struct ast *ast)
     // Save both variable and function hash_map
     struct hash_map *hm_vars = hash_map_copy(get_variables());
     struct hash_map *hm_funcs = hash_map_copy(get_functions());
-    // Execute the subshell
-    int out = evaluate_ast(ast->children[0]);
+    // Execute the subshell in child
+    int fd = fork();
+    if (fd == 0)
+    {
+        return evaluate_ast(ast->children[0]);
+    }
+    int wstatus;
+    waitpid(fd, &wstatus, 0);
+    int out = WEXITSTATUS(wstatus);
     if (out >= 999)
     {
         if (out == 999)
