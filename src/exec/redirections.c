@@ -278,7 +278,6 @@ int handle_redirect(struct ast *ast)
 
         current++;
     }
-
     int out = (command != NULL) ? handle_command(command, false) : 0;
 
     dup2(save_stdin, STDIN_FILENO);
@@ -289,6 +288,8 @@ int handle_redirect(struct ast *ast)
         if (fds[c] != -1)
             close(fds[c]);
 
+    close(save_stdin);
+    close(save_stdout);
     free(fds);
 
     return out;
