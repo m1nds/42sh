@@ -23,6 +23,25 @@ enum parser_status parse_shell_command(struct ast **res, struct lexer *lexer)
         lexer_pop(lexer, true);
         return PARSER_OK;
     }
+    if (token == TOKEN_LEFT_PARENTHESES)
+    {
+        lexer_pop(lexer, true);
+        struct ast *child = NULL;
+        if (parse_compound_list(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        struct ast *subshell = ast_new(NODE_SUBSHELL, 1, NULL);
+        subshell->children[0] = child;
+        *res = subshell;
+        token = lexer_peek(lexer).curr_tok;
+        if (token != TOKEN_RIGHT_PARENTHESES)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        lexer_pop(lexer, true);
+        return PARSER_OK;
+    }
     if (parse_rule_if(res, lexer) == PARSER_UNEXPECTED_TOKEN
         && parse_rule_while(res, lexer) == PARSER_UNEXPECTED_TOKEN
         && parse_rule_until(res, lexer) == PARSER_UNEXPECTED_TOKEN

@@ -103,11 +103,19 @@ int handle_for(struct ast *ast);
 int handle_redirect(struct ast *ast);
 
 /*
- * @def: Insert a new function in the function's hash map
- * @param: struct ast *ast: AST node containing the function
- * @ret: nothing
+ * @def:    Insert a new function in the function's hash map
+ * @param:  struct ast *ast: AST node containing the function
+ * @ret:    nothing
  * */
 void insert_function(struct ast *ast);
+
+/*
+ * @def:    Evaluation handler for subshells.
+ * @parma:  struct ast *ast: AST node containing in Child[0] the compound list
+ *                           to evaluate in a subshell
+ * @ret:    return code of the last command in the subshell
+ */
+int handle_subshell(struct ast *ast);
 
 /*
  * @def:   Complete AST evaluation function

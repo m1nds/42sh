@@ -39,6 +39,8 @@ int evaluate_ast(struct ast *ast)
     case NODE_ASSIGN:
         setup_value(ast->value[0], ast->value[1]);
         return 0;
+    case NODE_SUBSHELL:
+        return handle_subshell(ast);
     default:
         return -1;
     }

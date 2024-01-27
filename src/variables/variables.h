@@ -18,13 +18,19 @@ struct hash_map *get_variables(void);
 
 struct hash_map *get_functions(void);
 
-static inline char *get_exit_value()
+void set_variables(struct hash_map *hm);
+
+void set_functions(struct hash_map *hm);
+
+static inline int get_exit_value()
 {
-    if (hm_funcs == NULL)
+    hm_vars = get_variables();
+    char *out = hash_map_get(hm_vars, "?");
+    if (out == NULL || hm_funcs == NULL)
     {
-        return hash_map_get(hm_vars, "?");
+        return 0;
     }
-    return hash_map_get(hm_vars, "?");
+    return atoi(out);
 }
 
 static inline void setup_nb_args(int nb_args)
@@ -35,6 +41,7 @@ static inline void setup_nb_args(int nb_args)
 
 static inline char *get_nb_args()
 {
+    hm_vars = get_variables();
     return hash_map_get(hm_vars, "#");
 }
 
@@ -46,6 +53,7 @@ static inline void setup_pid()
 
 static inline char *get_pid()
 {
+    hm_vars = get_variables();
     return hash_map_get(hm_vars, "$");
 }
 
@@ -77,6 +85,7 @@ static inline void setup_uid()
 
 static inline char *get_uid()
 {
+    hm_vars = get_variables();
     return hash_map_get(hm_vars, "UID");
 }
 

@@ -149,7 +149,16 @@ void *hash_map_get(const struct hash_map *hash_map, char *key)
         {
             if (strcmp(lp->key, key) == 0)
             {
-                return lp->value;
+                if (hash_map->type == HASH_MAP_AST)
+                {
+                    struct ast *ret = lp->value;
+                    return ret;
+                }
+                else
+                {
+                    char *ret = lp->value;
+                    return ret;
+                }
             }
             lp = lp->next;
         }
@@ -197,4 +206,53 @@ bool hash_map_remove(struct hash_map *hash_map, char *key)
         lp = lp->next;
     }
     return false;
+}
+
+struct hash_map *hash_map_copy(struct hash_map *hash_map)
+{
+    if (hash_map == NULL)
+    {
+        return NULL;
+    }
+    struct hash_map *copy = hash_map_init(hash_map->size, hash_map->type);
+    for (size_t k = 0; k < hash_map->size; k++)
+    {
+        if (hash_map->data[k] != NULL)
+        {
+            struct pair_list *pl = hash_map->data[k];
+            struct pair_list *pl_copy = malloc(sizeof(struct pair_list));
+            copy->data[k] = pl_copy;
+            pl_copy->key = strdup(pl->key);
+            if (hash_map->type == HASH_MAP_AST)
+            {
+                pl_copy->value = ast_deep_copy(pl->value);
+            }
+            else
+            {
+                pl_copy->value = strdup(pl->value);
+            }
+            pl_copy->next = NULL;
+            while (pl->next != NULL)
+            {
+                pl = pl->next;
+                pl_copy->next = malloc(sizeof(struct pair_list));
+                pl_copy = pl_copy->next;
+                pl_copy->key = strdup(pl->key);
+                if (hash_map->type == HASH_MAP_AST)
+                {
+                    pl_copy->value = ast_deep_copy(pl->value);
+                }
+                else
+                {
+                    pl_copy->value = strdup(pl->value);
+                }
+                pl_copy->next = NULL;
+            }
+        }
+        else
+        {
+            copy->data[k] = NULL;
+        }
+    }
+    return copy;
 }

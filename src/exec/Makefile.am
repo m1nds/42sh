@@ -11,7 +11,8 @@ libexec_a_SOURCES = exec.h \
 					check_builtin.c \
 					loop.c \
 					redirections.c \
-                                        function.c
+					function.c \
+					subshell.c
 
 libexec_a_CPPFLAGS = -I../ -D_POSIX_C_SOURCE=200809L
 libexec_a_CFLAGS = -std=c99 -Werror -Wall -Wextra -Wvla -pedantic

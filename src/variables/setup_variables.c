@@ -74,6 +74,16 @@ struct hash_map *get_functions(void)
     return hm_funcs;
 }
 
+void set_variables(struct hash_map *hm)
+{
+    hm_vars = hm;
+}
+
+void set_functions(struct hash_map *hm)
+{
+    hm_funcs = hm;
+}
+
 void setup_variables(int nb_args, char **args)
 {
     srand(time(NULL));
