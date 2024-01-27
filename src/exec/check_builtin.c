@@ -43,5 +43,10 @@ int check_builtin(char **value)
     {
         return exit_builtin(value);
     }
+
+    if (strcmp("cd", value[0]) == 0)
+    {
+        return cd_builtin(value);
+    }
     return -1;
 }

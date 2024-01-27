@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "builtin/builtin.h"
+#include "utils/vector.h"
 
 Test(true_builtin, default_behavior)
 {
@@ -104,4 +105,38 @@ Test(echo_builtin, multi_flags_together3)
     echo_builtin(str);
     fflush(stdout);
     cr_assert_stdout_eq_str("\\n");
+}
+
+Test(cd_builtin, canonical_path_easy)
+{
+    char *test = "/home";
+    char *expected = "/home";
+
+    struct vector *path = vector_create(50);
+
+    vector_append_string(path, test);
+
+    struct vector *new_path = canonical_path(path);
+
+    cr_assert_str_eq(new_path->data, expected);
+
+    vector_destroy(path);
+    vector_destroy(new_path);
+}
+
+Test(cd_builtin, canonical_path_edge1)
+{
+    char *test = "/home/../tmp///././../home/";
+    char *expected = "/home";
+
+    struct vector *path = vector_create(50);
+
+    vector_append_string(path, test);
+
+    struct vector *new_path = canonical_path(path);
+
+    cr_assert_str_eq(new_path->data, expected);
+
+    vector_destroy(path);
+    vector_destroy(new_path);
 }
