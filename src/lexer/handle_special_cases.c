@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 200809L
 #include "lexer/handle_special_cases.h"
 
 #include <ctype.h>
