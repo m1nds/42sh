@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 200809L
 #include "lexer/get_token_type.h"
 
 #include <stddef.h>
