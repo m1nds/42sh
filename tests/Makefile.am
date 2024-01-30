@@ -5,12 +5,13 @@ test_CPPFLAGS = -I../src/ -D_POSIX_C_SOURCE=200809L
 
 test_LDADD = \
 		-lcriterion \
-		%D%/../src/input/libinput.a \
 		%D%/../src/exec/libexec.a \
+		%D%/../src/builtin/libbuiltin.a \
+		%D%/../src/main_loop/libmainloop.a \
+		%D%/../src/input/libinput.a \
 		%D%/../src/lexer/liblexer.a \
 		%D%/../src/parser/libparser.a \
 		%D%/../src/ast/libast.a \
-		%D%/../src/builtin/libbuiltin.a \
 		%D%/../src/variables/libvariables.a \
 		%D%/../src/utils/libutils.a
 

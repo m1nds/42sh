@@ -1,4 +1,4 @@
-SUBDIRS = utils ast exec input lexer parser builtin variables
+SUBDIRS = utils ast exec input lexer parser builtin variables main_loop
 
 bin_PROGRAMS = 42sh
 
@@ -8,6 +8,7 @@ bin_PROGRAMS = 42sh
 42sh_CFLAGS = -std=c99 -Werror -Wall -Wextra -Wvla -pedantic
 
 42sh_LDADD =\
+		main_loop/libmainloop.a \
 		input/libinput.a \
 		lexer/liblexer.a \
 		parser/libparser.a \
