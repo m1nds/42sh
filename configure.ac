@@ -13,6 +13,7 @@ AC_CONFIG_FILES([
                     Makefile
                     src/Makefile
                     src/utils/Makefile
+                    src/main_loop/Makefile
                     src/ast/Makefile
                     src/exec/Makefile
                     src/input/Makefile
