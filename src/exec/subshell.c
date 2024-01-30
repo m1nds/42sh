@@ -6,24 +6,8 @@
 #include "utils/hash_map.h"
 #include "variables/variables.h"
 
-int handle_subshell(struct ast *ast)
+int real_exit_code(int out)
 {
-    if (ast == NULL)
-    {
-        return -1;
-    }
-    // Save both variable and function hash_map
-    struct hash_map *hm_vars = hash_map_copy(get_variables());
-    struct hash_map *hm_funcs = hash_map_copy(get_functions());
-    // Execute the subshell in child
-    int fd = fork();
-    if (fd == 0)
-    {
-        return evaluate_ast(ast->children[0]);
-    }
-    int wstatus;
-    waitpid(fd, &wstatus, 0);
-    int out = WEXITSTATUS(wstatus);
     if (out >= 999)
     {
         if (out == 999)
@@ -44,6 +28,29 @@ int handle_subshell(struct ast *ast)
             out -= 1000;
         }
     }
+    return out;
+}
+
+int handle_subshell(struct ast *ast)
+{
+    if (ast == NULL)
+    {
+        return -1;
+    }
+    // Save both variable and function hash_map
+    struct hash_map *hm_vars = hash_map_copy(get_variables());
+    struct hash_map *hm_funcs = hash_map_copy(get_functions());
+    // Execute the subshell in child
+    int fd = fork();
+    if (fd == 0)
+    {
+        int out = evaluate_ast(ast->children[0]);
+        exit(real_exit_code(out));
+    }
+    int wstatus;
+    waitpid(fd, &wstatus, 0);
+    int out = WEXITSTATUS(wstatus);
+    out = real_exit_code(out);
     // Restore variable and function hash_map
     hash_map_free(get_variables());
     hash_map_free(get_functions());

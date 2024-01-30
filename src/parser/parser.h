@@ -8,6 +8,7 @@ enum parser_status
 {
     PARSER_OK,
     PARSER_UNEXPECTED_TOKEN,
+    PARSER_REALLY_NOT_OK,
 };
 /*
  * @def: prints an error

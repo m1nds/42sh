@@ -39,23 +39,29 @@ static int unset_env(char **list_str, size_t i)
 
 static int unset_fun(char **list_str, size_t i)
 {
-    if (list_str[i])
+    struct hash_map *hm_funcs = get_functions();
+    if (list_str[i] == NULL)
     {
         return 1;
+    }
+    while (list_str[i] != NULL)
+    {
+        hash_map_remove(hm_funcs, list_str[i]);
+        i++;
     }
     return 0;
 }
 
 int unset(char **list_str)
 {
-    if (list_str == NULL)
+    if (list_str == NULL || list_str[1] == NULL)
     {
-        return 500000;
+        return 0;
     }
     char flag_f = 0;
     char flag_v = 0;
     char break_flag = 0;
-    size_t i = 0;
+    size_t i = 1;
     while (list_str[i] != NULL)
     {
         size_t j = 0;
@@ -94,7 +100,9 @@ int unset(char **list_str)
     }
     if (flag_f && flag_v)
     {
-        errx(1, "cannot simultaneously unset a function and a variable");
+        fprintf(stderr,
+                "cannot simultaneously unset a function and a variable\n");
+        return 1;
     }
     if (flag_f)
     {
@@ -102,7 +110,11 @@ int unset(char **list_str)
     }
     if (flag_v)
     {
-        return unset_env(list_str, i);
+        unset_env(list_str, i);
+        return unset_var(list_str, i);
     }
+    // If there are no flags, unset remove all occurences
+    unset_fun(list_str, i);
+    unset_env(list_str, i);
     return unset_var(list_str, i);
 }

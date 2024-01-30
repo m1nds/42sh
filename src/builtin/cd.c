@@ -151,12 +151,24 @@ int cd_builtin(char **args)
         vector_append(cp, '/');
 
     struct vector *can = canonical_path(cp);
-
+    // To handle the case where they just do cd / or cd /..
+    if (strcmp(can->data, "") == 0)
+    {
+        can->data[0] = '/';
+        can->data[1] = '\0';
+    }
     int out = 0;
     if ((out = chdir(can->data)) != -1)
     {
         setenv("PWD", can->data, 1);
-        setenv("OLDPWD", pwd_save, 1);
+        if (pwd_save == NULL)
+        {
+            unsetenv("OLDPWD");
+        }
+        else
+        {
+            setenv("OLDPWD", pwd_save, 1);
+        }
     }
 
     vector_destroy(can);
