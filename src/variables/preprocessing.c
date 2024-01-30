@@ -149,9 +149,8 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
     *command_name = name;
     (*i)++;
 }
-
 void preprocessing_strings(char **strings, struct vector *final_command,
-                           struct vector *name)
+                           struct vector *name, enum ast_type node_type)
 {
     struct hash_map *hm_vars = get_variables();
     size_t i = 0;
@@ -224,8 +223,12 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             }
             else if (strings[i][j] == '"')
             {
+                if (node_type == NODE_FOR)
+                    vector_append(final_command, '\"');
                 preprocessing_double_quotes(strings[i], final_command, &name,
                                             &j);
+                if (node_type == NODE_FOR)
+                    vector_append(final_command, '\"');
                 quote_flag = 1;
                 continue;
             }
@@ -302,20 +305,22 @@ void replace_variables(struct ast *ast)
     {
         if (ast->node_type == NODE_ASSIGN)
         {
-            preprocessing_strings(ast->value + 1, final_command, name);
+            preprocessing_strings(ast->value + 1, final_command, name,
+                                  ast->node_type);
         }
         else
         {
-            preprocessing_strings(ast->value, final_command, name);
+            preprocessing_strings(ast->value, final_command, name,
+                                  ast->node_type);
         }
-    }
-    if (ast->children != NULL)
-    {
-        size_t i = 0;
-        while (ast->children[i] != NULL)
-        {
-            replace_variables(ast->children[i]);
-            i++;
-        }
-    }
+    } /*
+     if (ast->children != NULL)
+     {
+         size_t i = 0;
+         while (ast->children[i] != NULL)
+         {
+             replace_variables(ast->children[i]);
+             i++;
+         }
+     }*/
 }
