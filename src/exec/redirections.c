@@ -65,7 +65,7 @@ static int redirect_input_and(void *arg)
 
     int dest = retrieve_fd(ast->value[1]);
 
-    if (strcmp(ast->value[1], "-") == 0)
+    if (ast->value[1] != NULL && strcmp(ast->value[1], "-") == 0)
     {
         close(dest);
         return -1;
@@ -85,7 +85,7 @@ static int redirect_output_and(void *arg)
 
     int dest = retrieve_fd(ast->value[1]);
 
-    if (strcmp(ast->value[1], "-") == 0)
+    if (ast->value[1] != NULL && strcmp(ast->value[1], "-") == 0)
     {
         close(dest);
         return -1;

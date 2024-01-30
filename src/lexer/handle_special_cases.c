@@ -30,12 +30,13 @@ struct lexer_token_save handle_escape(struct lexer *lexer)
         lexer->prev = fgetc(lexer->input);
     }
     struct lexer_token_save out = main_loop(lexer, vec);
-    if (out.curr_tok != TOKEN_NONE)
+    if (out.curr_tok != TOKEN_NONE && out.curr_tok != TOKEN_WORD
+        && out.curr_tok != TOKEN_ESCAPED_WORD)
     {
         return out;
     }
     vector_append(vec, '\0');
-    out.curr_tok = TOKEN_WORD;
+    out.curr_tok = TOKEN_ESCAPED_WORD;
     out.tok_str = strdup(vec->data);
     vector_destroy(vec);
     return out;

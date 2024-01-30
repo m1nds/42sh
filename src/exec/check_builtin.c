@@ -5,7 +5,7 @@
 
 int check_builtin(char **value)
 {
-    if (value == NULL)
+    if (value == NULL || value[0] == NULL)
     {
         return -1;
     }

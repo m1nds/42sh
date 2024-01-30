@@ -32,6 +32,10 @@ void free_lexer(struct lexer *lexer)
         {
             free(lexer->ls.tok_str);
         }
+        if (lexer->ls_next.curr_tok != TOKEN_NONE)
+        {
+            free(lexer->ls_next.tok_str);
+        }
         // destroy_stack(lexer->stack);
         // lexer->stack = NULL;
         free(lexer);
@@ -137,6 +141,7 @@ struct lexer_token_save main_loop(struct lexer *lexer, struct vector *vec)
                 out = handle_brackets(lexer, vec);
                 if (out.curr_tok == TOKEN_STDIN)
                 {
+                    vector_destroy(vec);
                     return out;
                 }
                 c = fgetc(lexer->input);

@@ -91,7 +91,7 @@ int handle_command(struct ast *ast, bool replace)
     }
     else if (!pid)
     {
-        if (execvp(ast->value[0], ast->value) == -1)
+        if (ast->value[0] == NULL || execvp(ast->value[0], ast->value) == -1)
         {
             errx(127, "Could not find command %s", ast->value[0]);
         }

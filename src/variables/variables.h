@@ -63,6 +63,7 @@ static inline void setup_random(char *pointer)
     char *value = itoa_base((int)((rand() * (size_t)hm_vars) % 32768));
     if (pointer != NULL)
     {
+        free(value);
         value = itoa_base((int)((rand() * (size_t)pointer) % 32768));
     }
     hash_map_insert(hm_vars, key, strdup(value));

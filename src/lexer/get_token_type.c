@@ -9,13 +9,22 @@
 struct lexer_token_save match_word(struct lexer *lexer, char *word)
 {
     char *words[] = { "if",  "then", "elif", "else", "fi", "while", "until",
-                      "for", "in",   "do",   "done", "{",  "}" };
-    enum token tokens[] = { TOKEN_IF,           TOKEN_THEN, TOKEN_ELIF,
-                            TOKEN_ELSE,         TOKEN_FI,   TOKEN_WHILE,
-                            TOKEN_UNTIL,        TOKEN_FOR,  TOKEN_IN,
-                            TOKEN_DO,           TOKEN_DONE, TOKEN_LEFT_BRACKET,
-                            TOKEN_RIGHT_BRACKET };
-    size_t len = 13;
+                      "for", "in",   "do",   "done", "{",  "}",     "!" };
+    enum token tokens[] = { TOKEN_IF,
+                            TOKEN_THEN,
+                            TOKEN_ELIF,
+                            TOKEN_ELSE,
+                            TOKEN_FI,
+                            TOKEN_WHILE,
+                            TOKEN_UNTIL,
+                            TOKEN_FOR,
+                            TOKEN_IN,
+                            TOKEN_DO,
+                            TOKEN_DONE,
+                            TOKEN_LEFT_BRACKET,
+                            TOKEN_RIGHT_BRACKET,
+                            TOKEN_NOT };
+    size_t len = 14;
     struct lexer_token_save out;
     out.curr_tok = TOKEN_WORD;
     for (size_t i = 0; i < len; i++)
@@ -91,8 +100,6 @@ struct lexer_token_save get_special_character(struct lexer *lexer, char c)
         return handle_pipe_or(lexer);
     case '&':
         return handle_ands(lexer);
-    case '!':
-        return fill_out(lexer, out, TOKEN_NOT);
     case '(':
         return fill_out(lexer, out, TOKEN_LEFT_PARENTHESES);
     case ')':

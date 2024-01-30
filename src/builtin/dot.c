@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -23,6 +24,7 @@ int dot(char **list_ptr)
 {
     if (list_ptr[1] == NULL)
     {
+        fprintf(stderr, ".: filename argument required\n");
         return 2;
     }
 

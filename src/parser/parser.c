@@ -96,6 +96,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
         lexer_pop(lexer, true);
         if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
         {
+            ast_free(not_ast);
             return PARSER_UNEXPECTED_TOKEN;
         }
         not_ast->children[0] = child;
@@ -112,7 +113,16 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
     if (token == TOKEN_REDIR_PIPE)
     {
         struct ast *pipe = ast_new(NODE_PIPE, 1, NULL);
-        pipe->children[0] = *res;
+        if ((*res)->node_type == NODE_NOT)
+        {
+            pipe->children[0] = (*res)->children[0];
+            (*res)->children[0] = pipe;
+        }
+        else
+        {
+            pipe->children[0] = *res;
+            *res = pipe;
+        }
         size_t nb_children = 1;
         while (token == TOKEN_REDIR_PIPE)
         {
@@ -126,7 +136,7 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             struct ast *child = NULL;
             if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
             {
-                ast_free(pipe);
+                ast_free(*res);
                 *res = NULL;
                 return PARSER_UNEXPECTED_TOKEN;
             }
@@ -137,7 +147,6 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
             token = lexer_peek(lexer).curr_tok;
         }
         pipe->children[nb_children + 1] = NULL;
-        *res = pipe;
     }
     return PARSER_OK;
 }
@@ -248,7 +257,8 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     while (true)
     {
         struct ast *element = NULL;
-        if (parse_element(&element, lexer) == PARSER_OK)
+        enum parser_status status = parse_element(&element, lexer);
+        if (status == PARSER_OK)
         {
             if (element->node_type == NODE_COMMAND)
             {
@@ -268,9 +278,14 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
                 nb_children++;
             }
         }
-        else
+        else if (status == PARSER_UNEXPECTED_TOKEN)
         {
             break;
+        }
+        else
+        {
+            ast_free(result);
+            return PARSER_UNEXPECTED_TOKEN;
         }
     }
     result->children =
@@ -307,9 +322,6 @@ enum parser_status parse_element(struct ast **res, struct lexer *lexer)
         *res = word;
         return PARSER_OK;
     }
-    if (parse_redirection(res, lexer) == PARSER_OK)
-    {
-        return PARSER_OK;
-    }
-    return PARSER_UNEXPECTED_TOKEN;
+    enum parser_status status = parse_redirection(res, lexer);
+    return status;
 }

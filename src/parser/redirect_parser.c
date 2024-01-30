@@ -75,6 +75,7 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
             redirect = ast_new(NODE_REDIR_INOUT, 0, NULL);
             break;
         default:
+            free(io_number);
             return PARSER_UNEXPECTED_TOKEN;
         }
         lexer_pop(lexer, true);
@@ -90,6 +91,9 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
             *res = redirect;
             return PARSER_OK;
         }
+        ast_free(redirect);
+        free(io_number);
+        return PARSER_REALLY_NOT_OK;
     }
     free(io_number);
     return PARSER_UNEXPECTED_TOKEN;
