@@ -277,8 +277,22 @@ int handle_redirect(struct ast *ast)
 
         current++;
     }
-    int out = (command != NULL) ? handle_command(command, false) : 0;
-
+    int out;
+    if (command == NULL)
+    {
+        out = 0;
+    }
+    else
+    {
+        if (command->node_type == NODE_COMMAND)
+        {
+            out = handle_command(command, false);
+        }
+        else
+        {
+            out = evaluate_ast(command);
+        }
+    }
     dup2(save_stdin, STDIN_FILENO);
     dup2(save_stdout, STDOUT_FILENO);
     reset_env_variables(env_variables);
