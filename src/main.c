@@ -12,13 +12,9 @@
 
 void free_heap(struct lexer *lexer, struct ast *ast, FILE *input)
 {
-    struct hash_map *hm_vars = get_variables();
-    struct hash_map *hm_funcs = get_functions();
     ast_free(ast);
     free_lexer(lexer);
     fclose(input);
-    hash_map_free(hm_vars);
-    hash_map_free(hm_funcs);
 }
 
 int main_execution_loop(FILE *input, int options)
@@ -36,7 +32,6 @@ int main_execution_loop(FILE *input, int options)
     */
     struct ast *ast = NULL;
     enum parser_status status = parse_input(&ast, lexer);
-    setup_variables(0, NULL);
     int return_code = 0;
     while (status == PARSER_OK)
     {
@@ -94,5 +89,11 @@ int main(int argc, char **argv)
 {
     int options = 0;
     FILE *input = get_input(argc, argv, &options);
-    return main_execution_loop(input, options);
+    setup_variables(0, NULL);
+    int out = main_execution_loop(input, options);
+    struct hash_map *hm_vars = get_variables();
+    struct hash_map *hm_funcs = get_functions();
+    hash_map_free(hm_vars);
+    hash_map_free(hm_funcs);
+    return out;
 }

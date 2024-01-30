@@ -14,7 +14,9 @@ enum ast_type
     NODE_NOT,
     NODE_AND,
     NODE_OR,
+    NODE_SUBSHELL,
     NODE_WHILE,
+    NODE_FOR,
     NODE_UNTIL,
     NODE_REDIR,
     NODE_REDIR_IN,
@@ -24,9 +26,7 @@ enum ast_type
     NODE_REDIR_OUTAND,
     NODE_REDIR_INOUT,
     NODE_ASSIGN,
-    NODE_FUNCTION,
-    NODE_FOR,
-    NODE_SUBSHELL
+    NODE_FUNCTION
 };
 
 struct ast
