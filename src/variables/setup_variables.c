@@ -17,10 +17,10 @@ void setup_args(int nb_args, char **args)
     struct vector *vec = vector_create(100);
     if (*args)
     {
-        vector_append_string(vec, args[0]);
+        vector_append_string(vec, args[1]);
     }
 
-    for (int i = 1; i < nb_args; i++)
+    for (int i = 2; i < nb_args; i++)
     {
         vector_append(vec, ' ');
         vector_append_string(vec, args[i]);
@@ -46,8 +46,8 @@ void setup_args_n(int nb_args, char **args)
 
     for (int i = 0; i < nb_args; i++)
     {
-        char *key = itoa_base(i + 1);
-        hash_map_insert(hm_vars, key, args[i]);
+        char *key = itoa_base(i);
+        hash_map_insert(hm_vars, key, strdup(args[i]));
     }
 }
 
@@ -89,7 +89,7 @@ void setup_variables(int nb_args, char **args)
     hm_funcs = hash_map_init(25, HASH_MAP_AST);
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
-    setup_nb_args(nb_args);
+    setup_nb_args(nb_args - 1);
     setup_random(NULL);
     setup_uid();
     setup_pid();
