@@ -1,6 +1,8 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +24,7 @@ void set_variables(struct hash_map *hm);
 
 void set_functions(struct hash_map *hm);
 
-static inline int get_exit_value()
+static inline int get_exit_value(void)
 {
     hm_vars = get_variables();
     char *out = hash_map_get(hm_vars, "?");
@@ -39,19 +41,19 @@ static inline void setup_nb_args(int nb_args)
     hash_map_insert(hm_vars, strdup("#"), value);
 }
 
-static inline char *get_nb_args()
+static inline char *get_nb_args(void)
 {
     hm_vars = get_variables();
     return hash_map_get(hm_vars, "#");
 }
 
-static inline void setup_pid()
+static inline void setup_pid(void)
 {
     char *value = itoa_base(getpid());
     hash_map_insert(hm_vars, strdup("$"), value);
 }
 
-static inline char *get_pid()
+static inline char *get_pid(void)
 {
     hm_vars = get_variables();
     return hash_map_get(hm_vars, "$");
@@ -78,13 +80,13 @@ static inline char *get_random(char *pointer)
     return out;
 }
 
-static inline void setup_uid()
+static inline void setup_uid(void)
 {
     char *out = itoa_base(getuid());
     hash_map_insert(hm_vars, strdup("UID"), out);
 }
 
-static inline char *get_uid()
+static inline char *get_uid(void)
 {
     hm_vars = get_variables();
     return hash_map_get(hm_vars, "UID");

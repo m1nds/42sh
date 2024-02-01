@@ -41,6 +41,28 @@ enum parser_status parse_prefix(struct ast **res, struct lexer *lexer)
     return PARSER_UNEXPECTED_TOKEN;
 }
 
+struct ast *__switch_redirect(enum token token)
+{
+    switch (token)
+    {
+    case TOKEN_REDIR_STDIN:
+        return ast_new(NODE_REDIR_IN, 0, NULL);
+    case TOKEN_REDIR_STDOUT:
+        return  ast_new(NODE_REDIR_OUT, 0, NULL);
+    case TOKEN_REDIR_APPEND:
+        return ast_new(NODE_REDIR_OUTA, 0, NULL);
+    case TOKEN_REDIR_DUPIN:
+        return ast_new(NODE_REDIR_INAND, 0, NULL);
+    case TOKEN_REDIR_DUPOUT:
+        return ast_new(NODE_REDIR_OUTAND, 0, NULL);
+    case TOKEN_REDIR_INOUT:
+        return ast_new(NODE_REDIR_INOUT, 0, NULL);
+    default:
+        return NULL;
+    }
+    return NULL;
+}
+
 enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
 {
     enum token token = lexer_peek(lexer).curr_tok;
@@ -53,28 +75,9 @@ enum parser_status parse_redirection(struct ast **res, struct lexer *lexer)
     }
     if (token >= TOKEN_REDIR_STDIN && token <= TOKEN_REDIR_INOUT)
     {
-        struct ast *redirect = NULL;
-        switch (token)
+        struct ast *redirect = __switch_redirect(token);
+        if (redirect == NULL)
         {
-        case TOKEN_REDIR_STDIN:
-            redirect = ast_new(NODE_REDIR_IN, 0, NULL);
-            break;
-        case TOKEN_REDIR_STDOUT:
-            redirect = ast_new(NODE_REDIR_OUT, 0, NULL);
-            break;
-        case TOKEN_REDIR_APPEND:
-            redirect = ast_new(NODE_REDIR_OUTA, 0, NULL);
-            break;
-        case TOKEN_REDIR_DUPIN:
-            redirect = ast_new(NODE_REDIR_INAND, 0, NULL);
-            break;
-        case TOKEN_REDIR_DUPOUT:
-            redirect = ast_new(NODE_REDIR_OUTAND, 0, NULL);
-            break;
-        case TOKEN_REDIR_INOUT:
-            redirect = ast_new(NODE_REDIR_INOUT, 0, NULL);
-            break;
-        default:
             free(io_number);
             return PARSER_UNEXPECTED_TOKEN;
         }

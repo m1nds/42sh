@@ -86,29 +86,9 @@ enum parser_status parse_and_or(struct ast **res, struct lexer *lexer)
     return PARSER_OK;
 }
 
-enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
+static enum parser_status __parse_pipeline_loop(struct ast **res,
+                                                struct lexer *lexer)
 {
-    enum token not_tk = lexer_peek(lexer).curr_tok;
-    if (not_tk == TOKEN_NOT)
-    {
-        struct ast *not_ast = ast_new(NODE_NOT, 1, NULL);
-        struct ast *child = NULL;
-        lexer_pop(lexer, true);
-        if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
-        {
-            ast_free(not_ast);
-            return PARSER_UNEXPECTED_TOKEN;
-        }
-        not_ast->children[0] = child;
-        *res = not_ast;
-    }
-    else
-    {
-        if (parse_command(res, lexer) == PARSER_UNEXPECTED_TOKEN)
-        {
-            return PARSER_UNEXPECTED_TOKEN;
-        }
-    }
     enum token token = lexer_peek(lexer).curr_tok;
     if (token == TOKEN_REDIR_PIPE)
     {
@@ -149,6 +129,32 @@ enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
         pipe->children[nb_children + 1] = NULL;
     }
     return PARSER_OK;
+}
+
+enum parser_status parse_pipeline(struct ast **res, struct lexer *lexer)
+{
+    enum token not_tk = lexer_peek(lexer).curr_tok;
+    if (not_tk == TOKEN_NOT)
+    {
+        struct ast *not_ast = ast_new(NODE_NOT, 1, NULL);
+        struct ast *child = NULL;
+        lexer_pop(lexer, true);
+        if (parse_command(&child, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            ast_free(not_ast);
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+        not_ast->children[0] = child;
+        *res = not_ast;
+    }
+    else
+    {
+        if (parse_command(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+        {
+            return PARSER_UNEXPECTED_TOKEN;
+        }
+    }
+    return __parse_pipeline_loop(res, lexer);
 }
 
 enum parser_status __parse_redirects(struct ast **res, struct lexer *lexer)
@@ -216,42 +222,11 @@ enum parser_status parse_command(struct ast **res, struct lexer *lexer)
     return PARSER_UNEXPECTED_TOKEN;
 }
 
-enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
+static enum parser_status __parse_element_loop(struct ast **res,
+                                               struct ast *result,
+                                               size_t nb_children,
+                                               struct lexer *lexer)
 {
-    struct ast *result = ast_new(NODE_REDIR, 1, NULL);
-    size_t nb_children = 0;
-    char flag = 0;
-    if (parse_prefix(res, lexer) == PARSER_OK)
-    {
-        flag = 1;
-        result->children[0] = *res;
-        nb_children++;
-        struct ast *child = NULL;
-        while (parse_prefix(&child, lexer) == PARSER_OK)
-        {
-            result->children = realloc(result->children,
-                                       sizeof(struct ast) * (nb_children + 2));
-            result->children[nb_children] = child;
-            nb_children++;
-            child = NULL;
-        }
-        result->children[nb_children + 1] = NULL;
-    }
-    struct lexer_token_save token = lexer_peek(lexer);
-    if (token.curr_tok != TOKEN_WORD && token.curr_tok != TOKEN_ESCAPED_WORD)
-    {
-        if (flag == 1)
-        {
-            *res = result;
-            return PARSER_OK;
-        }
-        ast_free(result);
-        return PARSER_UNEXPECTED_TOKEN;
-    }
-    if (parse_element(res, lexer) == PARSER_UNEXPECTED_TOKEN)
-    {
-        return PARSER_UNEXPECTED_TOKEN;
-    }
     struct ast *command = *res;
     size_t loop = 1;
     while (true)
@@ -294,6 +269,45 @@ enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
     result->children[nb_children + 1] = NULL;
     *res = result;
     return PARSER_OK;
+}
+
+enum parser_status parse_simple_command(struct ast **res, struct lexer *lexer)
+{
+    struct ast *result = ast_new(NODE_REDIR, 1, NULL);
+    size_t nb_children = 0;
+    char flag = 0;
+    if (parse_prefix(res, lexer) == PARSER_OK)
+    {
+        flag = 1;
+        result->children[0] = *res;
+        nb_children++;
+        struct ast *child = NULL;
+        while (parse_prefix(&child, lexer) == PARSER_OK)
+        {
+            result->children = realloc(result->children,
+                                       sizeof(struct ast) * (nb_children + 2));
+            result->children[nb_children] = child;
+            nb_children++;
+            child = NULL;
+        }
+        result->children[nb_children + 1] = NULL;
+    }
+    struct lexer_token_save token = lexer_peek(lexer);
+    if (token.curr_tok != TOKEN_WORD && token.curr_tok != TOKEN_ESCAPED_WORD)
+    {
+        if (flag == 1)
+        {
+            *res = result;
+            return PARSER_OK;
+        }
+        ast_free(result);
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    if (parse_element(res, lexer) == PARSER_UNEXPECTED_TOKEN)
+    {
+        return PARSER_UNEXPECTED_TOKEN;
+    }
+    return __parse_element_loop(res, result, nb_children, lexer);
 }
 
 enum parser_status parse_element(struct ast **res, struct lexer *lexer)
