@@ -56,6 +56,6 @@ int dot(char **list_ptr)
         free(subpath);
         subpath = get_path(NULL);
     }
-
+    free(subpath);
     return (input != NULL) ? main_execution_loop(input, 0) : 1;
 }
