@@ -102,7 +102,7 @@ static int redirect_output_and(void *arg)
 static int redirect_output_append(void *arg)
 {
     struct ast *ast = (struct ast *)arg;
-    int user_flags = S_IWUSR | S_IWGRP | S_IWOTH;
+    int user_flags = 0644;
 
     int file_fd =
         open(ast->value[0], O_WRONLY | O_CREAT | O_APPEND, user_flags);
