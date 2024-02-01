@@ -260,6 +260,8 @@ static enum parser_status __parse_element_loop(struct ast **res,
         else
         {
             ast_free(result);
+            ast_free(command);
+            *res = NULL;
             return PARSER_UNEXPECTED_TOKEN;
         }
     }
