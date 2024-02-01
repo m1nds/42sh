@@ -39,6 +39,11 @@ void setup_args(int nb_args, char **args)
 
 void setup_args_n(int nb_args, char **args)
 {
+    if (args == NULL)
+    {
+        return;
+    }
+
     for (int i = 0; i < nb_args; i++)
     {
         char *key = itoa_base(i);
