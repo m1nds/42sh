@@ -39,11 +39,6 @@ void setup_args(int nb_args, char **args)
 
 void setup_args_n(int nb_args, char **args)
 {
-    if (args == NULL)
-    {
-        return;
-    }
-
     for (int i = 0; i < nb_args; i++)
     {
         char *key = itoa_base(i);
@@ -89,7 +84,7 @@ void setup_variables(int nb_args, char **args)
     hm_funcs = hash_map_init(25, HASH_MAP_AST);
     setup_args(nb_args, args);
     setup_args_n(nb_args, args);
-    setup_nb_args(nb_args - 1);
+    setup_nb_args(nb_args == 0 ? 0 : nb_args - 1);
     setup_random(NULL);
     setup_uid();
     setup_pid();
