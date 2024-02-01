@@ -36,6 +36,7 @@ int main_execution_loop(FILE *input, int options)
     {
         if (check_prettyprint(&options))
         {
+            printf("Printing AST\n");
             print_ast(ast);
         }
         if (ast != NULL)

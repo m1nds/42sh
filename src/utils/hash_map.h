@@ -55,12 +55,6 @@ bool hash_map_insert(struct hash_map *hash_map, char *key, void *value);
 void hash_map_free(struct hash_map *hash_map);
 
 /*
- * @def: print the hash map
- * @args hash_map: the hash map to print
- */
-void hash_map_dump(struct hash_map *hash_map);
-
-/*
  * @def: get the value of an element in hash map
  * @args hash_map: hash map to search into
  * @args key: key of the element to search
