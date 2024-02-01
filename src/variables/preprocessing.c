@@ -89,8 +89,9 @@ static void substitute_variable(char *string, struct vector *final_command,
     *command_name = name;
 }
 
-static void preprocessing_double_quotes(char *string, struct vector *final_command,
-                                 struct vector **command_name, size_t *i)
+static void preprocessing_double_quotes(char *string,
+                                        struct vector *final_command,
+                                        struct vector **command_name, size_t *i)
 {
     struct vector *name = *command_name;
     char name_flag = 0;
@@ -182,8 +183,7 @@ static void end_process_string(char **strings, size_t *i,
     }
 }
 
-static void reset_vectors(struct vector **final_command,
-                          struct vector **name)
+static void reset_vectors(struct vector **final_command, struct vector **name)
 {
     vector_destroy(*final_command);
     vector_destroy(*name);
@@ -192,7 +192,7 @@ static void reset_vectors(struct vector **final_command,
 }
 
 static void preprocessing_strings(char **strings, struct vector *final_command,
-                           struct vector *name, enum ast_type node_type)
+                                  struct vector *name, enum ast_type node_type)
 {
     size_t i = -1;
     while (strings[++i] != NULL)
@@ -244,8 +244,8 @@ static void preprocessing_strings(char **strings, struct vector *final_command,
                 {
                     j++;
                 }
-                add_character_to_vector(strings[i][j++], final_command,
-                                        name, name_flag);
+                add_character_to_vector(strings[i][j++], final_command, name,
+                                        name_flag);
             }
         }
         vector_append(name, '\0');

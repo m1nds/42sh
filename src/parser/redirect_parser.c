@@ -48,7 +48,7 @@ struct ast *__switch_redirect(enum token token)
     case TOKEN_REDIR_STDIN:
         return ast_new(NODE_REDIR_IN, 0, NULL);
     case TOKEN_REDIR_STDOUT:
-        return  ast_new(NODE_REDIR_OUT, 0, NULL);
+        return ast_new(NODE_REDIR_OUT, 0, NULL);
     case TOKEN_REDIR_APPEND:
         return ast_new(NODE_REDIR_OUTA, 0, NULL);
     case TOKEN_REDIR_DUPIN:
