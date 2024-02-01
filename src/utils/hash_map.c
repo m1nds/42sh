@@ -103,34 +103,6 @@ void hash_map_free(struct hash_map *hash_map)
     free(hash_map);
 }
 
-void hash_map_dump(struct hash_map *hash_map)
-{
-    if (!hash_map)
-    {
-        return;
-    }
-    for (size_t k = 0; k < hash_map->size; k++)
-    {
-        if (hash_map->data[k])
-        {
-            struct pair_list *pl = hash_map->data[k];
-            while (pl)
-            {
-                printf("%s: %p", pl->key, pl->value);
-                pl = pl->next;
-                if (pl)
-                {
-                    printf(", ");
-                }
-                else
-                {
-                    printf("\n");
-                }
-            }
-        }
-    }
-}
-
 void *hash_map_get(const struct hash_map *hash_map, char *key)
 {
     if (!hash_map || !key)
