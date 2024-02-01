@@ -8,14 +8,45 @@
 #include "variables/preprocessing.h"
 #include "variables/variables.h"
 
+static struct ast *deep_copy_ast(struct ast *ast)
+{
+    if (ast == NULL)
+        return NULL;
+    char **value = NULL;
+    if (ast->value != NULL)
+    {
+        for (size_t i = 0; ast->value[i] != NULL; i++)
+        {
+            value = realloc(value, sizeof(char *) * (i + 2));
+            value[i] = calloc(strlen(ast->value[i]) + 1, sizeof(char));
+            value[i] = strcpy(value[i], ast->value[i]);
+            value[i + 1] = NULL;
+        }
+    }
+    struct ast *ret = ast_new(ast->node_type, 0, NULL);
+    ret->value = value;
+    if (ast->children != NULL)
+    {
+        for (size_t i = 0; ast->children[i] != NULL; i++)
+        {
+            ret->children =
+                realloc(ret->children, sizeof(struct ast *) * (i + 2));
+            ret->children[i] = deep_copy_ast(ast->children[i]);
+            ret->children[i + 1] = NULL;
+        }
+    }
+    return ret;
+}
+
 int handle_while(struct ast *ast)
 {
     if (ast->node_type != NODE_WHILE)
     {
         return -1;
     }
-
-    int condition = evaluate_ast(ast->children[0]);
+    struct ast *tmp = deep_copy_ast(ast->children[0]);
+    int condition = evaluate_ast(tmp);
+    ast_free(tmp);
     if (condition >= 999)
     {
         return condition;
@@ -23,12 +54,16 @@ int handle_while(struct ast *ast)
     int retour = 0;
     while (condition == 0)
     {
-        retour = evaluate_ast(ast->children[1]);
+        tmp = deep_copy_ast(ast->children[1]);
+        retour = evaluate_ast(tmp);
+        ast_free(tmp);
         if (retour >= 999)
         {
             return retour;
         }
-        condition = evaluate_ast(ast->children[0]);
+        tmp = deep_copy_ast(ast->children[0]);
+        condition = evaluate_ast(tmp);
+        ast_free(tmp);
         if (condition >= 999)
         {
             return condition;
@@ -44,13 +79,30 @@ int handle_until(struct ast *ast)
     {
         return -1;
     }
-
-    int condition = evaluate_ast(ast->children[0]);
+    struct ast *tmp = deep_copy_ast(ast->children[0]);
+    int condition = evaluate_ast(tmp);
+    ast_free(tmp);
+    if (condition >= 999)
+    {
+        return condition;
+    }
     int retour = 0;
     while (condition != 0)
     {
-        retour = evaluate_ast(ast->children[1]);
-        condition = evaluate_ast(ast->children[0]);
+        tmp = deep_copy_ast(ast->children[1]);
+        retour = evaluate_ast(tmp);
+        ast_free(tmp);
+        if (retour >= 999)
+        {
+            return retour;
+        }
+        tmp = deep_copy_ast(ast->children[0]);
+        condition = evaluate_ast(tmp);
+        ast_free(tmp);
+        if (condition >= 999)
+        {
+            return condition;
+        }
     }
 
     return retour;
@@ -109,34 +161,13 @@ static int mini_lexing(char **value, char ***arr)
     return i2;
 }
 
-static struct ast *deep_copy_ast(struct ast *ast)
+static void free_all_arg(char **arr)
 {
-    if (ast == NULL)
-        return NULL;
-    char **value = NULL;
-    if (ast->value != NULL)
+    for (int i = 0; arr[i] != NULL; i++)
     {
-        for (size_t i = 0; ast->value[i] != NULL; i++)
-        {
-            value = realloc(value, sizeof(char *) * (i + 2));
-            value[i] = calloc(strlen(ast->value[i]) + 1, sizeof(char));
-            value[i] = strcpy(value[i], ast->value[i]);
-            value[i + 1] = NULL;
-        }
+        free(arr[i]);
     }
-    struct ast *ret = ast_new(ast->node_type, 0, NULL);
-    ret->value = value;
-    if (ast->children != NULL)
-    {
-        for (size_t i = 0; ast->children[i] != NULL; i++)
-        {
-            ret->children =
-                realloc(ret->children, sizeof(struct ast *) * (i + 2));
-            ret->children[i] = deep_copy_ast(ast->children[i]);
-            ret->children[i + 1] = NULL;
-        }
-    }
-    return ret;
+    free(arr);
 }
 
 int handle_for(struct ast *ast)
@@ -157,9 +188,13 @@ int handle_for(struct ast *ast)
         struct ast *tmp = deep_copy_ast(ast->children[0]);
         r = evaluate_ast(tmp);
         ast_free(tmp);
-        free(arr[i]);
+        if (r >= 999)
+        {
+            free_all_arg(arr);
+            return r;
+        }
         i++;
     }
-    free(arr);
+    free_all_arg(arr);
     return r;
 }
