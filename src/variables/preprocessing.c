@@ -51,53 +51,64 @@ void preprocessing_single_quotes(char *string, struct vector *vec, size_t *i)
     (*i)++;
 }
 
-void preprocessing_double_quotes(char *string, struct vector *final_command,
-                                 struct vector **command_name, size_t *i)
+static void substitute_variable(char *string, struct vector *final_command,
+                                struct vector **command_name, size_t *i)
 {
     struct hash_map *hm_vars = get_variables();
     struct vector *name = *command_name;
+    if (strlen(name->data) == 0)
+    {
+        if (special_character(string[*i]) == 1)
+        {
+            vector_append(name, string[(*i)++]);
+        }
+        else
+        {
+            vector_append(final_command, '$');
+        }
+    }
+    char *val = NULL;
+    if (strcmp(name->data, "RANDOM") == 0)
+    {
+        val = get_random(name->data);
+    }
+    else
+    {
+        val = hash_map_get(hm_vars, name->data);
+    }
+    if (val == NULL)
+    {
+        val = getenv(name->data);
+    }
+    if (val != NULL)
+    {
+        vector_append_string(final_command, val);
+    }
+    vector_destroy(name);
+    name = vector_create(100);
+    *command_name = name;
+}
+
+static void preprocessing_double_quotes(char *string,
+                                        struct vector *final_command,
+                                        struct vector **command_name, size_t *i)
+{
+    struct vector *name = *command_name;
     char name_flag = 0;
+    char brackets_flag = 0;
     (*i)++;
     while (string[*i] != '"')
     {
         if (is_continuous_name(string[*i], strlen(name->data)) == 0
             && name_flag == 1)
         {
-            if (strlen(name->data) == 0)
-            {
-                if (special_character(string[*i]) == 1)
-                {
-                    vector_append(name, string[(*i)++]);
-                }
-                else
-                {
-                    vector_append(final_command, '$');
-                }
-            }
-            char *val = NULL;
-            if (strcmp(name->data, "RANDOM") == 0)
-            {
-                val = get_random(name->data);
-            }
-            else
-            {
-                val = hash_map_get(hm_vars, name->data);
-            }
-            if (val == NULL)
-            {
-                val = getenv(name->data);
-            }
-            if (val != NULL)
-            {
-                vector_append_string(final_command, val);
-            }
-            vector_destroy(name);
-            name = vector_create(100);
+            substitute_variable(string, final_command, &name, i);
             name_flag = 0;
-            if (string[*i] == '}')
+            if (string[*i] == '}' && brackets_flag == 1)
             {
                 (*i)++;
             }
+            brackets_flag = 0;
             continue;
         }
         else if (string[*i] == '\\')
@@ -111,6 +122,7 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
             if (string[*i] == '{')
             {
                 preprocessing_brackets(string, name, i);
+                brackets_flag = 1;
             }
             continue;
         }
@@ -126,35 +138,64 @@ void preprocessing_double_quotes(char *string, struct vector *final_command,
     }
     if (name_flag == 1)
     {
-        char *val = NULL;
-        if (strcmp(name->data, "RANDOM") == 0)
-        {
-            val = get_random(name->data);
-        }
-        else
-        {
-            val = hash_map_get(hm_vars, name->data);
-        }
-        if (val == NULL)
-        {
-            val = getenv(name->data);
-        }
-        if (val != NULL)
-        {
-            vector_append_string(final_command, val);
-        }
-        vector_destroy(name);
-        name = vector_create(100);
+        substitute_variable(string, final_command, &name, i);
     }
     *command_name = name;
     (*i)++;
 }
-void preprocessing_strings(char **strings, struct vector *final_command,
-                           struct vector *name, enum ast_type node_type)
+
+static void shift_strings(char **strings, size_t *i)
 {
-    struct hash_map *hm_vars = get_variables();
-    size_t i = 0;
-    while (strings[i] != NULL)
+    size_t k = *i;
+    for (; strings[k + 1] != NULL; k++)
+    {
+        strings[k] = strings[k + 1];
+    }
+    strings[k] = NULL;
+    (*i)--;
+}
+
+static void add_character_to_vector(char c, struct vector *final_command,
+                                    struct vector *name, char name_flag)
+{
+    if (name_flag == 0)
+    {
+        vector_append(final_command, c);
+    }
+    else
+    {
+        vector_append(name, c);
+    }
+}
+
+static void end_process_string(char **strings, size_t *i,
+                               struct vector *final_command, char quote_flag)
+{
+    free(strings[*i]);
+    vector_append(final_command, '\0');
+    if (strlen(final_command->data) == 0 && quote_flag == 0)
+    {
+        shift_strings(strings, i);
+    }
+    else
+    {
+        strings[*i] = strdup(final_command->data);
+    }
+}
+
+static void reset_vectors(struct vector **final_command, struct vector **name)
+{
+    vector_destroy(*final_command);
+    vector_destroy(*name);
+    *final_command = vector_create(100);
+    *name = vector_create(100);
+}
+
+static void preprocessing_strings(char **strings, struct vector *final_command,
+                                  struct vector *name, enum ast_type node_type)
+{
+    size_t i = -1;
+    while (strings[++i] != NULL)
     {
         size_t j = 0;
         char name_flag = 0;
@@ -165,61 +206,27 @@ void preprocessing_strings(char **strings, struct vector *final_command,
             if (is_continuous_name(strings[i][j], strlen(name->data)) == 0
                 && name_flag == 1)
             {
-                if (strlen(name->data) == 0)
-                {
-                    if (special_character(strings[i][j]) == 1)
-                    {
-                        vector_append(name, strings[i][j++]);
-                    }
-                    else
-                    {
-                        vector_append(final_command, '$');
-                    }
-                }
-                vector_append(name, '\0');
-                char *val = NULL;
-                if (strcmp(name->data, "RANDOM") == 0)
-                {
-                    val = get_random(name->data);
-                }
-                else
-                {
-                    val = hash_map_get(hm_vars, name->data);
-                }
-                if (val == NULL)
-                {
-                    val = getenv(name->data);
-                }
-                if (val != NULL)
-                {
-                    vector_append_string(final_command, val);
-                }
-                vector_destroy(name);
-                name = vector_create(100);
+                substitute_variable(strings[i], final_command, &name, &j);
                 name_flag = 0;
                 if (strings[i][j] == '}' && brackets_flag == 1)
                 {
                     j++;
                 }
                 brackets_flag = 0;
-                continue;
             }
             else if (strings[i][j] == '$')
             {
                 name_flag = 1;
-                j++;
-                if (strings[i][j] == '{')
+                if (strings[i][++j] == '{')
                 {
                     preprocessing_brackets(strings[i], name, &j);
                     brackets_flag = 1;
                 }
-                continue;
             }
             else if (strings[i][j] == '\'')
             {
                 preprocessing_single_quotes(strings[i], final_command, &j);
                 quote_flag = 1;
-                continue;
             }
             else if (strings[i][j] == '"')
             {
@@ -230,7 +237,6 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                 if (node_type == NODE_FOR)
                     vector_append(final_command, '\"');
                 quote_flag = 1;
-                continue;
             }
             else
             {
@@ -238,56 +244,17 @@ void preprocessing_strings(char **strings, struct vector *final_command,
                 {
                     j++;
                 }
-                if (name_flag == 0)
-                {
-                    vector_append(final_command, strings[i][j]);
-                }
-                else
-                {
-                    vector_append(name, strings[i][j]);
-                }
+                add_character_to_vector(strings[i][j++], final_command, name,
+                                        name_flag);
             }
-            j++;
         }
         vector_append(name, '\0');
-        char *val = NULL;
-        if (strcmp(name->data, "RANDOM") == 0)
+        if (name_flag == 1)
         {
-            val = get_random(name->data);
+            substitute_variable(strings[i], final_command, &name, &j);
         }
-        else
-        {
-            val = hash_map_get(hm_vars, name->data);
-        }
-        if (val == NULL)
-        {
-            val = getenv(name->data);
-        }
-        if (val != NULL)
-        {
-            vector_append_string(final_command, val);
-        }
-        free(strings[i]);
-        vector_append(final_command, '\0');
-        if (strlen(final_command->data) == 0 && quote_flag == 0)
-        {
-            size_t j = i;
-            for (; strings[j + 1] != NULL; j++)
-            {
-                strings[j] = strings[j + 1];
-            }
-            strings[j] = NULL;
-            i--;
-        }
-        else
-        {
-            strings[i] = strdup(final_command->data);
-        }
-        vector_destroy(final_command);
-        vector_destroy(name);
-        final_command = vector_create(100);
-        name = vector_create(100);
-        i++;
+        end_process_string(strings, &i, final_command, quote_flag);
+        reset_vectors(&final_command, &name);
     }
     vector_destroy(final_command);
     vector_destroy(name);
@@ -313,14 +280,5 @@ void replace_variables(struct ast *ast)
             preprocessing_strings(ast->value, final_command, name,
                                   ast->node_type);
         }
-    } /*
-     if (ast->children != NULL)
-     {
-         size_t i = 0;
-         while (ast->children[i] != NULL)
-         {
-             replace_variables(ast->children[i]);
-             i++;
-         }
-     }*/
+    }
 }

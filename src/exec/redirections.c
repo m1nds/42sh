@@ -234,6 +234,24 @@ void reset_env_variables(char **env_variables)
     }
 }
 
+static void close_fds(size_t i, int *fds)
+{
+    for (size_t c = 0; c < i; c++)
+        if (fds[c] != -1)
+            close(fds[c]);
+    free(fds);
+}
+
+static void end_redirect(int save_stdin, int save_stdout, char **env_variables)
+{
+    dup2(save_stdin, STDIN_FILENO);
+    dup2(save_stdout, STDOUT_FILENO);
+    reset_env_variables(env_variables);
+    free(env_variables);
+    close(save_stdin);
+    close(save_stdout);
+}
+
 int handle_redirect(struct ast *ast)
 {
     int save_stdin = dup(STDIN_FILENO);
@@ -271,8 +289,7 @@ int handle_redirect(struct ast *ast)
         {
             redirect_ptr redir = match_redirect_func((*current)->node_type);
             fds[i] = redir(*current);
-            fcntl(fds[i], F_SETFD, FD_CLOEXEC);
-            i++;
+            fcntl(fds[i++], F_SETFD, FD_CLOEXEC);
         }
 
         current++;
@@ -293,17 +310,7 @@ int handle_redirect(struct ast *ast)
             out = evaluate_ast(command);
         }
     }
-    dup2(save_stdin, STDIN_FILENO);
-    dup2(save_stdout, STDOUT_FILENO);
-    reset_env_variables(env_variables);
-    free(env_variables);
-    for (size_t c = 0; c < i; c++)
-        if (fds[c] != -1)
-            close(fds[c]);
-
-    close(save_stdin);
-    close(save_stdout);
-    free(fds);
-
+    close_fds(i, fds);
+    end_redirect(save_stdin, save_stdout, env_variables);
     return out;
 }
