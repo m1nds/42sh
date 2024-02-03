@@ -171,7 +171,7 @@ static void shift_strings(char **strings, size_t *i)
 }
 
 static int add_character_to_vector(char *c, struct vector *final_command,
-                                    struct vector *name, char name_flag)
+                                   struct vector *name, char name_flag)
 {
     int out = 0;
     if (c[0] == '\\')
