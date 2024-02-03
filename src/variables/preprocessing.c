@@ -7,7 +7,21 @@
 #include "utils/vector.h"
 #include "variables/variables.h"
 
-char is_continuous_name(char c, size_t len)
+struct eco_lines
+{
+    enum ast_type node_type;
+    char *s;
+};
+
+static struct eco_lines init_eco(enum ast_type node_type, char *s)
+{
+    struct eco_lines eco;
+    eco.node_type = node_type;
+    eco.s = s;
+    return eco;
+}
+
+static char is_continuous_name(char c, size_t len)
 {
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_')
     {
@@ -20,7 +34,7 @@ char is_continuous_name(char c, size_t len)
     return 0;
 }
 
-char special_character(char c)
+static char special_character(char c)
 {
     if (c == '$' || c == '*' || c == '#' || c == '?' || c == '@'
         || (c >= '0' && c <= '9'))
@@ -30,7 +44,7 @@ char special_character(char c)
     return 0;
 }
 
-void preprocessing_brackets(char *string, struct vector *name, size_t *i)
+static void preprocessing_brackets(char *string, struct vector *name, size_t *i)
 {
     (*i)++;
     while (string[*i] != '}')
@@ -40,7 +54,8 @@ void preprocessing_brackets(char *string, struct vector *name, size_t *i)
     }
 }
 
-void preprocessing_single_quotes(char *string, struct vector *vec, size_t *i)
+static void preprocessing_single_quotes(char *string, struct vector *vec,
+                                        size_t *i)
 {
     (*i)++;
     while (string[*i] != '\'')
@@ -191,6 +206,23 @@ static void reset_vectors(struct vector **final_command, struct vector **name)
     *name = vector_create(100);
 }
 
+static void destroy_vectors(struct vector *final_command, struct vector *name)
+{
+    vector_destroy(final_command);
+    vector_destroy(name);
+}
+
+static void handle_double_quotes(struct eco_lines eco,
+                                 struct vector *final_command,
+                                 struct vector **name, size_t *j)
+{
+    if (eco.node_type == NODE_FOR)
+        vector_append(final_command, '\"');
+    preprocessing_double_quotes(eco.s, final_command, name, j);
+    if (eco.node_type == NODE_FOR)
+        vector_append(final_command, '\"');
+}
+
 static void preprocessing_strings(char **strings, struct vector *final_command,
                                   struct vector *name, enum ast_type node_type)
 {
@@ -230,12 +262,8 @@ static void preprocessing_strings(char **strings, struct vector *final_command,
             }
             else if (strings[i][j] == '"')
             {
-                if (node_type == NODE_FOR)
-                    vector_append(final_command, '\"');
-                preprocessing_double_quotes(strings[i], final_command, &name,
-                                            &j);
-                if (node_type == NODE_FOR)
-                    vector_append(final_command, '\"');
+                struct eco_lines eco = init_eco(node_type, strings[i]);
+                handle_double_quotes(eco, final_command, &name, &j);
                 quote_flag = 1;
             }
             else
@@ -256,8 +284,7 @@ static void preprocessing_strings(char **strings, struct vector *final_command,
         end_process_string(strings, &i, final_command, quote_flag);
         reset_vectors(&final_command, &name);
     }
-    vector_destroy(final_command);
-    vector_destroy(name);
+    destroy_vectors(final_command, name);
 }
 // Replace function name by preprocessing
 void replace_variables(struct ast *ast)
