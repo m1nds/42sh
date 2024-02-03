@@ -8,7 +8,7 @@
 #include "utils/vector.h"
 #include "variables/variables.h"
 
-void setup_args(int nb_args, char **args)
+static void setup_args(int nb_args, char **args)
 {
     if (args == NULL)
     {
@@ -37,7 +37,7 @@ void setup_args(int nb_args, char **args)
     vector_destroy(vec);
 }
 
-void setup_args_n(int nb_args, char **args)
+static void setup_args_n(int nb_args, char **args)
 {
     if (args == NULL)
     {
@@ -60,6 +60,11 @@ void set_exit_value(int value)
 {
     char *str = itoa_base(value);
     hash_map_insert(hm_vars, strdup("?"), str);
+}
+
+static void setup_ifs(void)
+{
+    setenv("IFS", " \t\n", 1);
 }
 
 struct hash_map *get_variables(void)
@@ -94,4 +99,5 @@ void setup_variables(int nb_args, char **args)
     setup_uid();
     setup_pid();
     set_exit_value(0);
+    setup_ifs();
 }
