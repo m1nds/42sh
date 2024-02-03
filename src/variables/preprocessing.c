@@ -170,17 +170,36 @@ static void shift_strings(char **strings, size_t *i)
     (*i)--;
 }
 
-static void add_character_to_vector(char c, struct vector *final_command,
-                                    struct vector *name, char name_flag)
+static int add_character_to_vector(char *c, struct vector *final_command,
+                                   struct vector *name, char name_flag)
 {
+    int out = 0;
+    if (c[0] == '\\')
+    {
+        out++;
+    }
+    if (c[out] == '~' && out == 0)
+    {
+        char *home = getenv("HOME");
+        if (name_flag == 0)
+        {
+            vector_append_string(final_command, home);
+        }
+        else
+        {
+            vector_append_string(name, home);
+        }
+        return out + 1;
+    }
     if (name_flag == 0)
     {
-        vector_append(final_command, c);
+        vector_append(final_command, c[out]);
     }
     else
     {
-        vector_append(name, c);
+        vector_append(name, c[out]);
     }
+    return out + 1;
 }
 
 static void end_process_string(char **strings, size_t *i,
@@ -268,12 +287,8 @@ static void preprocessing_strings(char **strings, struct vector *final_command,
             }
             else
             {
-                if (strings[i][j] == '\\')
-                {
-                    j++;
-                }
-                add_character_to_vector(strings[i][j++], final_command, name,
-                                        name_flag);
+                j += add_character_to_vector(strings[i] + j, final_command,
+                                             name, name_flag);
             }
         }
         vector_append(name, '\0');
