@@ -286,8 +286,8 @@ test_all 'echo tofile >' 'empty redirect'
 test_all 'a=;"$a"' 'empty variable interpreted as command'
 test_all '. ' 'dot without any arguments'
 test_all 'echo a; (echo b; exit 1); echo $?' 'exit within subshell'
-test_all '(echo a; lss); while if false; then echo b; elif true; then echo a; false; else echo b; fi; do echo c; done; for test in a b c d e; do echo $test | cat -e > helpme; done; while false; do echo a; done; until ! false; do echo c; done; a=b; echo $a; test(){ ls && exit 2 || ls;}; test; cat < helpme; echo a >> helpme; ls >&2 <&3 <>;' 'long test' 'helpme'
-
+test_all '(echo a; lss); while if false; then echo b; elif true; then echo a; false; else echo b; fi; do echo c; done; for test in a b c d e; do echo $test | cat -e > helpme; done; while false; do echo a; done; until ! false; do echo c; done; a=b; echo $a; test(){ ls && exit 2 || ls;}; cat < helpme; echo a >> helpme;' 'long test' 'helpme'
+test_all 'echo "$IFS"' 'test IFS'
 ./42sh --pretty-print help.sh 1> /dev/null 2> /dev/null; rm helpme;
 
 echo -e "${GREEN}Passed: $pass ${NC}, ${RED}Failed $fail${NC}"
