@@ -173,6 +173,19 @@ static void shift_strings(char **strings, size_t *i)
 static void add_character_to_vector(char c, struct vector *final_command,
                                     struct vector *name, char name_flag)
 {
+    if (c == '~')
+    {
+        char *home = getenv("HOME");
+        if (name_flag == 0)
+        {
+            vector_append_string(final_command, home);
+        }
+        else
+        {
+            vector_append_string(name, home);
+        }
+        return;
+    }
     if (name_flag == 0)
     {
         vector_append(final_command, c);
