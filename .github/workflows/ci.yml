@@ -3,6 +3,8 @@ name: CI Script
 on:
   pull_request:
     branches: [ "master" ]
+  push:
+    branches: [ "master" ]
 permissions: write-all
 
 jobs:
